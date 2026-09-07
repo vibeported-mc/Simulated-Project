@@ -5,9 +5,9 @@ import com.simibubi.create.content.contraptions.MountedStorageManager;
 import dev.ryanhcode.offroad.content.blocks.borehead_bearing.BoreheadBearingBlockEntity;
 import dev.ryanhcode.offroad.content.blocks.borehead_bearing.BoreheadAttachedStorage;
 import dev.ryanhcode.offroad.service.OffroadMountedStorageService;
-import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import java.lang.ref.WeakReference;
 
 public class NeoForgeOffroadMountedStorageService implements OffroadMountedStorageService {
@@ -52,6 +52,23 @@ public class NeoForgeOffroadMountedStorageService implements OffroadMountedStora
             }
         }
 
+        /**
+         * <h2>26.2 note</h2>
+         * <p>{@code MountedItemStorageWrapper} is a {@code ResourceHandler<ItemResource>} now, not an
+         * {@code IItemHandler}, so the three methods this overrode are gone and the two it needs are
+         * different in shape:
+         *
+         * <ul>
+         *   <li>Simulation is a transaction rather than a flag. An insert or extract is applied when
+         *       the caller commits, and this wrapper never sees that commit -- so gating on
+         *       {@code insertAllowed} still works, but the unstall on a successful extract now fires
+         *       when the extract is <em>attempted</em> and would move something, including during a
+         *       simulation. The bearing's own guard makes a second start harmless, and the previous
+         *       code had the same shape for a simulated extract that returned a non-empty stack.</li>
+         *   <li>{@code setStackInSlot} became {@code IndexModifier.set}, which the parent implements
+         *       and this class only forwarded, so the override is dropped rather than rewritten.</li>
+         * </ul>
+         */
         class NeoForgeBoreheadInvWrapper extends MountedItemStorageWrapper {
 
             NeoForgeBoreheadInvWrapper(final MountedItemStorageWrapper wrapped) {
@@ -59,31 +76,27 @@ public class NeoForgeOffroadMountedStorageService implements OffroadMountedStora
             }
 
             @Override
-            public @NotNull ItemStack insertItem(final int slot, final @NotNull ItemStack stack, final boolean simulate) {
-                if (NeoforgeBoreheadBearingMountedStorage.this.insertAllowed) {
-                    return super.insertItem(slot, stack, simulate);
-                } else {
-                    return stack;
+            public int insert(final int index, final ItemResource resource, final int amount, final TransactionContext transaction) {
+                if (!NeoforgeBoreheadBearingMountedStorage.this.insertAllowed) {
+                    return 0;
                 }
+
+                return super.insert(index, resource, amount, transaction);
             }
 
             @Override
-            public @NotNull ItemStack extractItem(final int slot, final int amount, final boolean simulate) {
+            public int extract(final int index, final ItemResource resource, final int amount, final TransactionContext transaction) {
                 final BoreheadBearingBlockEntity bbe = NeoforgeBoreheadBearingMountedStorage.this.attachedBoreheadBearing.get();
-                if (bbe != null) {
-                    final ItemStack extracted = super.extractItem(slot, amount, simulate);
-                    if (!extracted.isEmpty()) {
-                        bbe.startUnstalling();
-                        return extracted;
-                    }
+                if (bbe == null) {
+                    return 0;
                 }
 
-                return ItemStack.EMPTY;
-            }
+                final int extracted = super.extract(index, resource, amount, transaction);
+                if (extracted > 0) {
+                    bbe.startUnstalling();
+                }
 
-            @Override
-            public void setStackInSlot(final int slot, final @NotNull ItemStack stack) {
-                super.setStackInSlot(slot, stack);
+                return extracted;
             }
         }
     }

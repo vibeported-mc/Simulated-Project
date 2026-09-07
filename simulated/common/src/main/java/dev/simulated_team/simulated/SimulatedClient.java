@@ -1,6 +1,7 @@
 package dev.simulated_team.simulated;
 
 import com.simibubi.create.content.contraptions.render.ActorClients;
+import dev.simulated_team.simulated.index.client.SimCustomItemRenderers;
 import dev.simulated_team.simulated.client.BlockPropertiesTooltip;
 import dev.simulated_team.simulated.content.blocks.altitude_sensor.AltitudeSensorActorClient;
 import dev.simulated_team.simulated.content.blocks.altitude_sensor.AltitudeSensorMovementBehaviour;
@@ -27,6 +28,10 @@ public class SimulatedClient {
 	public static final MergingGlueItemHandler MERGING_GLUE_ITEM_HANDLER = new MergingGlueItemHandler();
 
     public static void init() {
+        // Must happen before models are baked: Create's ModelSwapper wraps each of these items'
+        // baked models so the renderer is reached through the item's render state.
+        SimCustomItemRenderers.register();
+
         SimPartialModels.init();
 
         // 26.2: how an actor draws itself is registered here rather than implemented on the

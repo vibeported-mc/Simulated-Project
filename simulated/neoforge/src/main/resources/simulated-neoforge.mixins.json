@@ -13,7 +13,6 @@
     "harvesters.SableHarvesterMixin",
     "harvesters.SableHarvesterTickerMixin",
     "harvesters.SawTileEntityMixin",
-    "item_renderer.PhysicsStaffItemMixin",
     "multiloader.CommonRedstoneBlockMixin",
     "self_mixins.DiagramEntityMixin",
     "self_mixins.HoneyGlueEntityMixin",

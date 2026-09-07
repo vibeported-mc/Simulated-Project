@@ -208,10 +208,17 @@ public class SimNeoForgeCommonEvents {
 			event.addProvider(SimSoundEvents.REGISTRY.getProvider(event.getGenerator().getPackOutput()));
 		}
 
+		/**
+		 * <h2>26.2 note</h2>
+		 * <p>The three capabilities were renamed with the Transfer API rewrite -- ItemHandler,
+		 * FluidHandler and EnergyStorage became Item, Fluid and Energy -- and each now hands out a
+		 * transactional handler rather than the old simulate-flag interface. The wrappers were
+		 * rewritten to match; what is registered here is otherwise unchanged.
+		 */
 		@SubscribeEvent
 		public static void registerCapabilities(final RegisterCapabilitiesEvent event) {
 			for (final NeoForgeSimInventoryService.InventoryGetterHolder<? extends BlockEntity> getter : NeoForgeSimInventoryService.inventoryGetters) {
-				event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, getter.type(), (be, dir) -> {
+				event.registerBlockEntity(Capabilities.Item.BLOCK, getter.type(), (be, dir) -> {
 					final AbstractContainer container = getter.castBlockEntityAndGetInv(be, dir);
 					if (container == null) {
 						return null;
@@ -222,7 +229,7 @@ public class SimNeoForgeCommonEvents {
 			}
 
 			for (final NeoForgeSimInventoryService.TankGetterHolder<? extends BlockEntity> getter : NeoForgeSimInventoryService.fluidTankGetters) {
-				event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, getter.type(), (be, dir) -> {
+				event.registerBlockEntity(Capabilities.Fluid.BLOCK, getter.type(), (be, dir) -> {
 					final SingleTank container = getter.castBlockEntityAndGetInv(be, dir);
 					if (container == null) {
 						return null;
@@ -233,7 +240,7 @@ public class SimNeoForgeCommonEvents {
 			}
 
 			for (final NeoForgeSimInventoryService.EnergyGetterHolder<? extends BlockEntity> getter : NeoForgeSimInventoryService.energyGetters) {
-				event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, getter.type(), (be, dir) -> {
+				event.registerBlockEntity(Capabilities.Energy.BLOCK, getter.type(), (be, dir) -> {
 					final SingleBattery battery = getter.castBlockEntityAndGetInv(be, dir);
 					if (battery == null) {
 						return null;

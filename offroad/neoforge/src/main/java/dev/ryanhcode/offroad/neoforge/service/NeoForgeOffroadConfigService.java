@@ -18,7 +18,9 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+// 26.2: EventBusSubscriber.Bus is gone -- an event goes to the mod bus if it implements
+// IModBusEvent, so one annotation covers both and there is nothing left to name.
+@EventBusSubscriber
 public class NeoForgeOffroadConfigService implements OffroadConfig {
 
 	public static final Map<ModConfig.Type, ConfigBase> CONFIGS = new EnumMap<>(ModConfig.Type.class);

@@ -11,8 +11,9 @@ import dev.simulated_team.simulated.service.SimInventoryService;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -47,7 +48,8 @@ public class NeoForgeSimInventoryService implements SimInventoryService {
     @Override
     public <T extends InventoryLoaderWrapper> T getInventory(@Nullable final BlockEntity be, @Nullable final Direction dir) {
         if (be != null) {
-            final IItemHandler handler = be.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, be.getBlockPos(), dir);
+            // 26.2: the item capability is a ResourceHandler<ItemResource> under Capabilities.Item.
+            final ResourceHandler<ItemResource> handler = be.getLevel().getCapability(Capabilities.Item.BLOCK, be.getBlockPos(), dir);
             if (handler != null) {
                 return (T) new InventoryLoaderWrapperImpl(handler);
             }
