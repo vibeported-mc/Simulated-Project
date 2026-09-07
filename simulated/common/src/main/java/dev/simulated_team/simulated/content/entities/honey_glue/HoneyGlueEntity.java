@@ -63,7 +63,9 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
     public void tick() {
         this.xRotO = this.getXRot();
         this.yRotO = this.getYRot();
-        this.walkDistO = this.walkDist;
+        // 26.2: walkDist is moveDist -- the name says what it measures rather than assuming the
+        // entity walks -- and the previous-tick copy is gone, so there is nothing to carry over.
+
         this.xo = this.getX();
         this.yo = this.getY();
         this.zo = this.getZ();

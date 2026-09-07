@@ -3,8 +3,10 @@ package dev.simulated_team.simulated.network.packets.linked_typewriter;
 import com.mojang.serialization.DataResult;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.LinkedTypewriterEntries;
+import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.index.SimBlocks;
 import foundry.veil.api.network.handler.ServerPacketContext;
+import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -74,7 +76,10 @@ public record TypewriterSaveKeyToItemPacket(InteractionHand hand, LinkedTypewrit
 
         currentTag.put("Keys", keys);
         if (item.is(SimBlocks.LINKED_TYPEWRITER.asItem())) {
-            CustomData.set(DataComponents.BLOCK_ENTITY_DATA, item, currentTag);
+            // 26.2: block entity data is a TypedEntityData carrying the block entity's type
+            // alongside the tag, so it is set directly rather than through CustomData.
+            item.set(DataComponents.BLOCK_ENTITY_DATA,
+                    TypedEntityData.of(SimBlockEntityTypes.LINKED_TYPEWRITER.get(), currentTag));
         }
     }
 

@@ -21,8 +21,8 @@ public class EndSeaFadeTransformer implements ShaderPreProcessor {
 
             boolean anyMatches = false;
 
-            for (final RenderType renderType : renderTypes) {
-                if (ctx.isVertex() && minecraftContext.shaderInstance().equals("rendertype_%s".formatted(renderType.name))) {
+            for (final ChunkSectionLayer renderType : renderTypes) {
+                if (ctx.isVertex() && minecraftContext.shaderInstance().equals("rendertype_%s".formatted(renderType.label()))) {
                     anyMatches = true;
                 }
             }

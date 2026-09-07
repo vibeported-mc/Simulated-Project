@@ -228,7 +228,7 @@ public class KeyEditorScreen {
         guiGraphics.enableScissor(0, this.topPos() + 20, this.parentScreen.width, this.topPos() + KEY_MENU.height - 35);
 
         for (final KeyEntryWidget wrapper : this.keyboardEntryWrappers) {
-            wrapper.render(guiGraphics, mouseX, mouseY, pt, ps);
+            wrapper.extractRenderState(guiGraphics, mouseX, mouseY, pt, ps);
         }
 
         guiGraphics.disableScissor();
@@ -395,8 +395,8 @@ public class KeyEditorScreen {
                         : this.isHovered ? AllGuiTextures.BUTTON_HOVER
                         : this.green ? AllGuiTextures.BUTTON_GREEN : AllGuiTextures.BUTTON;
 
-                graphics.blit(RenderPipelines.GUI_TEXTURED, button.location, 0, 0, button.getStartX(), button.getStartY(), button.getWidth(),
-                        button.getHeight());
+                graphics.blit(RenderPipelines.GUI_TEXTURED, button.location, 0, 0, button.getStartX(), button.getStartY(),
+                        button.getWidth(), button.getHeight(), 256, 256);
                 this.icon.render(graphics, 1, 1);
             }
         }

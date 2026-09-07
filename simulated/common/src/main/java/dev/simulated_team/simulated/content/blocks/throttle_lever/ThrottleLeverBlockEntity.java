@@ -117,7 +117,6 @@ public class ThrottleLeverBlockEntity extends SmartBlockEntity implements IHaveG
         super.preRemoveSideEffects(pos, state);
     }
 
-    @Override
     public void setSignal(final int signal) {
         this.state = this.getBlockState().getValue(ThrottleLeverBlock.INVERTED) ? 15 - signal : signal;
         this.lastChange = 2;

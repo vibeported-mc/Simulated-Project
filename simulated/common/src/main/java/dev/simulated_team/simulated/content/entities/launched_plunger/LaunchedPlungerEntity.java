@@ -517,7 +517,8 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
         // 26.2: an owner is an EntityReference now, and setOwner is overloaded on both, so a bare
         // null does not pick one. Sets the owner to null so that plungers without a pair are removed when loaded.
         this.setOwner((Entity) null);
-        this.ownerUUID = null;
+        // 26.2: Projectile.ownerUUID is gone -- the owner is an EntityReference, and setOwner
+        // above already cleared it.
     }
 
     public boolean isPlunged() {
