@@ -312,8 +312,10 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
     }
 
     @Override
-    protected AABB makeBoundingBox() {
-        final AABB bb = this.getDimensions(this.getPose()).makeBoundingBox(this.position());
+    protected AABB makeBoundingBox(final Vec3 position) {
+        // 26.2: makeBoundingBox takes the position rather than reading it back off the entity, so
+        // that it can be asked about a position the entity has not moved to yet.
+        final AABB bb = this.getDimensions(this.getPose()).makeBoundingBox(position);
         return bb.move(0.0, -bb.getYsize() / 2.0, 0.0);
     }
 
@@ -385,7 +387,7 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
         final Optional<UUID> other = this.getData(OTHER_PLUNGER);
         other.ifPresent(value -> compoundTag.store("OtherPlunger", UUIDUtil.CODEC, value));
 
-        compoundTag.put("PlungedBlockPos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.getData(PLUNGED_BLOCK_POS)));
+        compoundTag.store("PlungedBlockPos", BlockPos.CODEC, this.getData(PLUNGED_BLOCK_POS));
         compoundTag.put("TargetPos", VecHelper.writeNBT(this.getData(TARGET_POS)));
         NBTHelper.writeEnum(compoundTag, "PlungedDir", this.getData(PLUNGED_DIRECTION));
         compoundTag.putBoolean("IsPlunged", this.getData(IS_PLUNGED));
@@ -512,7 +514,9 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
     @Override
     public void load(final ValueInput input) {
         super.load(input);
-        this.setOwner(null); // Sets the owner to null so that plungers without a pair will be removed when loaded
+        // 26.2: an owner is an EntityReference now, and setOwner is overloaded on both, so a bare
+        // null does not pick one. Sets the owner to null so that plungers without a pair are removed when loaded.
+        this.setOwner((Entity) null);
         this.ownerUUID = null;
     }
 

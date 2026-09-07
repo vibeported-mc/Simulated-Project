@@ -22,7 +22,6 @@ import net.createmod.catnip.api.data.Pair;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
