@@ -344,7 +344,7 @@ public class AugerShaftBlockEntity extends KineticBlockEntity implements ItemRec
 
         final int count = this.inventory.slot.getStack().getCount();
         if (count > 0) {
-            CreateLang.translate("tooltip.chute.contains", Component.translatable(this.inventory.slot.getStack().getDescriptionId())
+            CreateLang.translate("tooltip.chute.contains", this.inventory.slot.getStack().getHoverName()
                             .getString(), count)
                     .style(ChatFormatting.GREEN)
                     .forGoggles(tooltip);

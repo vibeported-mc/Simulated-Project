@@ -149,7 +149,7 @@ public class ContainerSlot implements NBTSerializable {
 
         slotTag.putInt("index", this.getIndex());
         if (!this.getStack().isEmpty()) {
-            slotTag.put("item", this.getStack().save(provider));
+            slotTag.store("item", ItemStack.CODEC, RegistryNbt.ops(provider), this.getStack());
         }
 
         return slotTag;

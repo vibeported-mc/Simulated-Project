@@ -66,7 +66,7 @@ public class PlungerLauncherItem extends Item {
             if (player.isShiftKeyDown()) {
                 LaunchedPlungerServerHandler.removePlayerPlungers(player);
                 if (player instanceof final ServerPlayer serverPlayer) {
-                    serverPlayer.displayClientMessage(SimLang.translate("plunger_launcher.clear_plungers").color(0xaaaaaa).component(), true);
+                    serverPlayer.sendSystemMessage(SimLang.translate("plunger_launcher.clear_plungers").color(0xaaaaaa).component(), true);
                 }
                 return InteractionResult.SUCCESS;
             }

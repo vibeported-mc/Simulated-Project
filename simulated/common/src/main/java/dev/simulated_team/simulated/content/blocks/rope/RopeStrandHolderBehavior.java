@@ -198,7 +198,8 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
         final RopeAttachment endAttachment = strand.getAttachment(RopeAttachmentPoint.END);
 
         // todo: no nice way to grab a potentially causing player to check for infinite materials :p
-        final boolean tileDrops = level.getGameRules().get(GameRules.BLOCK_DROPS);
+        final boolean tileDrops = !(level instanceof final ServerLevel serverLevel)
+                || serverLevel.getGameRules().get(GameRules.BLOCK_DROPS);
 
         if (endAttachment == null) {
             this.destroyRope(null, this.getAttachmentPoint(), tileDrops);
@@ -573,7 +574,8 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
             this.removeClientStrand();
         }
 
-        final boolean tileDrops = level.getGameRules().get(GameRules.BLOCK_DROPS);
+        final boolean tileDrops = !(level instanceof final ServerLevel serverLevel)
+                || serverLevel.getGameRules().get(GameRules.BLOCK_DROPS);
 
         if (!this.strandOwner && attachedStrand != null) {
             final RopeAttachment startAttachment = attachedStrand.getAttachment(RopeAttachmentPoint.START);

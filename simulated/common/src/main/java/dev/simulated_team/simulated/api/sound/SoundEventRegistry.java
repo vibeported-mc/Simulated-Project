@@ -95,7 +95,7 @@ public class SoundEventRegistry {
 		}
 
 		public DefinitionBuilder addEventVariant(final SoundEvent event, final UnaryOperator<SoundBuilder> operator) {
-			final SoundBuilder builder = SoundEventRegistry.this.new SoundBuilder(event.getLocation())
+			final SoundBuilder builder = SoundEventRegistry.this.new SoundBuilder(event.location())
 					.setType(SoundFile.Type.EVENT);
 			operator.apply(builder);
 			this.sounds.add(builder.build());

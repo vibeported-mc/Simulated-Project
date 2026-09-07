@@ -6,6 +6,7 @@ import dev.simulated_team.simulated.content.blocks.nav_table.navigation_target.N
 import dev.simulated_team.simulated.content.navigation_targets.lodestone_compass_compatability.LodestoneInformation;
 import dev.simulated_team.simulated.content.navigation_targets.lodestone_compass_compatability.LodestoneTrackingMap;
 import dev.simulated_team.simulated.index.SimDataComponents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -26,6 +27,9 @@ public class CompassNavigationTarget implements NavigationTarget {
 			}
 		}
 
-		return level.getSharedSpawnPos().getCenter();
+		// 26.2: the world spawn is RespawnData on the server rather than a position on the level.
+		return level instanceof final ServerLevel serverLevel
+				? serverLevel.getRespawnData().globalPos().pos().getCenter()
+				: Vec3.ZERO;
 	}
 }
