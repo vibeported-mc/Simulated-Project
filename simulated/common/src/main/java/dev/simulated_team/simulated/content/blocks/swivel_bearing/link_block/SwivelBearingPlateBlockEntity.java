@@ -93,7 +93,7 @@ public class SwivelBearingPlateBlockEntity extends KineticBlockEntity implements
         super.write(compound, registries, clientPacket);
 
         if (this.parent != null) {
-            compound.put("ParentPos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.parent));
+            compound.store("ParentPos", BlockPos.CODEC, this.parent);
         }
 
         if (this.parentSubLevelId != null) {

@@ -326,7 +326,7 @@ public class NameplateBlockEntity extends SmartBlockEntity implements ClipboardC
         if (this.controller) {
             tag.putInt("Width", this.controllerWidth);
         } else {
-            tag.put("ControllerPos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.controllerPos));
+            tag.store("ControllerPos", BlockPos.CODEC, this.controllerPos);
         }
     }
 

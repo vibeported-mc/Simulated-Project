@@ -15,6 +15,7 @@ import net.createmod.ponder.api.client.element.ElementLink;
 import net.createmod.ponder.api.client.element.WorldSectionElement;
 import net.createmod.ponder.api.client.scene.*;
 import net.minecraft.core.BlockPos;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;

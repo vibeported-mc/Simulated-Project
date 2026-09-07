@@ -115,7 +115,7 @@ public class LevititeBlendTicker {
 
 		tag.putBoolean("requiresCatalyst", this.requiresCatalyst);
 
-		tag.put("pos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.getPos()));
+		tag.store("pos", BlockPos.CODEC, this.getPos());
 		Identifier resourceLocation = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().getKey(this.context);
 		tag.putString("context", resourceLocation.toString());
 

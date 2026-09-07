@@ -184,7 +184,9 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
         final ItemStack itemStack = super.getCloneItemStack(level, pos, state, includeData, player);
         final BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null) {
-            BlockItem.setBlockEntityData(itemStack, blockEntity.getType(), blockEntity.saveWithoutMetadata(level.registryAccess()));
+            final TagValueOutput dropOutput = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, level.registryAccess());
+            blockEntity.saveWithoutMetadata(dropOutput);
+            BlockItem.setBlockEntityData(itemStack, blockEntity.getType(), dropOutput);
             if (blockEntity.components().has(DataComponents.CUSTOM_NAME)) {
                 itemStack.set(DataComponents.CUSTOM_NAME, blockEntity.components().get(DataComponents.CUSTOM_NAME));
             }

@@ -7,6 +7,8 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import dev.simulated_team.simulated.mixin_interface.extra_kinetics.KineticBlockEntityExtension;
 import dev.simulated_team.simulated.util.extra_kinetics.ExtraBlockPos;
 import dev.simulated_team.simulated.util.extra_kinetics.ExtraKinetics;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -171,7 +173,7 @@ public abstract class KineticBlockEntityMixin extends SmartBlockEntity implement
                 if (clientPacket) {
                     extraKinetics.readClient(extraKineticsTag, registries);
                 } else {
-                    extraKinetics.loadCustomOnly(extraKineticsTag, registries);
+                    extraKinetics.loadCustomOnly(TagValueInput.create(ProblemReporter.DISCARDING, registries, extraKineticsTag));
                 }
             }
         }

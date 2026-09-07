@@ -205,7 +205,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
         tag.putInt("Size", this.size);
 
         if (this.config != null) {
-            tag.put("Config", DiagramConfig.CODEC.encodeStart(NbtOps.INSTANCE, this.config).getOrThrow());
+            tag.store("Config", DiagramConfig.CODEC, this.config).getOrThrow();
         }
 
         NbtValueIO.store(output, tag);

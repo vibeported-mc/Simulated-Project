@@ -19,6 +19,9 @@ import net.createmod.ponder.api.client.element.WorldSectionElement;
 import net.createmod.ponder.api.client.level.PonderLevel;
 import net.createmod.ponder.api.client.scene.*;
 import net.createmod.ponder.api.client.scene.PonderScene;
+import com.simibubi.create.foundation.utility.RegistryNbt;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.RegistryAccess;
@@ -291,8 +294,8 @@ public class RedstoneScenes {
             final BlockEntity blockEntity = level.getBlockEntity(modulatingLink);
             final RegistryAccess registryAccess = level.registryAccess();
             final CompoundTag tag = blockEntity.saveWithFullMetadata(registryAccess);
-            tag.put(FrequencyLast, iron.save(registryAccess, new CompoundTag()));
-            blockEntity.loadWithComponents(tag, registryAccess);
+            tag.store(FrequencyLast, ItemStack.CODEC, RegistryNbt.ops(registryAccess), iron);
+            blockEntity.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, registryAccess, tag));
         });
     }
 

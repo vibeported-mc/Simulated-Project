@@ -48,7 +48,9 @@ public abstract class AbstractLinkedReceiverBlockEntity extends SmartBlockEntity
     }
 
     protected void createLink() {
-        final Pair<ValueBoxTransform, ValueBoxTransform> slots =
+        // 26.2 port: Create's value-box slots are an org.apache.commons Pair while this class's
+        // own getSignalFromLink hands back Catnip's, so one of the two has to be named in full.
+        final org.apache.commons.lang3.tuple.Pair<ValueBoxTransform, ValueBoxTransform> slots =
                 ValueBoxTransform.Dual.makeSlots(LinkedReceiverFrequencySlot::new);
         this.link = LinkBehaviour.receiver(this, slots, (signal) -> {});
     }
