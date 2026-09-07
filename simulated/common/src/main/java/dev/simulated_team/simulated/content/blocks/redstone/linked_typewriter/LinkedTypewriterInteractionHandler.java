@@ -226,7 +226,9 @@ public class LinkedTypewriterInteractionHandler {
 
             linkedControllerItems = emptyData;
         } else {
-            linkedControllerItems = new ObjectArrayList<>(linkedControllerData.stream().toList());
+            // 26.2: ItemContainerContents holds stack templates and hands out copies; a bare
+            // stream() would have leaked the stored entries.
+            linkedControllerItems = new ObjectArrayList<>(linkedControllerData.allItemsCopyStream().toList());
 
             while (linkedControllerItems.size() < 12) {
                 linkedControllerItems.add(ItemStack.EMPTY);

@@ -126,7 +126,8 @@ public class NameplateBlock extends HorizontalDirectionalBlock implements IBE<Na
         return SimBlockShapes.NAMEPLATE.get(pState.getValue(FACING));
     }
 
-    public Position getPositionState(final LevelAccessor level, final BlockPos pos, final Direction facing) {
+    // 26.2: updateShape hands over a LevelReader rather than a LevelAccessor, and this only reads.
+    public Position getPositionState(final LevelReader level, final BlockPos pos, final Direction facing) {
         Position outPos = Position.SINGLE;
 
         final BlockState leftState = level.getBlockState(pos.offset(facing.getClockWise(Direction.Axis.Y).getUnitVec3i()));

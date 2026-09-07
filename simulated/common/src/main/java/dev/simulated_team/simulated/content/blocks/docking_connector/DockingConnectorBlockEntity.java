@@ -442,7 +442,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         tag.putFloat("Feet", this.feet.getValue());
 
         if (this.otherConnectorPosition != null) {
-            tag.put("OtherConnector", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.otherConnectorPosition));
+            tag.store("OtherConnector", BlockPos.CODEC, this.otherConnectorPosition);
         }
 
         if (this.otherConnectorSubLevelId != null) {

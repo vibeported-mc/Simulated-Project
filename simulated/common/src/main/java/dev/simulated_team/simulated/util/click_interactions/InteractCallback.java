@@ -95,7 +95,7 @@ public interface InteractCallback {
 
         public boolean matches(final KeyMapping mapping) {
             if (this.mouse) {
-                return mapping.matchesMouse(this.key);
+                return mapping.matches(InputConstants.Type.MOUSE.getOrCreate(this.key));
             } else {
                 return mapping.matches(InputConstants.Type.KEYSYM.getOrCreate(this.key));
             }
