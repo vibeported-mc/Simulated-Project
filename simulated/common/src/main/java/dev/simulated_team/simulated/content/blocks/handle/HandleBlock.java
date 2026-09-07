@@ -83,7 +83,7 @@ public class HandleBlock extends AbstractDirectionalAxisBlock implements IBE<Han
             return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         if (canInteractWithHandle(player)) {
-            if (level.isClientSide && player.isLocalPlayer()) {
+            if (level.isClientSide() && player.isLocalPlayer()) {
                 SimClickInteractions.HANDLE_HANDLER.startHold(level, player, blockPos);
             }
             return InteractionResult.SUCCESS;
@@ -105,7 +105,7 @@ public class HandleBlock extends AbstractDirectionalAxisBlock implements IBE<Han
     @Override
     public void neighborChanged(final BlockState state, final Level worldIn, final BlockPos pos, final Block blockIn, final BlockPos fromPos,
                                 final boolean isMoving) {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
             return;
 
         final Direction blockFacing = state.getValue(FACING);

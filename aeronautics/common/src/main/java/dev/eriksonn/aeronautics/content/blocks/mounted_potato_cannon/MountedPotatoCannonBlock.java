@@ -57,7 +57,7 @@ public class MountedPotatoCannonBlock extends DirectionalAxisKineticBlock implem
 			if (slot.isEmpty() || slot.getType() == heldItem.getItem()) {
 				final long inserted = slot.insertStack(info, Math.min(heldItem.getCount(), 16), true);
 				if (inserted > 0) {
-					if (!level.isClientSide) {
+					if (!level.isClientSide()) {
 						slot.insertStack(info, Math.min(heldItem.getCount(), 16), false);
 					}
 
@@ -74,7 +74,7 @@ public class MountedPotatoCannonBlock extends DirectionalAxisKineticBlock implem
 				player.getInventory().placeItemBackInInventory(extracted);
 				slot.setStack(ItemStack.EMPTY);
 
-				if (!level.isClientSide) {
+				if (!level.isClientSide()) {
 					final long inserted = slot.insertStack(info, Math.min(heldItem.getCount(), 16), false);
 					heldItem.shrink((int) inserted);
 				}
@@ -88,7 +88,7 @@ public class MountedPotatoCannonBlock extends DirectionalAxisKineticBlock implem
 
 	@Override
 	public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block block, final BlockPos fromPos, final boolean isMoving) {
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return;
 		}
 

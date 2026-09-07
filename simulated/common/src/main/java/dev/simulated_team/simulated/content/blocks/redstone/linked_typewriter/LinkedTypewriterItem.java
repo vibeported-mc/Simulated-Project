@@ -50,7 +50,7 @@ public class LinkedTypewriterItem extends BlockItem {
 
         //should never be null here, but whatever
         if (frequency != null) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 return InteractionResult.CONSUME;
             }
 
@@ -64,7 +64,7 @@ public class LinkedTypewriterItem extends BlockItem {
             LinkedTypewriterInteractionHandler.setMode(LinkedTypewriterInteractionHandler.Mode.BINDING_FROM_ITEM);
             LinkedTypewriterItemBindHandler.setClickedPos(clickedPos);
             return InteractionResult.SUCCESS;
-        } else if (level.isClientSide) {
+        } else if (level.isClientSide()) {
             LinkedTypewriterItemBindHandler.reset();
         }
 
@@ -74,7 +74,7 @@ public class LinkedTypewriterItem extends BlockItem {
     @Override
     public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand usedHand) {
         final BlockHitResult blockHitResult = RaycastHelper.rayTraceRange(level, player, player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE));
-        if (blockHitResult.getType() == HitResult.Type.MISS && level.isClientSide) {
+        if (blockHitResult.getType() == HitResult.Type.MISS && level.isClientSide()) {
             LinkedTypewriterItemBindHandler.reset();
         }
 

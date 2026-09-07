@@ -29,7 +29,7 @@ public interface CrystalPropagationContext {
     void onCrystallize(Level level, BlockPos pos);
 
     default void onDefaultCrystallize(final Level level, final BlockPos pos) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             level.setBlockAndUpdate(pos, this.getCrystalBlockState(level, pos));
 
             if (AeroConfig.server().blocks.breakBlocksOnCrystallize.get()) {

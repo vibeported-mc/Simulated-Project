@@ -120,7 +120,7 @@ public class SteamVentBlock extends Block implements IBE<SteamVentBlockEntity>, 
 
     @Override
     public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block blockIn, final BlockPos fromPos, final boolean isMoving) {
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
 
         this.withBlockEntityDo(level, pos, SteamVentBlockEntity::updateRawSignal);

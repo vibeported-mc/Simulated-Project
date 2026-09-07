@@ -98,7 +98,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
 
         final Item linkedControllerItem = AllItems.LINKED_CONTROLLER.asItem();
         if (player.getMainHandItem().is(linkedControllerItem) || player.getOffhandItem().is(linkedControllerItem)) {
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 final ItemStack item = player.getMainHandItem().is(linkedControllerItem) ?
                         player.getMainHandItem() : player.getOffhandItem();
                 player.displayClientMessage(SimLang.translate("linked_typewriter.linked_controller_copy").component(), true);
@@ -106,7 +106,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
                 LinkedControllerClientHandler.MODE = LinkedControllerClientHandler.Mode.IDLE;
             }
 
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.sidedSuccess(level.isClientSide());
         }
 
         if (heldItem.isEmpty() && interactionHand == InteractionHand.MAIN_HAND) {
@@ -116,7 +116,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
                 final UUID uuid = player.getUUID();
 
                 if (player.isShiftKeyDown() && be.checkAndStartUsing(uuid)) {
-                    if (!level.isClientSide) {
+                    if (!level.isClientSide()) {
                         this.displayScreen(be, player);
                     } else {
                         LinkedTypewriterInteractionHandler.setMode(LinkedTypewriterInteractionHandler.Mode.SCREEN_BINDING);
@@ -195,7 +195,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
         assert level != null;
 
         final BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity != null && !level.isClientSide && player.isCreative() &&
+        if (blockEntity != null && !level.isClientSide() && player.isCreative() &&
                 blockEntity instanceof final LinkedTypewriterBlockEntity linkedTypewriterBlockEntity && (!linkedTypewriterBlockEntity.getTypewriterEntries().getKeyMap().isEmpty() || linkedTypewriterBlockEntity.components().has(DataComponents.CUSTOM_NAME))) {
 
             Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), this.getCloneItemStack(level, pos, state));

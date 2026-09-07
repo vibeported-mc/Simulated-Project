@@ -86,7 +86,7 @@ public class PhysicsAssemblerBlock extends FaceAttachedHorizontalDirectionalBloc
     protected InteractionResult useWithoutItem(final BlockState state, final Level level, final BlockPos pos, final Player player, final BlockHitResult hitResult) {
         // Deployer interaction
         if (player instanceof DeployerFakePlayer) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 this.withBlockEntityDo(level, pos, PhysicsAssemblerBlockEntity::assembleOrDisassemble);
             }
 
@@ -94,7 +94,7 @@ public class PhysicsAssemblerBlock extends FaceAttachedHorizontalDirectionalBloc
         }
 
         // Start holding
-        if (level.isClientSide && player.isLocalPlayer()) {
+        if (level.isClientSide() && player.isLocalPlayer()) {
             return this.onBlockEntityUse(level, pos, be -> {
                 SimClickInteractions.PHYSICS_ASSEMBLER_MANAGER.startHold(level, player, pos);
                 return InteractionResult.SUCCESS;

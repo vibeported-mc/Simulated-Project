@@ -54,7 +54,7 @@ public class BoreheadBearingBlock extends DirectionalAxisKineticBlock implements
         if (player.isShiftKeyDown())
             return InteractionResult.FAIL;
         if (stack.isEmpty()) {
-            if (level.isClientSide)
+            if (level.isClientSide())
                 return InteractionResult.SUCCESS;
             this.withBlockEntityDo(level, pos, be -> {
                 if (be.isRunning()) {
@@ -87,7 +87,7 @@ public class BoreheadBearingBlock extends DirectionalAxisKineticBlock implements
     @Override
     public InteractionResult onWrenched(final BlockState state, final UseOnContext context) {
         final InteractionResult resultType = super.onWrenched(state, context);
-        if (!context.getLevel().isClientSide && resultType.consumesAction()) {
+        if (!context.getLevel().isClientSide() && resultType.consumesAction()) {
             final BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
 
             if (be instanceof BoreheadBearingBlockEntity) {

@@ -121,7 +121,7 @@ public class PlungerLauncherItemRenderer extends CustomRenderedItemModelRenderer
 
                 final Vec3 focusPos1 = LaunchedPlungerEntityRenderer.getFirstPersonFocusPos(0f);
                 for (int i = 0; i < Math.random() * 4; i++) {
-                    final Vec3 m2 = VecHelper.offsetRandomly(player.getViewVector(0), player.level().random, 0.5f);
+                    final Vec3 m2 = VecHelper.offsetRandomly(player.getViewVector(0), player.level().getRandom(), 0.5f);
                     player.level().addParticle(new AirParticleData(1, 1 / 4f), focusPos1.x, focusPos1.y, focusPos1.z, m2.x, m2.y, m2.z);
                 }
 

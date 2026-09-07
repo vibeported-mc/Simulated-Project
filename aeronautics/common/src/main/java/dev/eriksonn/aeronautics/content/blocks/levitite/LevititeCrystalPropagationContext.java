@@ -30,7 +30,7 @@ public class LevititeCrystalPropagationContext implements CrystalPropagationCont
     public void onCrystallize(final Level level, final BlockPos pos) {
         this.onDefaultCrystallize(level, pos);
 
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             AeroSoundEvents.LEVITITE_BLEND_CRYSTALLIZE.play(level, null, pos, 1.0f, 1.0f);
             LevititeBlendHelper.spawnParticles(level, pos, ParticleTypes.FLAME, 30);
             AeroAdvancements.UNIDENTIFIED_FLOATING_OBJECT.awardToNearby(pos, level);

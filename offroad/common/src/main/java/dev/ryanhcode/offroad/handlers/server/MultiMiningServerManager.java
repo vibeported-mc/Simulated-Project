@@ -44,7 +44,7 @@ public class MultiMiningServerManager {
      * @return Whether the given position is a newly added one
      */
     public static boolean addOrRefreshPos(final Level level, final BlockPos pos, final MultiMiningSupplier supplier) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return false;
         }
 
@@ -57,7 +57,7 @@ public class MultiMiningServerManager {
     }
 
     public static void tick(final Level level) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return;
         }
 

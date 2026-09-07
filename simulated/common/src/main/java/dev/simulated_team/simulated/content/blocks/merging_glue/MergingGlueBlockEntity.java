@@ -198,10 +198,10 @@ public class MergingGlueBlockEntity extends SmartBlockEntity implements BlockEnt
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(tag, registries, clientPacket);
 
-        this.isController = tag.getBoolean("Controller");
+        this.isController = tag.getBooleanOr("Controller", false);
 
         if (tag.contains("PartnerPosition")) {
-            this.partnerPosition = BlockPos.of(tag.getLong("PartnerPosition"));
+            this.partnerPosition = BlockPos.of(tag.getLongOr("PartnerPosition", 0L));
         }
     }
 

@@ -16,7 +16,7 @@ public class SimLevelUtil {
         if (!((ILevelReaderExtension) level).isAreaLoaded(center, range)) {
             return false;
         } else {
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 final int minY = center.getY() - range;
                 final int maxY = center.getY() + range;
                 if (maxY < level.getMinBuildHeight() || minY >= level.getMaxBuildHeight()) {

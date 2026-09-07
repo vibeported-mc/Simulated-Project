@@ -167,7 +167,7 @@ public abstract class KineticBlockEntityMixin extends SmartBlockEntity implement
         if (this instanceof final ExtraKinetics ek) {
             final KineticBlockEntity extraKinetics = ek.getExtraKinetics();
             if (extraKinetics != null) {
-                final CompoundTag extraKineticsTag = compound.getCompound(ek.getExtraKineticsSaveName());
+                final CompoundTag extraKineticsTag = compound.getCompoundOrEmpty(ek.getExtraKineticsSaveName());
                 if (clientPacket) {
                     extraKinetics.readClient(extraKineticsTag, registries);
                 } else {
@@ -177,7 +177,7 @@ public abstract class KineticBlockEntityMixin extends SmartBlockEntity implement
         }
 
         if (compound.contains("ConnectedToExtraKinetics")) {
-            this.simulated$extraKineticsConnected = compound.getBoolean("ConnectedToExtraKinetics");
+            this.simulated$extraKineticsConnected = compound.getBooleanOr("ConnectedToExtraKinetics", false);
         }
     }
 

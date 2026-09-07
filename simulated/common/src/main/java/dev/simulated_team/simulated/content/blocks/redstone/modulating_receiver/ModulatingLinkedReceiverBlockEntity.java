@@ -104,13 +104,13 @@ public class ModulatingLinkedReceiverBlockEntity extends AbstractLinkedReceiverB
 
     @Override
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
-        this.distanceToClosest = compound.getDouble("DistanceToClosest");
+        this.distanceToClosest = compound.getDoubleOr("DistanceToClosest", 0.0);
 
         if (!clientPacket ||
                 !(Minecraft.getInstance().screen instanceof final ModulatingLinkedReceiverScreen screen) ||
                 !screen.isThisBlock(this.getBlockPos())) {
-            this.minRange = compound.getInt("MinRange");
-            this.maxRange = compound.getInt("MaxRange");
+            this.minRange = compound.getIntOr("MinRange", 0);
+            this.maxRange = compound.getIntOr("MaxRange", 0);
         }
 
         super.read(compound, registries, clientPacket);
@@ -135,8 +135,8 @@ public class ModulatingLinkedReceiverBlockEntity extends AbstractLinkedReceiverB
         if (simulate)
             return true;
 
-        this.minRange = tag.getInt("minRange");
-        this.maxRange = tag.getInt("maxRange");
+        this.minRange = tag.getIntOr("minRange", 0);
+        this.maxRange = tag.getIntOr("maxRange", 0);
         this.sendData();
         return true;
     }

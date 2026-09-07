@@ -370,18 +370,18 @@ public class TorsionSpringBlockEntity extends KineticBlockEntity implements Extr
         @Override
         protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
             super.read(compound, registries, clientPacket);
-            this.oldAngle = compound.getDouble("OldAngle");
-            this.angle = compound.getDouble("Angle");
-            this.targetAngle = compound.getDouble("TargetAngle");
-            this.lastSpringSpeed = compound.getFloat("LastSpringSpeed");
+            this.oldAngle = compound.getDoubleOr("OldAngle", 0.0);
+            this.angle = compound.getDoubleOr("Angle", 0.0);
+            this.targetAngle = compound.getDoubleOr("TargetAngle", 0.0);
+            this.lastSpringSpeed = compound.getFloatOr("LastSpringSpeed", 0.0f);
             this.sequencedAngleLimit = compound.contains("SequencedAngleLimit") ? compound.getDouble("SequencedAngleLimit") : -1;
-            this.rotationProgressTicks = compound.getInt("RotationProgressTicks");
-            this.rotationDurationTicks = compound.getInt("RotationDurationTicks");
-            this.generatedSpeed = compound.getFloat("GeneratedSpeed");
-            this.queuedSpeed = compound.getFloat("QueuedSpeed");
+            this.rotationProgressTicks = compound.getIntOr("RotationProgressTicks", 0);
+            this.rotationDurationTicks = compound.getIntOr("RotationDurationTicks", 0);
+            this.generatedSpeed = compound.getFloatOr("GeneratedSpeed", 0.0f);
+            this.queuedSpeed = compound.getFloatOr("QueuedSpeed", 0.0f);
 
             if (compound.contains("CurrentState"))
-                this.currentState = State.values()[compound.getInt("CurrentState")];
+                this.currentState = State.values()[compound.getIntOr("CurrentState", 0)];
         }
 
         @Override

@@ -66,7 +66,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         assert this.level != null;
         this.entryMap.updateNetworks(this.level);
 
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             if (this.getBlockState().getValue(LinkedTypewriterBlock.POWERED) != this.powered) {
                 this.level.setBlockAndUpdate(this.getBlockPos(), this.getBlockState().setValue(LinkedTypewriterBlock.POWERED, this.powered));
             }
@@ -113,7 +113,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
 
                 this.powered = true;
                 playerEx.simulated$setCurrentTypewriter(this.getBlockPos());
-                if (this.level.isClientSide) {
+                if (this.level.isClientSide()) {
                     LinkedTypewriterInteractionHandler.associateTypewriter(this);
                 } else {
                     this.level.playSound(null, this.worldPosition, AllSoundEvents.CONTROLLER_PUT.getMainEvent(), SoundSource.BLOCKS, 1.0F, 0.95F + 0.1F * this.level.getRandom().nextFloat());
@@ -149,7 +149,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
      * Disconnects the current user.
      */
     public void disconnectUser() {
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             this.pressedKeys.clear();
             this.entryMap.deactivateAll();
             this.setChanged();
@@ -246,7 +246,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(tag, registries, clientPacket);
 
-        this.typedEntry = tag.getString("typedEntry");
+        this.typedEntry = tag.getStringOr("typedEntry", "");
         this.entryMap = LinkedTypewriterEntries.readKeys(registries, tag.getList("Keys", 10), this.getBlockPos());
         if (tag.contains("CurrentUser")) {
             this.currentUser = tag.getUUID("CurrentUser");

@@ -136,7 +136,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
             }
         }
 
-        if (this.otherConnectorPosition != null && !this.level.isClientSide) {
+        if (this.otherConnectorPosition != null && !this.level.isClientSide()) {
             if (!(this.level.getBlockEntity(this.otherConnectorPosition) instanceof final DockingConnectorBlockEntity be && Objects.equals(be.otherConnectorPosition, this.getBlockPos()))) {
                 this.unDock();
                 this.state = DockingConnectorState.EXTENDED;
@@ -458,10 +458,10 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
 
     @Override
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
-        this.powered = tag.getBoolean("IsPowered");
-        this.extension.setValue(tag.getFloat("Extension"));
-        this.extension.updateChaseTarget(tag.getFloat("Target"));
-        this.feet.setValue(tag.getFloat("Feet"));
+        this.powered = tag.getBooleanOr("IsPowered", false);
+        this.extension.setValue(tag.getFloatOr("Extension", 0.0f));
+        this.extension.updateChaseTarget(tag.getFloatOr("Target", 0.0f));
+        this.feet.setValue(tag.getFloatOr("Feet", 0.0f));
 
         // ensure current = old value for visual lerping
         this.extension.setValue(this.extension.getValue());
@@ -477,9 +477,9 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
             this.otherConnectorSubLevelId = tag.getUUID("OtherConnectorSubLevelId");
         }
 
-        this.inventory.read(registries, tag.getCompound("Inventory"));
-        this.tank.read(tag.getCompound("Tank"));
-        this.battery.read(tag.getCompound("Battery"));
+        this.inventory.read(registries, tag.getCompoundOrEmpty("Inventory"));
+        this.tank.read(tag.getCompoundOrEmpty("Tank"));
+        this.battery.read(tag.getCompoundOrEmpty("Battery"));
         super.read(tag, registries, clientPacket);
     }
 
@@ -497,7 +497,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     public void remove() {
         super.remove();
         this.removeConstraint();
-        if (this.level == null || !this.level.isClientSide) {
+        if (this.level == null || !this.level.isClientSide()) {
             this.ccWiredElement.remove();
         }
     }

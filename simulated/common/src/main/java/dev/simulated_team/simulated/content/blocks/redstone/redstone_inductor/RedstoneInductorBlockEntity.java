@@ -80,7 +80,7 @@ public class RedstoneInductorBlockEntity extends SmartBlockEntity implements IHa
 
         final boolean powered = this.getBlockState().getValue(RedstoneInductorBlock.POWERED);
 
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             if (tempPower == 0 && !powered) {
                 this.delayTicks = 0;
                 // setDischarge(false, level);
@@ -107,7 +107,7 @@ public class RedstoneInductorBlockEntity extends SmartBlockEntity implements IHa
             }
         }
 
-        if(this.level.isClientSide) this.lerpedState.tickChaser();
+        if(this.level.isClientSide()) this.lerpedState.tickChaser();
     }
 
     private void updateFacingBlock(final RedstoneInductorBlock block, final Level levelIn) {
@@ -131,8 +131,8 @@ public class RedstoneInductorBlockEntity extends SmartBlockEntity implements IHa
 
     @Override
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
-        this.outputSignal = tag.getInt("OutputSignal");
-        this.delayTicks = tag.getInt("DelayTicks");
+        this.outputSignal = tag.getIntOr("OutputSignal", 0);
+        this.delayTicks = tag.getIntOr("DelayTicks", 0);
         this.lerpedState.chase(this.outputSignal, 0.4, LerpedFloat.Chaser.EXP);
         super.read(tag, registries, clientPacket);
     }

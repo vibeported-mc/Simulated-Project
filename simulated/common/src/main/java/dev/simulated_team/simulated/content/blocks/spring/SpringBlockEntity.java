@@ -135,7 +135,7 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
     public void tick() {
         super.tick();
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             this.renderLength.updateChaseTarget((float) this.desiredLength);
             this.renderLength.tickChaser();
             return;
@@ -371,7 +371,7 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
 
     @Override
     public void remove() {
-        if (!this.level.isClientSide && this.partnerPos != null && !this.assembling) {
+        if (!this.level.isClientSide() && this.partnerPos != null && !this.assembling) {
             this.level.destroyBlock(this.partnerPos, false);
         }
 
@@ -445,8 +445,8 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(tag, registries, clientPacket);
 
-        this.isController = tag.getBoolean("Controller");
-        this.desiredLength = tag.getDouble("DesiredLength");
+        this.isController = tag.getBooleanOr("Controller", false);
+        this.desiredLength = tag.getDoubleOr("DesiredLength", 0.0);
 
         if (this.renderLength.getValue() == 0) {
             this.renderLength.setValue(this.desiredLength);
@@ -476,7 +476,7 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
         }
 
         if (tag.contains("Goal")) {
-            BlockPos blockPos = BlockPos.of(tag.getLong("Goal"));
+            BlockPos blockPos = BlockPos.of(tag.getLongOr("Goal", 0L));
 
             if (isPlacingFromSchematic) {
                 if (mapping != null) {

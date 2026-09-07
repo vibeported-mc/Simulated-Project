@@ -84,7 +84,7 @@ public class VelocitySensorBlockEntity extends SmartBlockEntity implements IHave
 
         final SubLevel subLevel = this.subLevelReference.get();
         final int redstoneStrengthBefore = this.signedRedstoneStrength;
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             if (subLevel != null) {
                 final float dot = (float) this.getGlobalVelocity().dot(subLevel.logicalPose().transformNormal(this.currentNormal, new Vector3d()));
                 if (Math.abs(dot) > 0.05) {
@@ -158,7 +158,7 @@ public class VelocitySensorBlockEntity extends SmartBlockEntity implements IHave
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(tag, registries, clientPacket);
 
-        this.adjustedVelocity = tag.getFloat("AdjustedVelocity");
+        this.adjustedVelocity = tag.getFloatOr("AdjustedVelocity", 0.0f);
         this.signedRedstoneStrength = Mth.clamp(-15, 15, tag.getInt("SignedRedstoneStrength"));
     }
 
@@ -247,7 +247,7 @@ public class VelocitySensorBlockEntity extends SmartBlockEntity implements IHave
 
         @Override
         public void read(final CompoundTag nbt, final HolderLookup.Provider registries, final boolean clientPacket) {
-            this.towards = nbt.getBoolean("ScrollValueTowards");
+            this.towards = nbt.getBooleanOr("ScrollValueTowards", false);
             super.read(nbt, registries, clientPacket);
         }
 

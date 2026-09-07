@@ -40,7 +40,7 @@ public class AirflowAABBInstruction extends TickingInstruction {
     @Override
     protected final void firstTick(final PonderScene scene) {
         super.firstTick(scene);
-        this.hash = scene.getWorld().random.nextInt();
+        this.hash = scene.getWorld().getRandom().nextInt();
     }
 
     @Override

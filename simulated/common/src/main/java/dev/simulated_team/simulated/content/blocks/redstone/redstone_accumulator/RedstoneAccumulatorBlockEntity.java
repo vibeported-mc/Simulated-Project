@@ -89,14 +89,14 @@ public class RedstoneAccumulatorBlockEntity extends SmartBlockEntity implements 
             this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
             this.level.updateNeighborsAt(this.worldPosition.relative(facing), this.getBlockState().getBlock());
         }
-        if(this.level.isClientSide) this.lerpedState.tickChaser();
+        if(this.level.isClientSide()) this.lerpedState.tickChaser();
         this.lerpedState.chase(this.outputSignal, 0.4, LerpedFloat.Chaser.EXP);
     }
 
     @Override
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
-        this.outputSignal = tag.getInt("OutputSignal");
-        this.delayTicks = tag.getInt("DelayTicks");
+        this.outputSignal = tag.getIntOr("OutputSignal", 0);
+        this.delayTicks = tag.getIntOr("DelayTicks", 0);
         this.lerpedState.chase(this.outputSignal, 0.4, LerpedFloat.Chaser.EXP);
         super.read(tag, registries, clientPacket);
     }

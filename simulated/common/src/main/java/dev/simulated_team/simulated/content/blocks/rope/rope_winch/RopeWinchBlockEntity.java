@@ -70,12 +70,12 @@ public class RopeWinchBlockEntity extends KineticBlockEntity implements RopeStra
         final ServerRopeStrand strand = this.ropeHolder.getOwnedStrand();
         final boolean hasRope = strand != null;
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             this.invalidateRenderBoundingBox();
             this.clientAngle.setValue(this.clientAngle.getValue() + this.getMovementSpeed());
         }
 
-        if (!this.level.isClientSide && hasRope && this.ropeHolder.ownsRope()) {
+        if (!this.level.isClientSide() && hasRope && this.ropeHolder.ownsRope()) {
             this.updateRopeStrandExtension(strand);
         }
 
@@ -104,8 +104,8 @@ public class RopeWinchBlockEntity extends KineticBlockEntity implements RopeStra
             }
 
             if (this.stretchTimer == 0) {
-                this.stretchTimer = this.level.random.nextIntBetweenInclusive(5 * 20, 15 * 20);
-                this.level.playSound(null, this.getBlockPos(), SimSoundEvents.ROPE_WINCH_STRETCH.event(), SoundSource.BLOCKS, 0.1f, 0.8f + this.level.random.nextFloat() * 0.2f);
+                this.stretchTimer = this.level.getRandom().nextIntBetweenInclusive(5 * 20, 15 * 20);
+                this.level.playSound(null, this.getBlockPos(), SimSoundEvents.ROPE_WINCH_STRETCH.event(), SoundSource.BLOCKS, 0.1f, 0.8f + this.level.getRandom().nextFloat() * 0.2f);
             }
 
             movementSpeed = Math.max(0.0f, movementSpeed);

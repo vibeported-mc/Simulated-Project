@@ -60,7 +60,7 @@ public class AnalogTransmissionBlockEntity extends KineticBlockEntity implements
     public void tick() {
         final int bestNeighborSignal = this.getLevel().getBestNeighborSignal(this.getBlockPos());
 
-        if (!this.getLevel().isClientSide) {
+        if (!this.getLevel().isClientSide()) {
             if (bestNeighborSignal != this.signal) {
                 //detach our own network, and our ExtraKinetic's
                 this.detachKinetics();
@@ -141,13 +141,13 @@ public class AnalogTransmissionBlockEntity extends KineticBlockEntity implements
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(compound, registries, clientPacket);
 
-        this.signal = compound.getInt("Signal");
-        this.oversaturated = compound.getBoolean("Oversaturated");
+        this.signal = compound.getIntOr("Signal", 0);
+        this.oversaturated = compound.getBooleanOr("Oversaturated", false);
     }
 
     @Override
     public boolean isOverStressed() {
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             return this.oversaturated || this.overStressed;
         }
 

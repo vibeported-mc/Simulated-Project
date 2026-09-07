@@ -233,7 +233,7 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
         if(simulate) {
             return true;
         }
-        this.opacity = tag.getFloat("Opacity");
+        this.opacity = tag.getFloatOr("Opacity", 0.0f);
         return true;
     }
 

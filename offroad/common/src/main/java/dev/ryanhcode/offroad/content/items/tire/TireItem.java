@@ -18,7 +18,7 @@ public class TireItem extends Item {
     public InteractionResult useOn(final @NotNull UseOnContext context) {
         final Player player = context.getPlayer();
 
-        if (player != null && player.level().isClientSide) {
+        if (player != null && player.level().isClientSide()) {
             player.displayClientMessage(Component.translatable("item.offroad.tire.placement_error")
                     .setStyle(Style.EMPTY.withColor(SimColors.NUH_UH_RED)), true);
         }

@@ -118,7 +118,7 @@ public class HotAirBurnerBlock extends Block implements IBE<HotAirBurnerBlockEnt
     @Override
     public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block blockIn, final BlockPos fromPos,
                                 final boolean isMoving) {
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
         this.withBlockEntityDo(level, pos, HotAirBurnerBlockEntity::updateSignal);
         final boolean previouslyPowered = state.getValue(POWERED);

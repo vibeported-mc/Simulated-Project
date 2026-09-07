@@ -244,7 +244,7 @@ public class PropellerActorBehaviour extends BlockEntityBehaviour implements IHa
      * Spawn simple airflow particles
      */
     public void spawnParticles() {
-        if (!this.getWorld().isClientSide)
+        if (!this.getWorld().isClientSide())
             return;
         if (this.propellerLayers.isEmpty())
             return;

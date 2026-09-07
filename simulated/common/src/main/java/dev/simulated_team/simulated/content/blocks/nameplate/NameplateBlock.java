@@ -196,7 +196,7 @@ public class NameplateBlock extends HorizontalDirectionalBlock implements IBE<Na
             return success.booleanValue() ? InteractionResult.SUCCESS : InteractionResult.TRY_WITH_EMPTY_HAND;
         }
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             this.withBlockEntityDo(level, blockPos, nbe -> {
                 final NameplateBlockEntity controller = nbe.findController();
                 if(!controller.waxed) {

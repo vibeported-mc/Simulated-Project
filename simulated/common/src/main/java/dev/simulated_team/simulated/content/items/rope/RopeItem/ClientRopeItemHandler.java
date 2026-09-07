@@ -113,7 +113,7 @@ public class ClientRopeItemHandler {
                 final int segments = (((int) totalFlyingTicks) / 3) + 1;
 
                 for (int i = 0; i < segments; i++) {
-                    final Vec3 vec = globalFirstPoint.lerp(globalTarget, level.random.nextFloat());
+                    final Vec3 vec = globalFirstPoint.lerp(globalTarget, level.getRandom().nextFloat());
                     level.addParticle(data, vec.x, vec.y, vec.z, 0, 0, 0);
                 }
             }

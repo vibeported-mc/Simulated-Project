@@ -210,9 +210,9 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
     @Override
     public void readAdditionalSaveData(final CompoundTag tag) {
         if (tag.contains("Facing", Tag.TAG_ANY_NUMERIC)) {
-            this.direction = Direction.from3DDataValue(tag.getByte("Facing"));
-            this.verticalOrientation = Direction.from3DDataValue(tag.getByte("Orientation"));
-            this.size = tag.getInt("Size");
+            this.direction = Direction.from3DDataValue(tag.getByteOr("Facing", (byte) 0));
+            this.verticalOrientation = Direction.from3DDataValue(tag.getByteOr("Orientation", (byte) 0));
+            this.size = tag.getIntOr("Size", 0);
         } else {
             this.direction = Direction.SOUTH;
             this.verticalOrientation = Direction.DOWN;
@@ -220,7 +220,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
         }
 
         if (tag.contains("Config", Tag.TAG_COMPOUND)) {
-            final CompoundTag configTag = tag.getCompound("Config");
+            final CompoundTag configTag = tag.getCompoundOrEmpty("Config");
             this.config = DiagramConfig.CODEC.parse(NbtOps.INSTANCE, configTag).getOrThrow();
         } else {
             this.config = DiagramConfig.makeDefault(this);
@@ -416,7 +416,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
     @Override
     public InteractionResult interactAt(final Player player, final Vec3 vec, final InteractionHand hand) {
 
-        if (this.level().isClientSide) {
+        if (this.level().isClientSide()) {
             final SubLevel subLevel = Sable.HELPER.getContaining(this);
 
             if (subLevel == null) {

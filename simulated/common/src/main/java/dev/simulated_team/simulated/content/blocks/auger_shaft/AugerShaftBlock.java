@@ -118,14 +118,14 @@ public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<Au
         if (!(blockState.getBlock() instanceof AugerCogBlock)) {
             final Boolean encased = blockState.getValue(ENCASED);
             if (encased && AllItems.WRENCH.isIn(player.getItemInHand(interactionHand))) {
-                if (level.isClientSide)
+                if (level.isClientSide())
                     return InteractionResult.SUCCESS;
 
                 level.setBlockAndUpdate(blockPos, blockState.cycle(ENCASED));
                 level.levelEvent(2001, blockPos, Block.getId(AllBlocks.INDUSTRIAL_IRON_BLOCK.getDefaultState()));
                 return InteractionResult.SUCCESS;
             } else if (!encased && player.getItemInHand(interactionHand).is(AllBlocks.INDUSTRIAL_IRON_BLOCK.asItem())) {
-                if (level.isClientSide)
+                if (level.isClientSide())
                     return InteractionResult.SUCCESS;
 
                 level.setBlockAndUpdate(blockPos, blockState.cycle(ENCASED));
@@ -140,7 +140,7 @@ public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<Au
     @Override
     public InteractionResult onWrenched(final BlockState state, final UseOnContext context) {
         final Level level = context.getLevel();
-        if (level.isClientSide)
+        if (level.isClientSide())
             return InteractionResult.SUCCESS;
 
         return this.transformAuger(state, SimBlocks.AUGER_COG.getDefaultState(), context, level);

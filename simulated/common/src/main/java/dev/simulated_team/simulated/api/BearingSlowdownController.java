@@ -203,11 +203,11 @@ public class BearingSlowdownController {
     }
 
     public void deserializeFromNBT(final CompoundTag nbt) {
-        this.countdown = nbt.getFloat("CurrentTime");
-        this.maxTime = nbt.getFloat("DisassemblyTimerTotal");
-        this.symmetry = ContraptionSymmetry.values()[nbt.getInt("Symmetry")];
-        this.initialAngle = nbt.getFloat("InitialSlowdownAngle");
-        this.initialVelocity = nbt.getFloat("InitialSlowdownVelocity");
+        this.countdown = nbt.getFloatOr("CurrentTime", 0.0f);
+        this.maxTime = nbt.getFloatOr("DisassemblyTimerTotal", 0.0f);
+        this.symmetry = ContraptionSymmetry.values()[nbt.getIntOr("Symmetry", 0)];
+        this.initialAngle = nbt.getFloatOr("InitialSlowdownAngle", 0.0f);
+        this.initialVelocity = nbt.getFloatOr("InitialSlowdownVelocity", 0.0f);
         this.generateConstants();
         this.applyVelocityClamping();
     }

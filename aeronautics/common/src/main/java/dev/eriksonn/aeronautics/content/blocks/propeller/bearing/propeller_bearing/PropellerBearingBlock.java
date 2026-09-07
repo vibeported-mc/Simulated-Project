@@ -46,7 +46,7 @@ public class PropellerBearingBlock extends BearingBlock implements IBE<Propeller
         if (player.isShiftKeyDown())
             return InteractionResult.FAIL;
         if (stack.isEmpty()) {
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
 
                 return InteractionResult.SUCCESS;
             }

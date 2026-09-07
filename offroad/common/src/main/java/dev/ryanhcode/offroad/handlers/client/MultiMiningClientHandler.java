@@ -43,7 +43,7 @@ public class MultiMiningClientHandler {
     private LevelAccelerator accelerator;
 
     public static void handleInboundClientUpdate(final Level level, final Map<BlockPos, ClientBlockBreakingData> incomingData, final int breakingID) {
-        if (!level.isClientSide || incomingData.isEmpty()) {
+        if (!level.isClientSide() || incomingData.isEmpty()) {
             return;
         }
 
@@ -58,7 +58,7 @@ public class MultiMiningClientHandler {
     }
 
     public static void tick(final Level level) {
-        if (level instanceof PonderLevel || !level.isClientSide) {
+        if (level instanceof PonderLevel || !level.isClientSide()) {
             return;
         }
 

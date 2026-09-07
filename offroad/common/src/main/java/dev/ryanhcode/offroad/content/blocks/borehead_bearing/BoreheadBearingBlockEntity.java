@@ -139,7 +139,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
             this.movedContraption = null;
         }
 
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             this.visitedPositions.clear();
         }
 
@@ -150,7 +150,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
             return;
         }
 
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             this.updateMiningBlocks();
         }
     }
@@ -280,7 +280,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
         assert this.level != null;
 
         if (this.isSlowingDown()) {
-            if (this.slowdownController.stepGoal() && !this.level.isClientSide) {
+            if (this.slowdownController.stepGoal() && !this.level.isClientSide()) {
                 this.disassemble();
                 return;
             }
@@ -318,7 +318,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
 
     private int getRockCuttingAmount(final int minimumRockcuttingWheelAmount) {
         assert this.level != null;
-        int rockCuttingWheelAmount = this.level.isClientSide ? this.clientRockCutters : this.centerMiningPositions.size();
+        int rockCuttingWheelAmount = this.level.isClientSide() ? this.clientRockCutters : this.centerMiningPositions.size();
 
         if (minimumRockcuttingWheelAmount > 0) {
             rockCuttingWheelAmount = Math.max(rockCuttingWheelAmount, minimumRockcuttingWheelAmount);
@@ -347,7 +347,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
         if (this.insideMainTick && this.disassemblySlowdown) {
             float slowDownSpeed = this.slowdownController.getSpeed(1);
 
-            if (this.level.isClientSide) {
+            if (this.level.isClientSide()) {
                 slowDownSpeed *= ServerSpeedProvider.get();
                 slowDownSpeed += this.clientAngleDiff / 3f;
             }
@@ -444,7 +444,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
         this.setChanged();
         final BlockPos anchor = this.worldPosition.relative(blockState.getValue(BlockStateProperties.FACING));
         this.movedContraption.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             this.running = true;
             this.sendData();
         }
@@ -456,12 +456,12 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
     public void initializeContraption() {
         assert this.level != null;
 
-        if (!this.level.isClientSide && this.movedContraption instanceof final BoreheadContraptionEntity bce) {
+        if (!this.level.isClientSide() && this.movedContraption instanceof final BoreheadContraptionEntity bce) {
             ((BoreheadAttachedStorage) bce.getContraption().getStorage())
                     .attachBlockEntity(this);
         }
 
-        if (!this.initialized && this.movedContraption != null && !this.level.isClientSide) {
+        if (!this.initialized && this.movedContraption != null && !this.level.isClientSide()) {
             this.resetCenterMiningInfo();
 
             final Map<BlockPos, StructureTemplate.StructureBlockInfo> blocks = this.movedContraption.getContraption().getBlocks();

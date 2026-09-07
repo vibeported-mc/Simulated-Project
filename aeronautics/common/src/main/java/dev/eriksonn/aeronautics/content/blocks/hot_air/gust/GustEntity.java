@@ -56,7 +56,7 @@ public class GustEntity extends Entity implements IEntityWithComplexSpawn {
     public void tick() {
         super.tick();
 
-        if (this.level().isClientSide) {
+        if (this.level().isClientSide()) {
             this.spawnClientEffects();
         } else {
             final SubLevel subLevel = Sable.HELPER.getContaining(this);

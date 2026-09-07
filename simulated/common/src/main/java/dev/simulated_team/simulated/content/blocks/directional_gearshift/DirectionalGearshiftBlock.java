@@ -91,7 +91,7 @@ public class DirectionalGearshiftBlock extends DirectionalAxisKineticBlock imple
 
     @Override
     public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block blockIn, final BlockPos fromPos, final boolean isMoving) {
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
 
         final boolean previouslyLeftPowered = state.getValue(LEFT_POWERED);
@@ -165,7 +165,7 @@ public class DirectionalGearshiftBlock extends DirectionalAxisKineticBlock imple
 	@Override
 	public InteractionResult onWrenched(final BlockState state, final UseOnContext context) {
 		final InteractionResult interactionResult = super.onWrenched(state, context);
-		if (interactionResult.consumesAction() && !context.getLevel().isClientSide) { //make sure we detach when we rotate no matter what
+		if (interactionResult.consumesAction() && !context.getLevel().isClientSide()) { //make sure we detach when we rotate no matter what
 			this.detachKinetics(context.getLevel(), context.getClickedPos(), true);
 		}
 

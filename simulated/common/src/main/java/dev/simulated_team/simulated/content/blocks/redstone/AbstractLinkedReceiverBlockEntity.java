@@ -65,7 +65,7 @@ public abstract class AbstractLinkedReceiverBlockEntity extends SmartBlockEntity
     public void tick() {
         super.tick();
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             return;
         }
 
@@ -146,9 +146,9 @@ public abstract class AbstractLinkedReceiverBlockEntity extends SmartBlockEntity
     @Override
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(compound, registries, clientPacket);
-        this.receivedSignal = compound.getInt("Receive");
-        this.rawSignalValue = compound.getDouble("ReceivedValue");
-        this.receivedSignalChanged = compound.getBoolean("ReceivedChanged");
+        this.receivedSignal = compound.getIntOr("Receive", 0);
+        this.rawSignalValue = compound.getDoubleOr("ReceivedValue", 0.0);
+        this.receivedSignalChanged = compound.getBooleanOr("ReceivedChanged", false);
     }
 
     public int getReceivedSignal() {

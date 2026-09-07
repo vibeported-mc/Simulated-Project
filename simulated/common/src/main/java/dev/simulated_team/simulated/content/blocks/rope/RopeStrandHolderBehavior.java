@@ -312,7 +312,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
             this.removeServerStrand(level);
         }
 
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             this.removeClientStrand();
         }
     }
@@ -447,7 +447,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
     @Override
     public void read(final CompoundTag nbt, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(nbt, registries, clientPacket);
-        this.strandOwner = nbt.getBoolean("OwnStrand");
+        this.strandOwner = nbt.getBooleanOr("OwnStrand", false);
 
         if (nbt.contains("HasRopeAttached")) {
             this.attachedRopeID = nbt.getUUID("HasRopeAttached");
@@ -460,7 +460,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
                 this.removeClientStrand();
         } else {
             if (nbt.contains("Strand")) {
-                final CompoundTag strandNBT = nbt.getCompound("Strand");
+                final CompoundTag strandNBT = nbt.getCompoundOrEmpty("Strand");
 
                 if (this.ownedServerStrand == null) {
                     this.loadServerStrand(strandNBT);
@@ -568,7 +568,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
         final ServerRopeStrand attachedStrand = this.getAttachedStrand();
 
         final Level level = this.getLevel();
-        if (level != null && level.isClientSide) {
+        if (level != null && level.isClientSide()) {
             this.removeClientStrand();
         }
 

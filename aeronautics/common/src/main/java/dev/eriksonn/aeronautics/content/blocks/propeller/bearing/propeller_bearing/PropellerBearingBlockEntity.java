@@ -216,13 +216,13 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
     public void activeTick() {
         this.behavior.pushEntities();
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             this.behavior.spawnParticles();
         }
     }
 
     public void onDirectionChanged() {
-        if (!this.level.isClientSide && this.running) {
+        if (!this.level.isClientSide() && this.running) {
             this.updateGeneratedRotation();
         }
     }
@@ -279,7 +279,7 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
             speed = this.slowdownController.getSpeed(1);
         }
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             speed *= ServerSpeedProvider.get();
             speed += this.clientAngleDiff / 3f;
         }
@@ -305,7 +305,7 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
     }
 
     private void updateSlowdownSpeed() {
-        if (this.slowdownController.stepGoal() && !this.level.isClientSide) {
+        if (this.slowdownController.stepGoal() && !this.level.isClientSide()) {
             this.disassemble();
             return;
         }
@@ -319,7 +319,7 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
         super.attach(contraption);
         this.contraptionInitialize();
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             this.currentSoundInstance = AeroSoundDistUtil.tickPropellerSounds(this, this.currentSoundInstance);
         }
     }

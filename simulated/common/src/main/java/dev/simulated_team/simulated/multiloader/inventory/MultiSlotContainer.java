@@ -400,12 +400,12 @@ public abstract class MultiSlotContainer implements AbstractContainer {
     //This will be called after this container has been instantiated.
     @Override
     public void read(final HolderLookup.Provider provider, final CompoundTag nbt) {
-        this.storedItemCount = nbt.getInt("Stored Count");
+        this.storedItemCount = nbt.getIntOr("Stored Count", 0);
 
         final ListTag inv = nbt.getList("Items", Tag.TAG_COMPOUND);
         for (final Tag tag : inv) {
             final CompoundTag itemTag = (CompoundTag) tag;
-            final ContainerSlot slot = this.inventory.get(itemTag.getInt("index"));
+            final ContainerSlot slot = this.inventory.get(itemTag.getIntOr("index", 0));
             slot.read(provider, itemTag);
             this.populatedSlots.add(slot);
         }

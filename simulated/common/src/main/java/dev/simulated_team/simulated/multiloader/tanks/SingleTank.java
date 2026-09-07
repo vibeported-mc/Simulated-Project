@@ -90,8 +90,8 @@ public class SingleTank {
     }
 
     public void read(final CompoundTag tag) {
-        this.amount = tag.getInt("Amount");
-        this.type = CFluidType.read(tag.getCompound("Variant"));
+        this.amount = tag.getIntOr("Amount", 0);
+        this.type = CFluidType.read(tag.getCompoundOrEmpty("Variant"));
     }
 
     public CompoundTag write() {

@@ -108,8 +108,8 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
 
         final DyeColor color = SimItemService.getDyeColor(heldItem);
         if (color != null) {
-            if (!level.isClientSide)
-                level.playSound(null, blockPos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0f, 1.1f - level.random.nextFloat() * .2f);
+            if (!level.isClientSide())
+                level.playSound(null, blockPos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0f, 1.1f - level.getRandom().nextFloat() * .2f);
 
             final BlockState newState = BlockHelper.copyProperties(blockState, SimBlocks.PORTABLE_ENGINES.get(color).getDefaultState());
             level.setBlockAndUpdate(blockPos, newState);
@@ -118,7 +118,7 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
         }
 
         if (AllItems.CREATIVE_BLAZE_CAKE.isIn(heldItem)) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 if (be.isCurrentFuelInfinite()) {
                     if (be.isSuperHeated()) {
                         be.setCurrentBurnTime(0);
@@ -147,7 +147,7 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
                 final int transferAmount = Math.min(targetAmount - currentItemStack.getCount(), heldItem.getCount());
 
                 if (transferAmount <= 0)
-                    return InteractionResult.sidedSuccess(level.isClientSide);
+                    return InteractionResult.sidedSuccess(level.isClientSide());
 
                 slot.shrink(-transferAmount);
                 heldItem.shrink(transferAmount);
@@ -170,7 +170,7 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
 
         be.notifyUpdate();
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override

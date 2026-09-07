@@ -246,7 +246,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
         this.lastChasingYaw = this.chasingYaw;
         this.chasingYaw = Mth.lerp(0.4, this.chasingYaw, this.computeYaw());
 
-        if (!this.level.isClientSide) return;
+        if (!this.level.isClientSide()) return;
 
         if (tire == null) {
             this.angle = 0.0;
@@ -431,7 +431,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
     }
 
     protected int getSteeringSignal() {
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             return this.clientSteeringSignal;
         }
 

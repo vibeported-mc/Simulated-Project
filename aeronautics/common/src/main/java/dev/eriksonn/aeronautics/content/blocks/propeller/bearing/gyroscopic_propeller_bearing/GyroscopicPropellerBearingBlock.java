@@ -47,7 +47,7 @@ public class GyroscopicPropellerBearingBlock extends BearingBlock implements IBE
         if (player.isShiftKeyDown())
             return InteractionResult.FAIL;
         if (stack.isEmpty()) {
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
             }
             this.withBlockEntityDo(level, pos, te -> {
@@ -69,7 +69,7 @@ public class GyroscopicPropellerBearingBlock extends BearingBlock implements IBE
         final InteractionResult result = super.onWrenched(state, context);
 
         final Level level = context.getLevel();
-        if (level.isClientSide && result.consumesAction()) {
+        if (level.isClientSide() && result.consumesAction()) {
             final BlockState newState = this.getRotatedBlockState(state, context.getClickedFace());
             level.setBlock(context.getClickedPos(), newState, 2);
             this.withBlockEntityDo(context.getLevel(), context.getClickedPos(), be -> be.forceTilt(newState));

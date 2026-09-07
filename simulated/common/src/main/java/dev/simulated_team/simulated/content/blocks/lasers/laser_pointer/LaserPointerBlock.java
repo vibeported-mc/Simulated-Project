@@ -76,7 +76,7 @@ public class LaserPointerBlock extends DirectionalBlock implements IBE<LaserPoin
     @Override
     public void neighborChanged(final BlockState state, final Level world, final BlockPos pos, final Block neighborBlock, final BlockPos fromPos, final boolean moving) {
         super.neighborChanged(state, world, pos, neighborBlock, fromPos, moving);
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             final boolean powered = world.hasNeighborSignal(pos);
             world.setBlock(pos, state.setValue(POWERED, powered), 7);
         }

@@ -125,8 +125,8 @@ public class AltitudeSensorBlockEntity extends SmartBlockEntity implements IHave
 	@Override
 	protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
 		super.read(tag, registries, clientPacket);
-		this.highSignal = tag.getFloat("high_signal");
-		this.lowSignal = tag.getFloat("low_signal");
+		this.highSignal = tag.getFloatOr("high_signal", 0.0f);
+		this.lowSignal = tag.getFloatOr("low_signal", 0.0f);
 	}
 
 	@Override
@@ -181,8 +181,8 @@ public class AltitudeSensorBlockEntity extends SmartBlockEntity implements IHave
 		if(simulate) {
 			return true;
 		}
-		this.highSignal = tag.getFloat("high_signal");
-		this.lowSignal = tag.getFloat("low_signal");
+		this.highSignal = tag.getFloatOr("high_signal", 0.0f);
+		this.lowSignal = tag.getFloatOr("low_signal", 0.0f);
 		this.setChanged();
 		this.sendData();
 		return true;

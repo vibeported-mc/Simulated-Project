@@ -125,7 +125,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity
             this.tickBalloonLogic();
         }
 
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             if (!this.isVirtual()) {
                 this.notifyUpdate();
             }
@@ -141,7 +141,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity
         super.tick();
 
         this.ticksSinceSync++;
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             return;
         }
 
@@ -206,7 +206,7 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity
     public void invalidate() {
         super.invalidate();
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             AeroSoundDistUtil.removePosHotAirBurnerSound(this.getBlockPos());
         } else {
             this.removeFromBalloon();

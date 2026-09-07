@@ -63,7 +63,7 @@ public class SwivelBearingBlock extends DirectionalKineticBlock implements IBE<S
         }
 
         if (player.getItemInHand(interactionHand).isEmpty()) {
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
             }
 
@@ -102,7 +102,7 @@ public class SwivelBearingBlock extends DirectionalKineticBlock implements IBE<S
         if (!rotated.canSurvive(level, context.getClickedPos()))
             return InteractionResult.PASS;
 
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             this.withBlockEntityDo(level, pos, SwivelBearingBlockEntity::disassemble);
         }
 

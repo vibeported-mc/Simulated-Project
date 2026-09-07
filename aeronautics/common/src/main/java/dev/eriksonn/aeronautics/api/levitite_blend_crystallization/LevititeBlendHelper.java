@@ -29,7 +29,7 @@ public class LevititeBlendHelper {
     public static BlockState crystallizeLevititeBlend(final Level level, final BlockPos pos, final CrystalPropagationContext context) {
         context.onCrystallize(level, pos);
 
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             updateSurroundingLevititeBlend(level, pos, context);
         }
 
@@ -62,7 +62,7 @@ public class LevititeBlendHelper {
     }
 
     public static void spawnParticles(final Level pLevel, final BlockPos pPos, final ParticleOptions type, final int count) {
-        if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide()) {
             final double d0 = 0.5625D;
             final RandomSource random = pLevel.random;
             final ServerLevel serverLevel = (ServerLevel) pLevel;
@@ -72,7 +72,7 @@ public class LevititeBlendHelper {
     }
 
     public static void addLevititeBlendTicker(final Level level, final BlockPos pPos, final boolean requiresCatalyst, final boolean isDormant, final CrystalPropagationContext context) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             LevititeCrystallizerManager.addTicker(level, pPos, context.getNewAge(level, 0, isDormant), requiresCatalyst, isDormant, context);
         }
     }

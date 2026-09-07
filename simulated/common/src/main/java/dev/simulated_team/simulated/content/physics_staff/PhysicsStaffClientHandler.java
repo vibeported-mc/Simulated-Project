@@ -519,7 +519,7 @@ public class PhysicsStaffClientHandler {
             Vec3 previousPosition = new Vec3(0, 0, 0);
 
             void update() {
-                final RandomSource random = Minecraft.getInstance().level.random;
+                final RandomSource random = Minecraft.getInstance().level.getRandom();
                 this.previousPosition = this.position;
                 this.position = this.position.offsetRandom(random, 3).scale(0.5);
             }

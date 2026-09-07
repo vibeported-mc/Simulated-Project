@@ -86,7 +86,7 @@ public class AbsorberBlockEntity extends SmartBlockEntity {
         if(this.animationTimer.settled()) {
             this.animationTimer.updateChaseTarget(powered ? 1 : 0);
         }
-        if(this.animationTimer.settled() && !this.level.isClientSide)
+        if(this.animationTimer.settled() && !this.level.isClientSide())
         {
             if (powered) {
                 if (this.currentRegion == null) {
@@ -113,13 +113,13 @@ public class AbsorberBlockEntity extends SmartBlockEntity {
                     this.level.setBlock(this.getBlockPos(), this.getBlockState().cycle(AbsorberBlock.WET), 2);
             }
         }
-        if(this.level.isClientSide && this.animationTimer.getChaseTarget() < this.animationTimer.getValue() && this.getBlockState().getValue(AbsorberBlock.WET))
+        if(this.level.isClientSide() && this.animationTimer.getChaseTarget() < this.animationTimer.getValue() && this.getBlockState().getValue(AbsorberBlock.WET))
         {
             final BlockPos pos = this.getBlockPos();
             final float t = this.animationTimer.getValue();
             final float offset = 0.5f+t*t*0.5f;
             for (int i = 0; i < 2; i++) {
-                this.level.addParticle(ParticleTypes.SPLASH,pos.getX()+ this.level.random.nextFloat(),pos.getY()+offset,pos.getZ()+ this.level.random.nextFloat(),0,0,0);
+                this.level.addParticle(ParticleTypes.SPLASH,pos.getX()+ this.level.getRandom().nextFloat(),pos.getY()+offset,pos.getZ()+ this.level.getRandom().nextFloat(),0,0,0);
             }
 
         }

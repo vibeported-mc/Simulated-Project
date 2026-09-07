@@ -65,7 +65,7 @@ public class LinkedTypewriterEntries {
      * Handles all redstoneLinkFrequency handling when adding and removing and updating to the server handler
      */
     public void updateNetworks(final Level level) {
-        if (!level.isClientSide) { //Iterate through activated keys first then deactivated keys to make sure if a key is activated and deactivated in the same tick it always deactivates
+        if (!level.isClientSide()) { //Iterate through activated keys first then deactivated keys to make sure if a key is activated and deactivated in the same tick it always deactivates
             for (final KeyboardEntry keyboardEntry : this.newlyActivatedKeyboardEntries) {
                 Create.REDSTONE_LINK_NETWORK_HANDLER.addToNetwork(level, keyboardEntry);
             }

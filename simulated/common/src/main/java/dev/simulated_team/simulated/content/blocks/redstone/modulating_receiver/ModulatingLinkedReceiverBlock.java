@@ -110,7 +110,7 @@ public class ModulatingLinkedReceiverBlock extends WrenchableDirectionalBlock im
     @Override
     public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block blockIn, final BlockPos fromPos,
                                 final boolean isMoving) {
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
 
         final Direction blockFacing = state.getValue(FACING);

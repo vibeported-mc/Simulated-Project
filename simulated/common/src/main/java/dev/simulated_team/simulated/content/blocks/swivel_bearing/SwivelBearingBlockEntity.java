@@ -163,7 +163,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         super.tick();
         this.cogwheel.tick();
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             if (this.isTooFast()) {
                 this.playGrindingEffect();
             }
@@ -264,7 +264,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
     private void playGrindingEffect() {
         final Direction facing = this.getBlockState().getValue(SwivelBearingBlock.FACING);
 
-        final RandomSource random = this.level.random;
+        final RandomSource random = this.level.getRandom();
 
         final int stepX = facing.getStepX();
         final int stepY = facing.getStepY();
@@ -635,7 +635,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
     @Override
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(compound, registries, clientPacket);
-        this.targetAngleDegrees = compound.getDouble("TargetAngle");
+        this.targetAngleDegrees = compound.getDoubleOr("TargetAngle", 0.0);
 
         final SubLevelSchematicSerializationContext schematicContext = SubLevelSchematicSerializationContext.getCurrentContext();
 
@@ -679,7 +679,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
     @Override
     public void remove() {
-        if (!this.level.isClientSide && !this.assembling) {
+        if (!this.level.isClientSide() && !this.assembling) {
             // If we're actually removed and not just unloaded, let's break the plate as well
             this.destroyPlate();
         }

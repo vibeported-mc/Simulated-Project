@@ -39,8 +39,8 @@ public class AltitudeSensorMovementBehaviour implements MovementBehaviour {
 
     @Override
     public void renderInContraption(final MovementContext context, final VirtualRenderWorld renderWorld, final ContraptionMatrices matrices, final MultiBufferSource buffer) {
-        final float lowSignal = context.blockEntityData.getFloat("low_signal");
-        final float highSignal = context.blockEntityData.getFloat("high_signal");
+        final float lowSignal = context.blockEntityData.getFloatOr("low_signal", 0.0f);
+        final float highSignal = context.blockEntityData.getFloatOr("high_signal", 0.0f);
 
         final float visualHeight;
         if (context.temporaryData instanceof final Pair<?, ?> heights) {

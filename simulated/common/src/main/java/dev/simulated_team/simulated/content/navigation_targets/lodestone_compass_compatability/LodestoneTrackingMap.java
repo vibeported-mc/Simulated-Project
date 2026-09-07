@@ -59,7 +59,7 @@ public class LodestoneTrackingMap extends SavedData {
 	private static final BlockPos.MutableBlockPos DUMMY_POS = new BlockPos.MutableBlockPos();
 
 	public static LodestoneTrackingMap getOrLoad(final Level level) {
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return null;
 		}
 

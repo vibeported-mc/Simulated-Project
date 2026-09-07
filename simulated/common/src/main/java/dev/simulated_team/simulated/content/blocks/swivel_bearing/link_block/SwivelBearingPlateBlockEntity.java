@@ -43,7 +43,7 @@ public class SwivelBearingPlateBlockEntity extends KineticBlockEntity implements
     @Override
     public void remove() {
         // if the block was broken / destroyed, destroy our parent
-        if (!this.level.isClientSide && !this.assembling) {
+        if (!this.level.isClientSide() && !this.assembling) {
             this.destroyBearing();
         }
 

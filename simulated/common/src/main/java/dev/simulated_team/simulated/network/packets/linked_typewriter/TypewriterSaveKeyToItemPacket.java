@@ -59,7 +59,7 @@ public record TypewriterSaveKeyToItemPacket(InteractionHand hand, LinkedTypewrit
 
         for (int i = 0; i < keys.size(); i++) {
             final Tag key = keys.get(i);
-            final int glfwKey = ((CompoundTag) key).getInt("GLFWKey");
+            final int glfwKey = ((CompoundTag) key).getIntOr("GLFWKey", 0);
 
             if (glfwKey == this.entry.glfwKeyCode) {
                 alreadyPresent = true;

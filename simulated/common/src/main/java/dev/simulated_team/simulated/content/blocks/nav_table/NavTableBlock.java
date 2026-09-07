@@ -115,7 +115,7 @@ public class NavTableBlock extends DirectionalBlock implements IBE<NavTableBlock
                 nav.setChanged();
                 nav.sendData();
 
-                final float pitch = 0.8f + level.random.nextFloat() * 0.4f;
+                final float pitch = 0.8f + level.getRandom().nextFloat() * 0.4f;
                 final float volume = .75f;
 
                 if (extract.isEmpty() && !newSlotItem.isEmpty()) {

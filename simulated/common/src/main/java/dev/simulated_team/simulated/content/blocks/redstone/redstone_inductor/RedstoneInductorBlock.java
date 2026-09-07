@@ -63,7 +63,7 @@ public class RedstoneInductorBlock extends AbstractDiodeBlock implements IBE<Red
         if (AllItems.WRENCH.isIn(player.getItemInHand(pHand)))
             return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        if (pLevel.isClientSide) {
+        if (pLevel.isClientSide()) {
             addParticles(pState, pLevel, pPos, 1f);
             return InteractionResult.SUCCESS;
         }

@@ -44,8 +44,8 @@ public class ThrottleLeverBlockEntity extends SmartBlockEntity implements IHaveG
 
     @Override
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
-        this.state = compound.getInt("State");
-        this.lastChange = compound.getInt("ChangeTimer");
+        this.state = compound.getIntOr("State", 0);
+        this.lastChange = compound.getIntOr("ChangeTimer", 0);
         this.clientAngle.chase(this.getBlockState().getValue(ThrottleLeverBlock.INVERTED) ? 15 - this.state : this.state, 0.5f, LerpedFloat.Chaser.EXP);
         super.read(compound, registries, clientPacket);
     }
@@ -59,7 +59,7 @@ public class ThrottleLeverBlockEntity extends SmartBlockEntity implements IHaveG
                 this.updateOutput();
         }
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             this.clientAngle.tickChaser();
             final boolean pressed = SimClickInteractions.THROTTLE_LEVER_MANAGER.isBlockActive(this.getBlockPos());
             this.clientPressedLerp.updateChaseTarget(pressed ? 1 : 0);

@@ -160,7 +160,7 @@ public class SteeringWheelBlockEntity extends GeneratingKineticBlockEntity {
     public void tick() {
         super.tick();
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             this.oldClientAngle = this.clientAngle;
             if (SimClickInteractions.STEERING_WHEEL_MANAGER.isBlockActive(this.getBlockPos())) {
                 this.clientAngle = this.targetAngleToUpdate;
@@ -176,12 +176,12 @@ public class SteeringWheelBlockEntity extends GeneratingKineticBlockEntity {
         if (this.inUse > 0) {
             this.inUse--;
 
-            if (this.inUse == 0 && !this.level.isClientSide) {
+            if (this.inUse == 0 && !this.level.isClientSide()) {
                 this.sequenceContext = null;
                 this.generatedSpeed = 0;
                 this.updateGeneratedRotation();
             }
-        } else if(!this.level.isClientSide) {
+        } else if(!this.level.isClientSide()) {
             this.updateTargetAngle(this.targetAngleToUpdate);
         }
     }
@@ -253,29 +253,29 @@ public class SteeringWheelBlockEntity extends GeneratingKineticBlockEntity {
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(compound, registries, clientPacket);
 
-        this.angle = compound.getFloat("Angle");
+        this.angle = compound.getFloatOr("Angle", 0.0f);
         if (clientPacket) {
-            this.held = compound.getBoolean("Held");
+            this.held = compound.getBooleanOr("Held", false);
         }
 
         if (!clientPacket || !SimClickInteractions.STEERING_WHEEL_MANAGER.isBlockActive(this.getBlockPos())) {
-            this.targetAngle = compound.getFloat("TargetAngle");
+            this.targetAngle = compound.getFloatOr("TargetAngle", 0.0f);
             if (compound.contains("TargetAngleToUpdate")) {
-                this.targetAngleToUpdate = compound.getFloat("TargetAngleToUpdate");
+                this.targetAngleToUpdate = compound.getFloatOr("TargetAngleToUpdate", 0.0f);
             } else {
                 this.targetAngleToUpdate = this.targetAngle;
             }
         }
 
-        this.inUse = compound.getInt("InUse");
-        this.sequencedAngleLimit = compound.getDouble("SequencedAngleLimit");
-        this.generatedSpeed = compound.getFloat("GeneratedSpeed");
+        this.inUse = compound.getIntOr("InUse", 0);
+        this.sequencedAngleLimit = compound.getDoubleOr("SequencedAngleLimit", 0.0);
+        this.generatedSpeed = compound.getFloatOr("GeneratedSpeed", 0.0f);
 
         final BlockState prevMaterial = this.material;
         if (!compound.contains("Material"))
             return;
 
-        this.material = NbtUtils.readBlockState(this.blockHolderGetter(), compound.getCompound("Material"));
+        this.material = NbtUtils.readBlockState(this.blockHolderGetter(), compound.getCompoundOrEmpty("Material"));
         if (this.material.isAir())
             this.material = Blocks.SPRUCE_PLANKS.defaultBlockState();
 

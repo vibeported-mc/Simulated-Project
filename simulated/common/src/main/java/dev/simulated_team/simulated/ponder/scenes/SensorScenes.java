@@ -609,7 +609,7 @@ public class SensorScenes {
 
         scene.world().modifyBlockEntityNBT(util.select().position(gimbalLocation), GimbalSensorBlockEntity.class,
             nbt -> {
-                final CompoundTag powers = nbt.getCompound("Powers");
+                final CompoundTag powers = nbt.getCompoundOrEmpty("Powers");
                 powers.putInt(directions[index].getName(), power ? 15 : 0);
                 nbt.put("Powers", powers);
             });
@@ -638,7 +638,7 @@ public class SensorScenes {
         );
         scene.world().modifyBlockEntityNBT(util.select().position(gimbalLocation), GimbalSensorBlockEntity.class,
                 nbt -> {
-                    final CompoundTag powers = nbt.getCompound("Powers");
+                    final CompoundTag powers = nbt.getCompoundOrEmpty("Powers");
                     powers.putInt(directions[index].getName(), strength == 0 ? 0 : 15);
                     nbt.put("Powers", powers);
                 });
@@ -1199,10 +1199,10 @@ public class SensorScenes {
     private static void modifyKineticSpeed(final SceneBuilder scene, final Selection selection, final UnaryOperator<Float> speedFunc) {
         scene.world().modifyBlockEntityNBT(selection, KineticBlockEntity.class, nbt -> {
             if (nbt.contains("SwivelCog")) {
-                final CompoundTag innerTag = nbt.getCompound("SwivelCog");
-                innerTag.putFloat("Speed", -speedFunc.apply(innerTag.getFloat("Speed")));
+                final CompoundTag innerTag = nbt.getCompoundOrEmpty("SwivelCog");
+                innerTag.putFloat("Speed", -speedFunc.apply(innerTag.getFloatOr("Speed", 0.0f)));
             } else {
-                nbt.putFloat("Speed", speedFunc.apply(nbt.getFloat("Speed")));
+                nbt.putFloat("Speed", speedFunc.apply(nbt.getFloatOr("Speed", 0.0f)));
             }
         });
     }

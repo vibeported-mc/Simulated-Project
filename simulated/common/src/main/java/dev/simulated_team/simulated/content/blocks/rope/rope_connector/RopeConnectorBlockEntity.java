@@ -35,7 +35,7 @@ public class RopeConnectorBlockEntity extends SmartBlockEntity implements RopeSt
     public void tick() {
         super.tick();
 
-        if (this.level.isClientSide) {
+        if (this.level.isClientSide()) {
             this.invalidateRenderBoundingBox();
         }
     }
