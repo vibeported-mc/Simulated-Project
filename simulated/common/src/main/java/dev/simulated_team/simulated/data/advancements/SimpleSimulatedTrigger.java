@@ -1,7 +1,7 @@
 package dev.simulated_team.simulated.data.advancements;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.advancements.triggers.CriterionValidator;
+import net.minecraft.world.level.storage.loot.ValidationContextSource;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +40,6 @@ public class SimpleSimulatedTrigger extends SimulatedCriterionTriggerBase<Simula
         }
 
         @Override
-        public void validate(@NotNull final CriterionValidator criterionValidator) {}
+        public void validate(@NotNull final ValidationContextSource criterionValidator) {}
     }
 }

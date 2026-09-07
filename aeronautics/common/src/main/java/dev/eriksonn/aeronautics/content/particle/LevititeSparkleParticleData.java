@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
 import dev.eriksonn.aeronautics.index.AeroParticleTypes;
-import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -37,7 +37,7 @@ public class LevititeSparkleParticleData implements ParticleOptions, ICustomPart
     }
 
     @Override
-    public ParticleEngine.SpriteParticleRegistration<LevititeSparkleParticleData> getMetaFactory() {
+    public ParticleResources.SpriteParticleRegistration<LevititeSparkleParticleData> getMetaFactory() {
         return LevititeSparkleParticle.Factory::new;
     }
 

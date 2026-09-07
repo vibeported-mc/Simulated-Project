@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
 import dev.simulated_team.simulated.index.SimParticleTypes;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -38,7 +38,7 @@ public class MagnetFieldParticleData implements ParticleOptions, ICustomParticle
         return CODEC;
     }
 
-    public ParticleEngine.SpriteParticleRegistration<MagnetFieldParticleData> getMetaFactory() {
+    public ParticleResources.SpriteParticleRegistration<MagnetFieldParticleData> getMetaFactory() {
         return MagnetFieldParticle.Factory::new;
     }
 

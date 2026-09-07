@@ -122,7 +122,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity implements SimMa
             }
 
             final BlockPos blockpos = this.getBlockPos().offset(dir);
-            if (this.level.getBlockState(blockpos).isSolidRender(this.level, blockpos)) {
+            if (this.level.getBlockState(blockpos).isSolidRender()) {
                 return;
             }
             final Vector3d offset = JOMLConversion.toJOML(VecHelper.offsetRandomly(new Vec3(0, 0, 0), this.level.getRandom(), 0.35f));

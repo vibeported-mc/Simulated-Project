@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
 import dev.simulated_team.simulated.index.SimParticleTypes;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -82,7 +82,7 @@ public class AugerIndicatorParticleData implements ParticleOptions, ICustomParti
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public ParticleEngine.SpriteParticleRegistration<AugerIndicatorParticleData> getMetaFactory() {
+    public ParticleResources.SpriteParticleRegistration<AugerIndicatorParticleData> getMetaFactory() {
         return AugerIndicatorParticle.Factory::new;
     }
 }

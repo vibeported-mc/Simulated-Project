@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
 import dev.eriksonn.aeronautics.index.AeroParticleTypes;
-import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -31,7 +31,7 @@ public record GustParticleData(
 
 
     @Override
-    public ParticleEngine.SpriteParticleRegistration<GustParticleData> getMetaFactory() {
+    public ParticleResources.SpriteParticleRegistration<GustParticleData> getMetaFactory() {
         return GustParticle.Factory::new;
     }
 

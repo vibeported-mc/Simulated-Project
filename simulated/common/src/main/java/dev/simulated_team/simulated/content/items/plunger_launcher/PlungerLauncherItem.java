@@ -38,7 +38,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
+public class PlungerLauncherItem extends Item {
 
     public static boolean reloadCooldown = false;
 

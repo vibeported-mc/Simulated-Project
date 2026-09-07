@@ -3,7 +3,7 @@ package dev.eriksonn.aeronautics.content.particle;
 import com.mojang.serialization.MapCodec;
 import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
 import dev.eriksonn.aeronautics.index.AeroParticleTypes;
-import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
@@ -18,7 +18,7 @@ public class AirPoofParticleData implements ParticleOptions, ICustomParticleData
     private AirPoofParticleData() {}
 
     @Override
-    public ParticleEngine.SpriteParticleRegistration<AirPoofParticleData> getMetaFactory() {
+    public ParticleResources.SpriteParticleRegistration<AirPoofParticleData> getMetaFactory() {
         return AirPoofParticle.Factory::new;
     }
 

@@ -61,8 +61,8 @@ public class PlungerLauncherItemRenderer extends CustomRenderedItemModelRenderer
         final PlayerLaunchedPlungerExtension duck = (PlayerLaunchedPlungerExtension) player;
 
         final LaunchedPlungerEntity plunger = duck.simulated$getLaunchedPlunger();
-        if (player.getCooldowns().getCooldownPercent(stack.getItem(), partialTicks) <= 0.6f || (plunger != null && plunger.getOther() == null)) {
-            if ((plunger == null || plunger.isRemoved() || plunger.getOther() != null) && player.getCooldowns().getCooldownPercent(stack.getItem(), partialTicks) <= 0.4f) {
+        if (player.getCooldowns().getCooldownPercent(stack, partialTicks) <= 0.6f || (plunger != null && plunger.getOther() == null)) {
+            if ((plunger == null || plunger.isRemoved() || plunger.getOther() != null) && player.getCooldowns().getCooldownPercent(stack, partialTicks) <= 0.4f) {
                 this.renderPlunger(ms, buffer, light, true);
             }
 
@@ -93,7 +93,7 @@ public class PlungerLauncherItemRenderer extends CustomRenderedItemModelRenderer
         final float partialTicks = timer.getGameTimeDeltaPartialTick(false);
 
         final ItemCooldowns cooldowns = Minecraft.getInstance().player.getCooldowns();
-        final float cooldown = cooldowns.getCooldownPercent(SimItems.PLUNGER_LAUNCHER.asItem(), partialTicks);
+        final float cooldown = cooldowns.getCooldownPercent(SimItems.PLUNGER_LAUNCHER.asStack(), partialTicks);
         if (cooldown > 0 && PlungerLauncherItem.reloadCooldown) {
             if (!first) {
                 float slideIn = Mth.clamp(Mth.map(cooldown, 0.3f, 0.6f, 0, 1), 0, 1);

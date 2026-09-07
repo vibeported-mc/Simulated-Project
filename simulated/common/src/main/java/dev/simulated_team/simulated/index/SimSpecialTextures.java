@@ -17,4 +17,9 @@ public enum SimSpecialTextures implements BindableTexture {
 	public Identifier getLocation() {
 		return this.location;
 	}
+
+	@Override
+	public Identifier getId() {
+		return this.location;
+	}
 }

@@ -153,7 +153,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
         final ServerLevel level = (ServerLevel) this.getLevel();
         if (level == null) return List.of();
 
-        final ChunkPos chunk = new ChunkPos(this.getPos());
+        final ChunkPos chunk = ChunkPos.containing(this.getPos());
 
         return level.getChunkSource().chunkMap.getPlayers(chunk, false);
     }

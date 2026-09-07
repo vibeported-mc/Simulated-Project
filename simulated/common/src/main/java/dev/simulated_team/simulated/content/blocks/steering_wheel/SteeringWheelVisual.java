@@ -15,7 +15,7 @@ import dev.engine_room.flywheel.lib.model.baked.BakedModelBuilder;
 import dev.engine_room.flywheel.lib.util.RendererReloadCache;
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual;
 import dev.simulated_team.simulated.index.SimPartialModels;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -125,7 +125,7 @@ public class SteeringWheelVisual extends KineticBlockEntityVisual<SteeringWheelB
     }
 
     private static Model generateModel(final SteeringWheelRenderer.ModelKey modelKey) {
-        final BakedModel bakedModel = SteeringWheelRenderer.generateModel(SimPartialModels.STEERING_WHEEL.get(), modelKey.material());
+        final BlockStateModel bakedModel = SteeringWheelRenderer.generateModel(SimPartialModels.STEERING_WHEEL.get(), modelKey.material());
         return new BakedModelBuilder(bakedModel).build();
     }
 }

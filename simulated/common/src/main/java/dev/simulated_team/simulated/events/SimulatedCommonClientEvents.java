@@ -25,7 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import foundry.veil.api.client.render.CachedBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -103,7 +103,7 @@ public class SimulatedCommonClientEvents {
         return Result.empty();
     }
 
-    public static void onRenderLevelStage(final VeilRenderLevelStageEvent.Stage stage, final LevelRenderer levelRenderer, final MultiBufferSource.BufferSource bufferSource, final MatrixStack matrixStack, final Matrix4fc matrix4fc, final Matrix4fc matrix4fc1, final int i, final DeltaTracker deltaTracker, final Camera camera, final Frustum frustum) {
+    public static void onRenderLevelStage(final VeilRenderLevelStageEvent.Stage stage, final LevelRenderer levelRenderer, final CachedBufferSource bufferSource, final MatrixStack matrixStack, final Matrix4fc matrix4fc, final Matrix4fc matrix4fc1, final int i, final DeltaTracker deltaTracker, final Camera camera, final Frustum frustum) {
         PhysicsStaffRenderHandler.renderSelectionBox(stage, levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc1, i, deltaTracker, camera, frustum);
     }
 

@@ -12,6 +12,7 @@ import dev.simulated_team.simulated.content.blocks.util.AbstractDirectionalAxisB
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.index.SimClickInteractions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
@@ -164,8 +165,11 @@ public class HandleBlock extends AbstractDirectionalAxisBlock implements IBE<Han
 
 
     public enum Variant implements StringRepresentable {
-        IRON(Ingredient.of(Tags.Items.NUGGETS_IRON)),
-        COPPER(Ingredient.of(AllTags.commonItemTag("nuggets/copper"))),
+        // 26.2 port: Ingredient.of takes a HolderSet rather than a TagKey, so the tag is looked
+        // up in the item registry. The lookup is deferred because these run at class-init, before
+        // the registry is populated.
+        IRON(BuiltInRegistries.ITEM.get(Tags.Items.NUGGETS_IRON).map(Ingredient::of).orElse(null)),
+        COPPER(BuiltInRegistries.ITEM.get(AllTags.commonItemTag("nuggets/copper")).map(Ingredient::of).orElse(null)),
         DYED(null);
 
         @Nullable final Ingredient ingredient;

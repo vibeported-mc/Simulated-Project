@@ -53,7 +53,7 @@ public class ClientHandleHandler extends BlockHoldInteraction {
     @Override
     public boolean activeTick(final Level level, final LocalPlayer player) {
         final BlockPos interactionPos = this.getInteractionPos();
-        final ChunkPos chunk = new ChunkPos(interactionPos);
+        final ChunkPos chunk = ChunkPos.containing(interactionPos);
 
         final SubLevelContainer container = SubLevelContainer.getContainer(level);
         assert container != null;
