@@ -110,7 +110,7 @@ lived in.
 
 ---
 
-## 3. Smaller things noted in passing
+## 4. Smaller things noted in passing
 
 - **The docking connector's unpair-on-turn.** `onRemove` used to see the replacing state, so a
   connector that merely *turned* could unpair. `affectNeighborsAfterRemoval` only runs when the block
