@@ -2,8 +2,9 @@
 #include veil:fog
 
 uniform sampler2D FirePalette;
-uniform float FlameRenderTime;
-uniform float Intensity;
+// 26.2 port: FlameRenderTime and Intensity arrive per vertex now -- see burner_flame.vsh. Palette
+// has only two values, so it stays a compile-time constant and the render type is built once per
+// palette instead.
 uniform float Palette;
 uniform float FogStart;
 uniform float FogEnd;
@@ -11,10 +12,12 @@ uniform vec4 FogColor;
 
 in float vertexDistance;
 in vec2 texCoord0;
+in float flameRenderTime;
+in float flameIntensity;
 out vec4 fragColor;
 
 vec3 sample_palette(float x) {
-    float i = x + mix(0.9, 0.2, Intensity);
+    float i = x + mix(0.9, 0.2, flameIntensity);
     return texture(FirePalette, vec2(1.0 - i, Palette)).rgb;
 }
 
@@ -64,7 +67,7 @@ vec4 main_flame(vec2 uv, float time) {
 vec2 cutout_circles(vec2 uv, float time) {
     vec4 color = vec4(0.0);
 
-    float intensity = (1.0 - Intensity) * 0.2;
+    float intensity = (1.0 - flameIntensity) * 0.2;
 
     const int count = 3;
     vec2 radius_range = vec2(0.08, 0.23 + intensity);
@@ -103,7 +106,7 @@ const float resolution = 32.0;
 void main() {
     // Mirror the uv so that +y is up
     vec2 uv = vec2(texCoord0.x, 1.0 - texCoord0.y);
-    float time = FlameRenderTime;
+    float time = flameRenderTime;
 
     // Misc uv transforms
     uv.x += 1.0 / resolution / 2.0;
