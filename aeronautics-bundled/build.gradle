@@ -26,9 +26,14 @@ java {
 neoForge {
     version = neoforge_version
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
+    // 26.2 port: the six real modules already guard this; these two did not, and asked for
+    // "parchment-same:none" -- a placeholder pair of property values, not a real artifact. There are
+    // no Parchment mappings for 26.2, so gradle.properties leaves both at their "off" values.
+    if (parchment_version != "none") {
+        parchment {
+            minecraftVersion = parchment_minecraft == "same" ? minecraft_version : parchment_minecraft
+            mappingsVersion = parchment_version
+        }
     }
 }
 
