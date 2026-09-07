@@ -30,10 +30,10 @@ public class SimItems {
 
     public static final ItemEntry<DiagramItem> CONTRAPTION_DIAGRAM =
             REGISTRATE.item("contraption_diagram", DiagramItem::new)
-                    .recipe((c, p) -> prov.shapeless(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shapeless(RecipeCategory.MISC, c.get(), 1)
                             .requires(Items.PAPER)
                             .requires(SimBlocks.PHYSICS_ASSEMBLER)
-                            .unlockedBy("has_ingredient", prov.has(SimBlocks.PHYSICS_ASSEMBLER))
+                            .unlockedBy("has_ingredient", p.has(SimBlocks.PHYSICS_ASSEMBLER))
                             .save(p))
                     .register();
 

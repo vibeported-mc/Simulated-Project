@@ -11,6 +11,7 @@ import dev.simulated_team.simulated.index.SimTags;
 import dev.simulated_team.simulated.util.SimColors;
 import net.createmod.catnip.api.math.AngleHelper;
 import net.createmod.catnip.api.math.VecHelper;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -142,8 +143,8 @@ public class LaserSensorBlockEntity extends SmartBlockEntity implements Clearabl
 
         if (stack.is(SimTags.Items.LASER_POINTER_LENS)) {
             color = SimColors.MEDIA_OURPLE;
-        } else if (item instanceof final DyeItem dyeItem) {
-            color = dyeItem.getDyeColor().getTextColor();
+        } else if (item instanceof DyeItem) {
+            color = stack.get(DataComponents.DYE).getTextColor();
         }
 
         return testColor == color;

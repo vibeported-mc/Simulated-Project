@@ -10,6 +10,7 @@ import dev.simulated_team.simulated.index.SimBlockShapes;
 import dev.simulated_team.simulated.index.SimTags;
 import dev.simulated_team.simulated.util.SimColors;
 import org.jspecify.annotations.Nullable;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -127,8 +128,9 @@ public class LaserPointerBlock extends DirectionalBlock implements IBE<LaserPoin
 
         int newColor = -1;
         boolean newRainbow = be.isRainbow();
-        if (itemStack.getItem() instanceof final DyeItem dyeItem) {
-            final DyeColor gatheredColor = dyeItem.getDyeColor();
+        if (itemStack.getItem() instanceof DyeItem) {
+            // 26.2: a dye's colour is a data component on the stack, not a field on the item.
+            final DyeColor gatheredColor = itemStack.get(DataComponents.DYE);
             newColor = gatheredColor.getTextColor();
         } else if (itemStack.is(SimTags.Items.LASER_POINTER_LENS)) {
             newColor = SimColors.MEDIA_OURPLE;

@@ -206,13 +206,13 @@ public class NameplateScreen extends Screen {
    }
 
    private void onDone() {
-      this.minecraft.setScreen(null);
+      this.minecraft.gui.setScreen(null);
    }
 
    public static void setScreen(final NameplateBlockEntity be) {
       if (be != null && NameplateBlockEntity.canPlayerReach(be, Minecraft.getInstance().player)) {
          final NameplateScreen screen = new NameplateScreen(be.findController());
-         Minecraft.getInstance().setScreen(screen);
+         Minecraft.getInstance().gui.setScreen(screen);
       }
    }
 }

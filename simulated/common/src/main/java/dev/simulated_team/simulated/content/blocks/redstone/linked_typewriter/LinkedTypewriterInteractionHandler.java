@@ -120,7 +120,7 @@ public class LinkedTypewriterInteractionHandler {
                     be.disconnectUser();
                     VeilPacketManager.server().sendPacket(new TypewriterDisconnectUser(be.getBlockPos()));
 
-                    minecraft.setScreen(null);
+                    minecraft.gui.setScreen(null);
                 }
 
                 if (frequency != null) {
