@@ -15,8 +15,13 @@ public class SimpleSimulatedTrigger extends SimulatedCriterionTriggerBase<Simula
         super(id);
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code SimpleCriterionTrigger} gained a {@code trigger(ServerPlayer, Predicate)} of its
+     * own, so a bare {@code null} no longer picks between it and the base-class overload.
+     */
     public void trigger(final ServerPlayer player) {
-        super.trigger(player, null);
+        super.trigger(player, (java.util.List<java.util.function.Supplier<Object>>) null);
     }
 
     public Instance instance() {

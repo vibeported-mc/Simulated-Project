@@ -4,6 +4,7 @@ import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.createmod.catnip.api.math.VecHelper;
 import net.createmod.catnip.api.theme.Color;
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -102,8 +103,9 @@ public class AugerIndicatorParticle extends SimpleAnimatedParticle {
             this.spriteSet = animatedSprite;
         }
 
+        @Override
         public Particle createParticle(final AugerIndicatorParticleData data, final ClientLevel worldIn, final double x, final double y, final double z,
-                                       final double xSpeed, final double ySpeed, final double zSpeed) {
+                                       final double xSpeed, final double ySpeed, final double zSpeed, final RandomSource random) {
             final Minecraft mc = Minecraft.getInstance();
             final LocalPlayer player = mc.player;
             final boolean visible = worldIn != mc.level || player != null && GogglesItem.isWearingGoggles(player);

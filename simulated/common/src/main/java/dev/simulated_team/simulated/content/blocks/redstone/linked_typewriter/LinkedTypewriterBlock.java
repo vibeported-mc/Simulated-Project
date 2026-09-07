@@ -10,6 +10,8 @@ import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimBlockEntityTypes;
 import dev.simulated_team.simulated.index.SimBlockShapes;
 import dev.simulated_team.simulated.service.SimMenuService;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -209,7 +211,11 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
         final BlockEntity blockEntity = params.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof final LinkedTypewriterBlockEntity typewriter) {
             final ItemStack itemStack = new ItemStack(this);
-            typewriter.saveToItem(itemStack, params.getLevel().registryAccess());
+            // 26.2: BlockEntity.saveToItem is gone -- a block entity writes itself into a value
+            // output, and BlockItem stores that on the stack alongside the block entity's type.
+            final TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, params.getLevel().registryAccess());
+            typewriter.saveWithoutMetadata(output);
+            BlockItem.setBlockEntityData(itemStack, typewriter.getType(), output);
 
             params.withDynamicDrop(ShulkerBoxBlock.CONTENTS, consumer -> itemStack.copy());
             return ImmutableList.of(itemStack);
