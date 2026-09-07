@@ -364,7 +364,7 @@ public class KeyEditorScreen {
         private void renderText(final GuiGraphicsExtractor guiGraphics, final PoseStack ps) {
             ps.pushPose();
             ps.translate((float) 9, 11, 0);
-            guiGraphics.drawString(Minecraft.getInstance().font, InputConstants.getKey(this.entry.glfwKeyCode, -1).getDisplayName(), 0, 0, 0xFFFFFF, true);
+            guiGraphics.text(Minecraft.getInstance().font, InputConstants.getKey(this.entry.glfwKeyCode, -1).getDisplayName(), 0, 0, 0xFFFFFF, true);
             ps.popPose();
         }
 

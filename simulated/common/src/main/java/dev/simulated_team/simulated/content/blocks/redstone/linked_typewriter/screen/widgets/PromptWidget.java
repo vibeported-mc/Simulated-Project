@@ -32,7 +32,7 @@ public class PromptWidget extends AbstractSimiWidget {
             }
 
             graphics.pose().translate(3, 4, 0);
-            graphics.drawString(Minecraft.getInstance().font, displayName, this.getX(), this.getY(), 0xFFFFFF, true);
+            graphics.text(Minecraft.getInstance().font, displayName, this.getX(), this.getY(), 0xFFFFFF, true);
         }
     }
 

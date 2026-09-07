@@ -110,7 +110,7 @@ public class ModulatingLinkedReceiverScreen extends AbstractSimiScreen {
 
         this.background.render(graphics, x, y);
 
-        graphics.drawString(this.font, this.title, x + (this.background.width - 8) / 2 - this.font.width(this.title) / 2, y + 4, SimColors.TITLE_DARK_RED, false);
+        graphics.text(this.font, this.title, x + (this.background.width - 8) / 2 - this.font.width(this.title) / 2, y + 4, SimColors.TITLE_DARK_RED, false);
 
         int currentX = 22;
 
@@ -208,7 +208,7 @@ public class ModulatingLinkedReceiverScreen extends AbstractSimiScreen {
     }
 
     private void label(final GuiGraphicsExtractor graphics, final int x, final int y, final Component text) {
-        graphics.drawString(this.font, text, this.guiLeft + x, this.guiTop + 26 + y, 0xFFFFEE);
+        graphics.text(this.font, text, this.guiLeft + x, this.guiTop + 26 + y, 0xFFFFEE);
     }
 
     @Override

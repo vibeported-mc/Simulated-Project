@@ -90,7 +90,7 @@ public class NameplateScreen extends Screen {
    public void render(final GuiGraphicsExtractor gui, final int pMouseX, final int pMouseY, final float pPartialTick) {
       Lighting.setupForFlatItems();
       this.renderBackground(gui, pMouseX, pMouseY, pPartialTick);
-      gui.drawCenteredString(this.font, this.title, this.width / 2, 40, 16777215);
+      gui.centeredText(this.font, this.title, this.width / 2, 40, 16777215);
 
       this.renderSign(gui);
       Lighting.setupFor3DItems();
@@ -146,15 +146,15 @@ public class NameplateScreen extends Screen {
       ps.pushPose();
 
       final BlockState blockstate = this.be.getBlockState();
-      pGuiGraphics.pose().pushPose();
+      pGuiGraphics.pose().pushMatrix();
       this.offsetSign(pGuiGraphics, blockstate);
       final float scale = 2.0f;
       ps.scale(scale, scale, scale);
-      pGuiGraphics.pose().pushPose();
+      pGuiGraphics.pose().pushMatrix();
       this.renderSignBackground(pGuiGraphics, blockstate);
-      pGuiGraphics.pose().popPose();
+      pGuiGraphics.pose().popMatrix();
       this.renderSignText(pGuiGraphics);
-      pGuiGraphics.pose().popPose();
+      pGuiGraphics.pose().popMatrix();
 
       ps.popPose();
    }
@@ -175,12 +175,12 @@ public class NameplateScreen extends Screen {
          }
 
          final int w = -this.font.width(this.message) / 2;
-         pGuiGraphics.drawString(this.font, this.message, w, 0, color, false);
+         pGuiGraphics.text(this.font, this.message, w, 0, color, false);
          if (cursorPos >= 0 && cursorFlash) {
             final int l1 = this.font.width(this.message.substring(0, Math.max(Math.min(cursorPos, this.message.length()), 0)));
             final int i2 = l1 - this.font.width(this.message) / 2;
             if (cursorPos >= this.message.length()) {
-               pGuiGraphics.drawString(this.font, "_", i2, 0, color, false);
+               pGuiGraphics.text(this.font, "_", i2, 0, color, false);
             }
          }
       }

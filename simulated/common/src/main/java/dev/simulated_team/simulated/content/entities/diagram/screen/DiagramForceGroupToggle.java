@@ -105,11 +105,11 @@ public class DiagramForceGroupToggle extends AbstractWidget {
         final MutableComponent name = MutableComponent.create(this.group.name().getContents());
 
         if (isEnabled) {
-            guiGraphics.drawString(font, name, 1, 1, 0xffe2d9c3, false);
-            guiGraphics.drawString(font, name, 0, 0, groupColor, false);
+            guiGraphics.text(font, name, 1, 1, 0xffe2d9c3, false);
+            guiGraphics.text(font, name, 0, 0, groupColor, false);
         } else {
             name.withStyle(ChatFormatting.STRIKETHROUGH);
-            guiGraphics.drawString(font, name, 0, 0, 0xaaaaaaaa, false);
+            guiGraphics.text(font, name, 0, 0, 0xaaaaaaaa, false);
         }
 
         if (this.forceCount > 0) {
@@ -117,10 +117,10 @@ public class DiagramForceGroupToggle extends AbstractWidget {
             final int x = 95 - font.width(forceCountText);
 
             if (isEnabled) {
-                guiGraphics.drawString(font, forceCountText, x + 1, 1, 0xffe2d9c3, false);
-                guiGraphics.drawString(font, forceCountText, x, 0, groupColor, false);
+                guiGraphics.text(font, forceCountText, x + 1, 1, 0xffe2d9c3, false);
+                guiGraphics.text(font, forceCountText, x, 0, groupColor, false);
             } else {
-                guiGraphics.drawString(font, forceCountText, x, 0, 0xaaaaaaaa, false);
+                guiGraphics.text(font, forceCountText, x, 0, 0xaaaaaaaa, false);
             }
         }
 

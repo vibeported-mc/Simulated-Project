@@ -100,7 +100,7 @@ public class SimulatedCreativeTab {
 		Window window = Minecraft.getInstance().getWindow();
 		float scale = (float) window.getGuiScale();
 
-		graphics.drawString(font, text, x, y, color1, true);
+		graphics.text(font, text, x, y, color1, true);
 
 		PoseStack ps = graphics.pose();
 		ps.pushPose();
@@ -120,7 +120,7 @@ public class SimulatedCreativeTab {
 				height
 		);
 
-		graphics.drawString(font, text, x, y, color2, false);
+		graphics.text(font, text, x, y, color2, false);
 
 		RenderSystem.disableScissor();
 

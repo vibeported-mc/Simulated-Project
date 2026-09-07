@@ -108,7 +108,7 @@ public class ThrottleLeverHandler extends BlockHoldInteraction {
 
         ps.translate(0.0, 0.0, 4.0);
 
-        graphics.drawString(Minecraft.getInstance().font, String.valueOf(this.inverted ? 15 - this.signal : this.signal), cx + 1, 3, SimColors.THROTTLE_VALUE_BROWN, false);
+        graphics.text(Minecraft.getInstance().font, String.valueOf(this.inverted ? 15 - this.signal : this.signal), cx + 1, 3, SimColors.THROTTLE_VALUE_BROWN, false);
 
         ps.popPose();
 

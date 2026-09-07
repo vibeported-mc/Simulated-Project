@@ -128,7 +128,7 @@ public class LinkedTypewriterItemBindHandler {
             return;
         }
 
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         final List<Component> list = new ArrayList<>();
         list.add(CreateLang.translateDirect("linked_controller.bind_mode")
                 .withStyle(ChatFormatting.GOLD));
@@ -146,7 +146,7 @@ public class LinkedTypewriterItemBindHandler {
         final int y = guiGraphics.guiHeight() - height - 24;
         guiGraphics.renderComponentTooltip(Minecraft.getInstance().font, list, x, y);
 
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     private static Couple<RedstoneLinkNetworkHandler.Frequency> isPosValid(final Level level) {

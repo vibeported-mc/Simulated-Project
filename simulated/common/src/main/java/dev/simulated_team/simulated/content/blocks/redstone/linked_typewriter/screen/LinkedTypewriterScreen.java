@@ -282,7 +282,7 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
 
         if (!this.keyEditorScreen.active) {
             this.backgroundMain.render(guiGraphics, this.getLeftPos(), this.getTopPos());
-            guiGraphics.drawString(Minecraft.getInstance().font, this.getTitle(), this.getLeftPos() + titleX, this.getTopPos() + 4, SimColors.TITLE_DARK_RED, false);
+            guiGraphics.text(Minecraft.getInstance().font, this.getTitle(), this.getLeftPos() + titleX, this.getTopPos() + 4, SimColors.TITLE_DARK_RED, false);
 
             final int x = this.leftPos;
             final int y = this.topPos;

@@ -141,7 +141,7 @@ public class KeybindWindowElement extends InputWindowElement {
         poseStack.translate(0, 0, 100);
 
         if (hasText) {
-            graphics.drawString(font, text, 2, (int) ((height - font.lineHeight) / 2f + 2),
+            graphics.text(font, text, 2, (int) ((height - font.lineHeight) / 2f + 2),
                     PonderPalette.WHITE.getColorObject().scaleAlpha(fade).getRGB(), false);
         }
 

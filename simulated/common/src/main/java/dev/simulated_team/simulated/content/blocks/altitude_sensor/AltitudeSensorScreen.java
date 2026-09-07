@@ -132,12 +132,12 @@ public class AltitudeSensorScreen extends AbstractSimiScreen {
         final int worldLow = (int) this.blockEntity.toWorldHeight(this.lowSignal);
         final String lowText = String.valueOf(worldLow);
         final String highText = String.valueOf(worldHigh);
-        graphics.drawCenteredString(this.font, lowText, this.barLeft + this.barCenterWidth / 2, (this.barTop - this.font.lineHeight / 2) + invLowMax, this.draggingLeft || this.overGrabby(mouseX, mouseY, true) ? SimColors.OFF_WHITE : SimColors.WOODEN_BROWN);
-        graphics.drawCenteredString(this.font, highText, this.rightBarLeft + this.barWidth / 2 + 1, (this.barTop - this.font.lineHeight / 2) + invHighMax, this.draggingRight || this.overGrabby(mouseX, mouseY, false) ? SimColors.OFF_WHITE : SimColors.WOODEN_BROWN);
+        graphics.centeredText(this.font, lowText, this.barLeft + this.barCenterWidth / 2, (this.barTop - this.font.lineHeight / 2) + invLowMax, this.draggingLeft || this.overGrabby(mouseX, mouseY, true) ? SimColors.OFF_WHITE : SimColors.WOODEN_BROWN);
+        graphics.centeredText(this.font, highText, this.rightBarLeft + this.barWidth / 2 + 1, (this.barTop - this.font.lineHeight / 2) + invHighMax, this.draggingRight || this.overGrabby(mouseX, mouseY, false) ? SimColors.OFF_WHITE : SimColors.WOODEN_BROWN);
 
         final int textWidth = this.font.width(this.title);
         final int textX = this.guiLeft - textWidth / 2 - 10;
-        graphics.drawCenteredString(this.font, this.title, textX, this.height / 2 - this.font.lineHeight, SimColors.OFF_WHITE);
+        graphics.centeredText(this.font, this.title, textX, this.height / 2 - this.font.lineHeight, SimColors.OFF_WHITE);
     }
 
     private boolean overBar(final double mouseX, final double mouseY, final boolean left) {
