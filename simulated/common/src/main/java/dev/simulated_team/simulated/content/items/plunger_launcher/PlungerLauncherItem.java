@@ -24,12 +24,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -54,21 +53,21 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand interactionHand) {
+    public InteractionResult use(final Level level, final Player player, final InteractionHand interactionHand) {
         final ItemStack heldStack = player.getItemInHand(interactionHand);
         if (SimEntityService.INSTANCE.isFake(player)) {
-            return InteractionResultHolder.fail(heldStack);
+            return InteractionResult.FAIL;
         }
 
         if (ShootableGadgetItemMethods.shouldSwap(player, heldStack, interactionHand, s -> s.getItem() instanceof PlungerLauncherItem)) {
-            return InteractionResultHolder.fail(heldStack);
+            return InteractionResult.FAIL;
         }
 
         if (!level.isClientSide()) {
             if (player.isShiftKeyDown()) {
                 LaunchedPlungerServerHandler.removePlayerPlungers(player);
                 player.displayClientMessage(SimLang.translate("plunger_launcher.clear_plungers").color(0xaaaaaa).component(),true);
-                return InteractionResultHolder.success(heldStack);
+                return InteractionResult.SUCCESS;
             }
 
             final BarrelAndCorrectionInfo info = this.getCorrectionInfo(player, interactionHand);
@@ -114,7 +113,7 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
             SimulatedClient.PLUNGER_LAUNCHER_RENDER_HANDLER.dontAnimateItem(interactionHand);
         }
 
-        return InteractionResultHolder.success(heldStack);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -163,8 +162,8 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
     }
 
     @Override
-    public UseAnim getUseAnimation(final ItemStack stack) {
-        return UseAnim.NONE;
+    public ItemUseAnimation getUseAnimation(final ItemStack stack) {
+        return ItemUseAnimation.NONE;
     }
 
     @Override
