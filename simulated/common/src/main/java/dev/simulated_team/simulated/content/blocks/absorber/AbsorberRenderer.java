@@ -1,31 +1,56 @@
 package dev.simulated_team.simulated.content.blocks.absorber;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
-import dev.ryanhcode.sable.util.SableDistUtil;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import net.createmod.catnip.api.math.AngleHelper;
 import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.createmod.catnip.api.client.render.SuperByteBufferRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
-public class AbsorberRenderer extends SmartBlockEntityRenderer<AbsorberBlockEntity> {
+/**
+ * <h2>26.2 note</h2>
+ * <p>{@code renderSafe} split into an extract phase, which reads the block entity, and a submit
+ * phase, which may run on another thread and may touch nothing but the render state. The sponge and
+ * the four arm pieces are baked into {@link SuperByteBufferRenderState}s while the block entity is
+ * still readable, and queued from those.
+ *
+ * <p>{@code RenderType.cutout()} was a chunk layer; block entities draw through
+ * {@code RenderTypes.cutoutMovingBlock()}, which is what Create's own renderers use.
+ */
+public class AbsorberRenderer extends SmartBlockEntityRenderer<AbsorberBlockEntity, AbsorberRenderer.AbsorberRenderState> {
+
+    public static class AbsorberRenderState extends SmartRenderState {
+        public final List<SuperByteBufferRenderState> parts = new ArrayList<>();
+    }
 
     public AbsorberRenderer(final BlockEntityRendererProvider.Context context) {
         super(context);
     }
+
     @Override
-    protected void renderSafe(final AbsorberBlockEntity be, final float partialTicks, final PoseStack ms, final MultiBufferSource buffer, final int light, final int overlay) {
-        super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
-        final Level level = SableDistUtil.getClientLevel();
-        final VertexConsumer vb = buffer.getBuffer(RenderType.cutout());
+    public AbsorberRenderState createRenderState() {
+        return new AbsorberRenderState();
+    }
+
+    @Override
+    protected void extractSafe(final AbsorberBlockEntity be, final AbsorberRenderState state, final float partialTicks, final Vec3 cameraPosition) {
+        super.extractSafe(be, state, partialTicks, cameraPosition);
+
+        // Render states are reused between frames, so the list has to be emptied rather than
+        // appended to, or last frame's geometry is drawn again alongside this frame's.
+        state.parts.clear();
 
         final BlockState blockState = be.getBlockState();
 
@@ -62,11 +87,12 @@ public class AbsorberRenderer extends SmartBlockEntityRenderer<AbsorberBlockEnti
 
         sponge.translate(0,0.25,0);
         sponge.scale(1,1-pos*movementDistance/9,1);
-        sponge.light(light).renderInto(ms,vb);
+        state.parts.add(sponge.light(state.lightCoords).extractRenderState());
+
         final Matrix4f rotationMatrix = new Matrix4f();
-        this.apply(CachedBufferer.partial(SimPartialModels.ABSORBER_HAT,blockState),ms,light,vb,yRot,totalMovement,rotationMatrix);
+        this.apply(CachedBufferer.partial(SimPartialModels.ABSORBER_HAT,blockState),state,yRot,totalMovement,rotationMatrix);
         totalMovement/=2;
-        this.apply(CachedBufferer.partial(SimPartialModels.ABSORBER_PIVOT,blockState),ms,light,vb,yRot,totalMovement,rotationMatrix);
+        this.apply(CachedBufferer.partial(SimPartialModels.ABSORBER_PIVOT,blockState),state,yRot,totalMovement,rotationMatrix);
 
         float height = totalMovement+0.5f/16; //height from base to pivot
         final float length = 13.8f/32f; //distance from pivot to endpoint of arm
@@ -79,19 +105,27 @@ public class AbsorberRenderer extends SmartBlockEntityRenderer<AbsorberBlockEnti
         rotationMatrix.m11(width);
         rotationMatrix.m12(-height);
 
-        this.apply(CachedBufferer.partial(SimPartialModels.ABSORBER_ARM,blockState),ms,light,vb,yRot,totalMovement,rotationMatrix);
+        this.apply(CachedBufferer.partial(SimPartialModels.ABSORBER_ARM,blockState),state,yRot,totalMovement,rotationMatrix);
         rotationMatrix.m21(-height);
         rotationMatrix.m12(height);
         rotationMatrix.m00(0.98f);
-        this.apply(CachedBufferer.partial(SimPartialModels.ABSORBER_ARM,blockState),ms,light,vb,yRot,totalMovement,rotationMatrix);
+        this.apply(CachedBufferer.partial(SimPartialModels.ABSORBER_ARM,blockState),state,yRot,totalMovement,rotationMatrix);
     }
-    void apply(final SuperByteBuffer buffer, final PoseStack ms, final int light, final VertexConsumer vb, final float yRot, final float offset, final Matrix4f rotationMatrix)
+
+    @Override
+    protected void submitSafe(final AbsorberRenderState state, final PoseStack ms, final SubmitNodeCollector queue, final CameraRenderState camera) {
+        super.submitSafe(state, ms, queue, camera);
+        for (final SuperByteBufferRenderState part : state.parts)
+            part.submit(ms, RenderTypes.cutoutMovingBlock(), queue);
+    }
+
+    void apply(final SuperByteBuffer buffer, final AbsorberRenderState state, final float yRot, final float offset, final Matrix4f rotationMatrix)
     {
 
         buffer.translate(0.5,0.25+offset,0.5);
         final Matrix4f r = new Matrix4f().rotate(yRot,0,1,0);
         buffer.mulPose(r.mul(rotationMatrix));
         buffer.translate(-0.5,0,-0.5);
-        buffer.light(light).renderInto(ms,vb);
+        state.parts.add(buffer.light(state.lightCoords).extractRenderState());
     }
 }
