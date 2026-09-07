@@ -4,13 +4,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.api.math.OrientedBoundingBox3d;
 import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.api.sublevel.ClientSubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
-import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimRenderTypes;
@@ -18,34 +16,58 @@ import dev.simulated_team.simulated.util.SimColors;
 import dev.simulated_team.simulated.util.SimMathUtils;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import org.joml.*;
 
 import java.lang.Math;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> {
-    private final Vector3d controlPointA = new Vector3d();
-    private final Vector3d controlPointB = new Vector3d();
-    private final Vector3d segmentALerp = new Vector3d();
-    private final Vector3d segmentBLerp = new Vector3d();
-    private final Vector3d segmentCLerp = new Vector3d();
-    private final Vector3d startUp = new Vector3d();
-    private final Vector3d endUp = new Vector3d();
-    private final Vector3d startLeft = new Vector3d();
-    private final Vector3d endLeft = new Vector3d();
-    private final Vector3d normalizedNormal = new Vector3d();
-    private final Vector3d vertex = new Vector3d();
+/**
+ * <h2>26.2 note</h2>
+ * <p>A spring is raw geometry along a spline between two block entities, and everything shaping it --
+ * the partner spring, both sub-level poses, the stress colour -- is only readable during extraction.
+ * So extraction walks the spline into a list of segments and submission writes their vertices, inside
+ * a {@code submitCustomGeometry} callback.
+ *
+ * <p>The scratch vectors this class kept as fields had to become locals. They were safe while
+ * rendering was one call on one thread; submission may run on another, and one renderer instance
+ * serves every spring in the world, so shared scratch is a race rather than an optimisation.
+ */
+public class SpringRenderer
+        extends SmartBlockEntityRenderer<SpringBlockEntity, SpringRenderer.SpringRenderState> {
+
+    /** One straight length of spring, with the frame at each end. */
+    public record Segment(Vector3dc startDirection, Vector3dc endDirection,
+                          Vector3dc startUp, Vector3dc endUp,
+                          Vector3dc startPos, Vector3dc endPos,
+                          boolean second, float uvStart, float uvEnd,
+                          float width, float textureWidth) { }
+
+    public static class SpringRenderState extends SmartRenderState {
+        public final List<Segment> segments = new ArrayList<>();
+        public @Nullable Identifier texture;
+        public @Nullable Vector3dc origin;
+        public int color;
+    }
 
     public SpringRenderer(final BlockEntityRendererProvider.Context context) {
         super(context);
+    }
+
+    @Override
+    public SpringRenderState createRenderState() {
+        return new SpringRenderState();
     }
 
     private static int getStressColor(final SpringBlockEntity be, final float partialTicks, final Vector3d otherCenter, final Vector3dc center, final Minecraft minecraft) {
@@ -66,8 +88,14 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
     }
 
     @Override
-    protected void renderSafe(final SpringBlockEntity be, final float partialTicks, final PoseStack ps, final MultiBufferSource bufferSource, final int light, final int overlay) {
-        super.renderSafe(be, partialTicks, ps, bufferSource, light, overlay);
+    protected void extractSafe(final SpringBlockEntity be, final SpringRenderState renderState, final float partialTicks, final Vec3 cameraPosition) {
+        super.extractSafe(be, renderState, partialTicks, cameraPosition);
+
+        // Reused between frames, so a spring that broke has to clear what it drew.
+        renderState.segments.clear();
+        renderState.texture = null;
+        renderState.origin = null;
+
         if (!be.isController()) {
             return;
         }
@@ -80,13 +108,13 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
         final BlockState state = be.getBlockState();
         final SpringBlock.Size size = state.getValue(SpringBlock.SIZE);
         final String name = (size == SpringBlock.Size.MEDIUM ? "" : (size.getSerializedName() + "_")) + "spring";
-        final VertexConsumer buffer = bufferSource.getBuffer(SimRenderTypes.spring(Simulated.path("textures/block/spring/" + name + ".png")));
-
-        ps.pushPose();
+        renderState.texture = Simulated.path("textures/block/spring/" + name + ".png");
 
         final Minecraft minecraft = Minecraft.getInstance();
         final ClientSubLevelContainer container = SubLevelContainer.getContainer(minecraft.level);
-        assert container != null;
+        if (container == null) {
+            return;
+        }
 
         final UUID otherSubLevelID = be.getPartnerSubLevelID();
         final ClientSubLevel otherSubLevel = otherSubLevelID != null ? (ClientSubLevel) container.getSubLevel(otherSubLevelID) : null;
@@ -102,7 +130,7 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
         final Vector3dc normalA = JOMLConversion.atLowerCornerOf(facing.getUnitVec3i());
         final Vector3d normalB = JOMLConversion.atLowerCornerOf(otherFacing.getUnitVec3i());
 
-        ps.translate(center.x() - (blockPos.getX()), center.y() - (blockPos.getY()), center.z() - (blockPos.getZ()));
+        renderState.origin = new Vector3d(center.x() - blockPos.getX(), center.y() - blockPos.getY(), center.z() - blockPos.getZ());
 
         final double PI2 = Math.PI / 2.0;
         final double PI4 = PI2 / 2.0;
@@ -119,7 +147,7 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
             renderPose.transformPositionInverse(otherCenter);
         }
 
-        final int color = getStressColor(be, partialTicks, otherCenter, center, minecraft);
+        renderState.color = getStressColor(be, partialTicks, otherCenter, center, minecraft);
 
         final List<SplinePoint> splinePoints = this.generateSpline(
                 JOMLConversion.ZERO,
@@ -216,7 +244,7 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
                 case LARGE -> 32.0f;
             };
 
-            this.renderSegment(ps,
+            renderState.segments.add(new Segment(
                     point.normal,
                     nextPoint.normal,
                     upDir,
@@ -226,14 +254,11 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
                     false,
                     (float) runningSpringLength * uvScale,
                     (float) (runningSpringLength + length) * uvScale,
-                    light,
-                    color,
-                    buffer,
                     width,
-                    textureWidth);
+                    textureWidth));
 
             // render inside
-            this.renderSegment(ps,
+            renderState.segments.add(new Segment(
                     point.normal.negate(new Vector3d()),
                     nextPoint.normal.negate(new Vector3d()),
                     upDir.negate(new Vector3d()),
@@ -243,14 +268,30 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
                     true,
                     0.0f - (float) runningSpringLength * uvScale,
                     0.0f - (float) (runningSpringLength + length) * uvScale,
-                    light,
-                    color,
-                    buffer,
                     width,
-                    textureWidth);
+                    textureWidth));
+
             runningSpringLength += length;
         }
+    }
 
+    @Override
+    protected void submitSafe(final SpringRenderState renderState, final PoseStack ps, final SubmitNodeCollector queue, final CameraRenderState camera) {
+        super.submitSafe(renderState, ps, queue, camera);
+
+        if (renderState.segments.isEmpty() || renderState.texture == null || renderState.origin == null)
+            return;
+
+        final int light = renderState.lightCoords;
+        final int color = renderState.color;
+        final List<Segment> segments = renderState.segments;
+
+        ps.pushPose();
+        ps.translate(renderState.origin.x(), renderState.origin.y(), renderState.origin.z());
+        queue.submitCustomGeometry(ps, SimRenderTypes.spring(renderState.texture), (pose, buffer) -> {
+            for (final Segment segment : segments)
+                renderSegment(pose, buffer, segment, color, light);
+        });
         ps.popPose();
     }
 
@@ -266,7 +307,7 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
             return facing.getAxis().isHorizontal() ? new Vec3(0, 1, 0) : new Vec3(0, 0, -1);
         }
 
-        return Vec3.atLowerCornerOf(Direction.getNearest(dir.x, dir.y, dir.z).getOpposite().getNormal());
+        return Vec3.atLowerCornerOf(Direction.getApproximateNearest(dir.x, dir.y, dir.z).getOpposite().getUnitVec3i());
     }
 
     /**
@@ -275,21 +316,29 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
     private List<SplinePoint> generateSpline(final Vector3dc pointA, final Vector3dc pointB, final Vector3dc normalA, final Vector3dc normalB, final double controlPointLength) {
         final List<SplinePoint> list = new ObjectArrayList<>();
 
+        // Locals rather than fields: extraction runs per block entity and one renderer instance
+        // serves them all.
+        final Vector3d controlPointA = new Vector3d();
+        final Vector3d controlPointB = new Vector3d();
+        final Vector3d segmentALerp = new Vector3d();
+        final Vector3d segmentBLerp = new Vector3d();
+        final Vector3d segmentCLerp = new Vector3d();
+
         final double influence = controlPointLength;
-        pointA.fma(influence, normalA, this.controlPointA);
-        pointB.fma(influence, normalB, this.controlPointB);
+        pointA.fma(influence, normalA, controlPointA);
+        pointB.fma(influence, normalB, controlPointB);
 
         final double len = pointA.distance(pointB);
         final int initialPointCount = Mth.clamp(Mth.ceil(len), 5, 8);
         for (int i = 0; i <= initialPointCount; i++) {
             final double t = (double) i / initialPointCount;
-            pointA.lerp(this.controlPointA, t, this.segmentALerp);
-            this.controlPointA.lerp(this.controlPointB, t, this.segmentBLerp);
-            this.controlPointB.lerp(pointB, t, this.segmentCLerp);
+            pointA.lerp(controlPointA, t, segmentALerp);
+            controlPointA.lerp(controlPointB, t, segmentBLerp);
+            controlPointB.lerp(pointB, t, segmentCLerp);
 
-            final Vector3d point = new Vector3d(this.segmentALerp
-                    .lerp(this.segmentBLerp, t)
-                    .lerp(this.segmentBLerp.lerp(this.segmentCLerp, t), t));
+            final Vector3d point = new Vector3d(segmentALerp
+                    .lerp(segmentBLerp, t)
+                    .lerp(segmentBLerp.lerp(segmentCLerp, t), t));
 
             final Vector3d normal = new Vector3d();
 
@@ -307,77 +356,79 @@ public class SpringRenderer extends SmartBlockEntityRenderer<SpringBlockEntity> 
         return list;
     }
 
-    private void renderSegment(final PoseStack ms,
-                               final Vector3dc startDirection,
-                               final Vector3dc endDirection,
-                               final Vector3dc inputStartUp,
-                               final Vector3dc inputEndUp,
-                               final Vector3dc startPos,
-                               final Vector3dc endPos,
-                               final boolean second,
-                               final float uvStart,
-                               final float uvEnd,
-                               final int light,
-                               final int color,
-                               final VertexConsumer a,
-                               final float width,
-                               final float textureWidth) {
-        inputStartUp.cross(startDirection, this.startLeft).normalize();
-        inputEndUp.cross(endDirection, this.endLeft).normalize();
+    private static void renderSegment(final PoseStack.Pose transform,
+                                      final VertexConsumer a,
+                                      final Segment segment,
+                                      final int color,
+                                      final int light) {
+        final Vector3d startLeft = new Vector3d();
+        final Vector3d endLeft = new Vector3d();
+        final Vector3d startUp = new Vector3d();
+        final Vector3d endUp = new Vector3d();
+        final Vector3d vertex = new Vector3d();
+
+        final Vector3dc startDirection = segment.startDirection();
+        final Vector3dc endDirection = segment.endDirection();
+        final Vector3dc startPos = segment.startPos();
+        final Vector3dc endPos = segment.endPos();
+        final float width = segment.width();
+        final float textureWidth = segment.textureWidth();
+
+        segment.startUp().cross(startDirection, startLeft).normalize();
+        segment.endUp().cross(endDirection, endLeft).normalize();
 
         final float texW = width / textureWidth;
         final double scale = width / 16.0 / 2.0;
 
-        this.startLeft.mul(scale);
-        inputStartUp.mul(scale, this.startUp);
-        this.endLeft.mul(scale);
-        inputEndUp.mul(scale, this.endUp);
+        startLeft.mul(scale);
+        segment.startUp().mul(scale, startUp);
+        endLeft.mul(scale);
+        segment.endUp().mul(scale, endUp);
 
-        final Vector3d startDown = this.startUp.negate(new Vector3d());
-        final Vector3d endDown = this.endUp.negate(new Vector3d());
-        final Vector3d startRight = this.startLeft.negate(new Vector3d());
-        final Vector3d endRight = this.endLeft.negate(new Vector3d());
+        final Vector3d startDown = startUp.negate(new Vector3d());
+        final Vector3d endDown = endUp.negate(new Vector3d());
+        final Vector3d startRight = startLeft.negate(new Vector3d());
+        final Vector3d endRight = endLeft.negate(new Vector3d());
 
         final float uvScale = 16.0f / textureWidth;
-        final float uvXOffset = second ? width / textureWidth : 0.0f;
-        this.vert(ms, a, startPos.add(this.startLeft, this.vertex).sub(this.startUp), color, 0.0f + uvXOffset, uvStart * uvScale, startDown, light);
-        this.vert(ms, a, endPos.add(this.endLeft, this.vertex).sub(this.endUp), color, 0.0f + uvXOffset, uvEnd * uvScale, endDown, light);
-        this.vert(ms, a, endPos.sub(this.endLeft, this.vertex).sub(this.endUp), color, texW + uvXOffset, uvEnd * uvScale, endDown, light);
-        this.vert(ms, a, startPos.sub(this.startLeft, this.vertex).sub(this.startUp), color, texW + uvXOffset, uvStart * uvScale, startDown, light);
+        final float uvXOffset = segment.second() ? width / textureWidth : 0.0f;
+        final float uvStart = segment.uvStart();
+        final float uvEnd = segment.uvEnd();
 
-        this.vert(ms, a, startPos.sub(this.startLeft, this.vertex).add(this.startUp), color, 0.0f + uvXOffset, uvStart * uvScale, this.startUp, light);
-        this.vert(ms, a, endPos.sub(this.endLeft, this.vertex).add(this.endUp), color, 0.0f + uvXOffset, uvEnd * uvScale, this.endUp, light);
-        this.vert(ms, a, endPos.add(this.endLeft, this.vertex).add(this.endUp), color, texW + uvXOffset, uvEnd * uvScale, this.endUp, light);
-        this.vert(ms, a, startPos.add(this.startLeft, this.vertex).add(this.startUp), color, texW + uvXOffset, uvStart * uvScale, this.startUp, light);
+        vert(transform, a, startPos.add(startLeft, vertex).sub(startUp), color, 0.0f + uvXOffset, uvStart * uvScale, startDown, light);
+        vert(transform, a, endPos.add(endLeft, vertex).sub(endUp), color, 0.0f + uvXOffset, uvEnd * uvScale, endDown, light);
+        vert(transform, a, endPos.sub(endLeft, vertex).sub(endUp), color, texW + uvXOffset, uvEnd * uvScale, endDown, light);
+        vert(transform, a, startPos.sub(startLeft, vertex).sub(startUp), color, texW + uvXOffset, uvStart * uvScale, startDown, light);
 
-        this.vert(ms, a, startPos.sub(this.startLeft, this.vertex).sub(this.startUp), color, 0.0f + uvXOffset, uvStart * uvScale, startRight, light);
-        this.vert(ms, a, endPos.sub(this.endLeft, this.vertex).sub(this.endUp), color, 0.0f + uvXOffset, uvEnd * uvScale, endRight, light);
-        this.vert(ms, a, endPos.sub(this.endLeft, this.vertex).add(this.endUp), color, texW + uvXOffset, uvEnd * uvScale, endRight, light);
-        this.vert(ms, a, startPos.sub(this.startLeft, this.vertex).add(this.startUp), color, texW + uvXOffset, uvStart * uvScale, startRight, light);
+        vert(transform, a, startPos.sub(startLeft, vertex).add(startUp), color, 0.0f + uvXOffset, uvStart * uvScale, startUp, light);
+        vert(transform, a, endPos.sub(endLeft, vertex).add(endUp), color, 0.0f + uvXOffset, uvEnd * uvScale, endUp, light);
+        vert(transform, a, endPos.add(endLeft, vertex).add(endUp), color, texW + uvXOffset, uvEnd * uvScale, endUp, light);
+        vert(transform, a, startPos.add(startLeft, vertex).add(startUp), color, texW + uvXOffset, uvStart * uvScale, startUp, light);
 
-        this.vert(ms, a, startPos.add(this.startLeft, this.vertex).add(this.startUp), color, 0.0f + uvXOffset, uvStart * uvScale, this.startLeft, light);
-        this.vert(ms, a, endPos.add(this.endLeft, this.vertex).add(this.endUp), color, 0.0f + uvXOffset, uvEnd * uvScale, this.endLeft, light);
-        this.vert(ms, a, endPos.add(this.endLeft, this.vertex).sub(this.endUp), color, texW + uvXOffset, uvEnd * uvScale, this.endLeft, light);
-        this.vert(ms, a, startPos.add(this.startLeft, this.vertex).sub(this.startUp), color, texW + uvXOffset, uvStart * uvScale, this.startLeft, light);
+        vert(transform, a, startPos.sub(startLeft, vertex).sub(startUp), color, 0.0f + uvXOffset, uvStart * uvScale, startRight, light);
+        vert(transform, a, endPos.sub(endLeft, vertex).sub(endUp), color, 0.0f + uvXOffset, uvEnd * uvScale, endRight, light);
+        vert(transform, a, endPos.sub(endLeft, vertex).add(endUp), color, texW + uvXOffset, uvEnd * uvScale, endRight, light);
+        vert(transform, a, startPos.sub(startLeft, vertex).add(startUp), color, texW + uvXOffset, uvStart * uvScale, startRight, light);
+
+        vert(transform, a, startPos.add(startLeft, vertex).add(startUp), color, 0.0f + uvXOffset, uvStart * uvScale, startLeft, light);
+        vert(transform, a, endPos.add(endLeft, vertex).add(endUp), color, 0.0f + uvXOffset, uvEnd * uvScale, endLeft, light);
+        vert(transform, a, endPos.add(endLeft, vertex).sub(endUp), color, texW + uvXOffset, uvEnd * uvScale, endLeft, light);
+        vert(transform, a, startPos.add(startLeft, vertex).sub(startUp), color, texW + uvXOffset, uvStart * uvScale, startLeft, light);
     }
 
-    private void vert(final PoseStack ms, final VertexConsumer a, final Vector3dc pos, final int color, final float u1, final float v1, final Vector3dc normal, final int light) {
-        normal.normalize(this.normalizedNormal);
-        a.addVertex(ms.last().pose(), (float) pos.x(), (float) pos.y(), (float) pos.z())
+    private static void vert(final PoseStack.Pose transform, final VertexConsumer a, final Vector3dc pos, final int color, final float u1, final float v1, final Vector3dc normal, final int light) {
+        final Vector3d normalized = new Vector3d();
+        normal.normalize(normalized);
+        a.addVertex(transform.pose(), (float) pos.x(), (float) pos.y(), (float) pos.z())
                 .setColor(color)
                 .setUv(u1, v1)
                 .setLight(light)
-                .setNormal(ms.last(), (float) this.normalizedNormal.x(), (float) this.normalizedNormal.y(), (float) this.normalizedNormal.z());
+                .setNormal(transform, (float) normalized.x(), (float) normalized.y(), (float) normalized.z());
     }
 
     @Override
     public boolean shouldRender(final SpringBlockEntity blockEntity, final Vec3 vec3) {
         return true;
-    }
-
-    @Override
-    public boolean shouldRenderOffScreen(final SpringBlockEntity blockEntity) {
-        return super.shouldRenderOffScreen(blockEntity);
     }
 
     record SplinePoint(Vector3dc point, Vector3dc normal) {
