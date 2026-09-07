@@ -1,4 +1,14 @@
 {
   "vertex": "aeronautics:hot_air_overlay",
-  "fragment": "aeronautics:hot_air_overlay"
+  "fragment": "aeronautics:hot_air_overlay",
+  "textures": {
+    "Sampler0": {
+      "type": "location",
+      "location": "aeronautics:textures/special/heat_overlay.png"
+    },
+    "Sampler1": {
+      "type": "location",
+      "location": "aeronautics:textures/special/lava_still.png"
+    }
+  }
 }

@@ -1,7 +1,7 @@
 package dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.effect;
 
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.opengl.GlStateManager;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.BlockEntityLiftingGasProvider;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.Balloon;
@@ -28,9 +28,6 @@ public class ClientBalloonEffectRenderer {
 
     private static final Identifier FBO_ID = Aeronautics.path("soft_light");
     private static final Identifier POST_SHADER_ID = Aeronautics.path("soft_light");
-
-    private static final Identifier SIDE_TEXTURE = Aeronautics.path("textures/special/heat_overlay.png");
-    private static final Identifier TOP_TEXTURE = Aeronautics.path("textures/special/lava_still.png");
 
     private static final Identifier SHADER_ID = Aeronautics.path("hot_air_overlay");
 
@@ -87,17 +84,19 @@ public class ClientBalloonEffectRenderer {
         overlayFbo.bind(false);
         overlayFbo.clear(0.0f, 0.0f, 0.0f, 0.0f, GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
 
-        RenderSystem.setShaderTexture(0, SIDE_TEXTURE);
-        RenderSystem.setShaderTexture(1, TOP_TEXTURE);
-        RenderSystem.enableCull();
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
+        // 26.2: RenderSystem.setShaderTexture is gone, and with it the two constants that named the
+        // side and top textures here. The samplers this program reads are declared in
+        // hot_air_overlay.json instead, which is how Veil binds a program's textures -- the same
+        // mechanism levitite already used for its noise sampler.
+        GlStateManager._enableCull();
+        GlStateManager._depthMask(true);
+        GlStateManager._enableDepthTest();
 
         GL30.glCullFace(GL11.GL_FRONT);
 
         // Polygon offset to be before blocks
-        RenderSystem.polygonOffset(-0.5F, -30.0F);
-        RenderSystem.enablePolygonOffset();
+        GlStateManager._polygonOffset(-0.5F, -30.0F);
+        GlStateManager._enablePolygonOffset();
 
         final float scrollAmount = (renderTick + partialTicks) / -20.0f;
 
@@ -106,9 +105,11 @@ public class ClientBalloonEffectRenderer {
 
         scrollUniform.setFloat((float) (Math.floor(scrollAmount * 16.0f) / 16.0f));
 
+        // 26.2: setShaderColor drove a vanilla uniform that no longer exists. The program declares
+        // ColorModulator itself, so it is set by name like every other uniform here.
         final float brightness = 0.85f;
         final float alpha = 1.0f;
-        RenderSystem.setShaderColor(brightness, brightness, brightness, alpha);
+        shader.getUniformSafe("ColorModulator").setVector(brightness, brightness, brightness, alpha);
 
         final Matrix4f modelViewMat = new Matrix4f(frustumMatrix);
         final Matrix4f projMat = new Matrix4f(projectionMatrix);
@@ -133,14 +134,14 @@ public class ClientBalloonEffectRenderer {
             filledPercent = Mth.clamp(filledPercent, 0.0f, 1.0f);
             yCutoffUniform.setFloat((1.0f - filledPercent) * (balloon.getHeight() + 1.0f));
 
-            renderRegion.render(modelViewMat, projMat);
+            renderRegion.render(shader, modelViewMat, projMat);
         }
 
         // Cleanup render state
-        RenderSystem.polygonOffset(0.0F, 0.0F);
-        RenderSystem.disablePolygonOffset();
+        GlStateManager._polygonOffset(0.0F, 0.0F);
+        GlStateManager._disablePolygonOffset();
         GL30.glCullFace(GL11.GL_BACK);
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        shader.getUniformSafe("ColorModulator").setVector(1.0f, 1.0f, 1.0f, 1.0f);
         AdvancedFbo.unbind();
 
         applyHeatingToScreen();

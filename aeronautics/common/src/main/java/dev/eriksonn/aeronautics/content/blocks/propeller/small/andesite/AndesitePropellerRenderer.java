@@ -8,7 +8,7 @@ import net.minecraft.core.Direction;
 
 import static dev.eriksonn.aeronautics.content.blocks.propeller.small.BasePropellerBlock.REVERSED;
 
-public class AndesitePropellerRenderer extends SimplePropellerRenderer<AndesitePropellerBlockEntity> {
+public class AndesitePropellerRenderer extends SimplePropellerRenderer<AndesitePropellerBlockEntity, SimplePropellerRenderer.SimplePropellerRenderState> {
 
     public AndesitePropellerRenderer(final BlockEntityRendererProvider.Context context) {
         super(context);

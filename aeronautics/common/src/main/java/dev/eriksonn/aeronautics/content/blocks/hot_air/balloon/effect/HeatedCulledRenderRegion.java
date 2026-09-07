@@ -1,6 +1,6 @@
 package dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.effect;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.*;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.Balloon;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.graph.BalloonLayerData;
@@ -12,7 +12,8 @@ import dev.ryanhcode.sable.render.region.SimpleCulledRenderRegionBuilder;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.util.LevelAccelerator;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ShaderInstance;
+import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import foundry.veil.api.client.render.vertex.VertexArray;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -26,7 +27,7 @@ import java.util.List;
 public class HeatedCulledRenderRegion implements NativeResource {
     private Balloon balloon;
     private boolean built = false;
-    private VertexBuffer buffer;
+    private VertexArray buffer;
     private Vec3 origin;
     private final LevelAccelerator accelerator;
 
@@ -35,7 +36,14 @@ public class HeatedCulledRenderRegion implements NativeResource {
         this.balloon = balloon;
     }
 
-    public void render(final Matrix4f modelView, final Matrix4f projectionMatrix) {
+    /**
+     * <h2>26.2 note</h2>
+     * <p>The shader arrives as an argument rather than being fetched from {@code RenderSystem}:
+     * {@code ShaderInstance} is gone, this draw runs under a Veil program, and the caller is the one
+     * that bound it. {@code setDefaultUniforms} went with it, so the two matrices the shader
+     * declares are set by name here -- there is no engine-side convention left to lean on.
+     */
+    public void render(final ShaderProgram shader, final Matrix4f modelView, final Matrix4f projectionMatrix) {
         if (!this.built) {
             this.build();
         }
@@ -43,10 +51,6 @@ public class HeatedCulledRenderRegion implements NativeResource {
         if (this.buffer == null) {
             return;
         }
-
-
-        final ShaderInstance shader = RenderSystem.getShader();
-        assert shader != null;
 
         final Minecraft client = Minecraft.getInstance();
         final ClientSubLevel subLevel = Sable.HELPER.getContainingClient(this.origin);
@@ -60,20 +64,20 @@ public class HeatedCulledRenderRegion implements NativeResource {
             globalOrientation.set(renderPose.orientation());
         }
 
-        final Vec3 relativePos = globalOrigin.subtract(client.gameRenderer.mainCamera().getPosition());
+        final Vec3 relativePos = globalOrigin.subtract(client.gameRenderer.mainCamera().position());
 
         final Matrix4f modelViewMatrix = new Matrix4f(modelView)
                 .setTranslation(0.0f, 0.0f, 0.0f)
                 .translate((float) relativePos.x, (float) relativePos.y, (float) relativePos.z)
                 .rotate(globalOrientation);
 
-        shader.setDefaultUniforms(VertexFormat.Mode.QUADS, modelViewMatrix, projectionMatrix, client.getWindow());
-        shader.apply();
+        shader.getUniformSafe("ModelViewMat").setMatrix(modelViewMatrix);
+        shader.getUniformSafe("ProjMat").setMatrix(projectionMatrix);
 
         this.buffer.bind();
         this.buffer.draw();
 
-        VertexBuffer.unbind();
+        VertexArray.unbind();
     }
 
     public void build() {
@@ -111,18 +115,23 @@ public class HeatedCulledRenderRegion implements NativeResource {
 
         builder.buildNoGreedy();
 
-        final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, this.getVertexFormat());
-        builder.render(new Matrix4f(), bufferBuilder);
+        // 26.2: Tesselator and VertexBuffer are both gone. A BufferBuilder writes into a
+        // ByteBufferBuilder the caller owns, and the mesh is uploaded through Veil's VertexArray --
+        // whose draw() also knows how to issue GL_PATCHES when the bound program is tessellated.
+        this.buffer = null;
+        try (ByteBufferBuilder byteBuffer = new ByteBufferBuilder(this.getVertexFormat().getVertexSize() * 1024)) {
+            final BufferBuilder bufferBuilder = new BufferBuilder(byteBuffer, PrimitiveTopology.QUADS, this.getVertexFormat());
+            builder.render(new Matrix4f(), bufferBuilder);
 
-        this.balloon = null;
-        final MeshData builtData = bufferBuilder.build();
+            this.balloon = null;
+            final MeshData builtData = bufferBuilder.build();
 
-        if (builtData != null) {
-            this.buffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-            this.buffer.bind();
-            this.buffer.upload(builtData);
-        } else {
-            this.buffer = null;
+            if (builtData != null) {
+                this.buffer = VertexArray.create();
+                this.buffer.bind();
+                this.buffer.upload(builtData, VertexArray.DrawUsage.STATIC);
+                VertexArray.unbind();
+            }
         }
 
         this.built = true;
@@ -143,7 +152,7 @@ public class HeatedCulledRenderRegion implements NativeResource {
     @Override
     public void free() {
         if (this.built && this.buffer != null) {
-            this.buffer.close();
+            this.buffer.free();
         }
     }
 }

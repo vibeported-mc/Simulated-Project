@@ -8,7 +8,7 @@ import net.minecraft.core.Direction;
 
 import static dev.eriksonn.aeronautics.content.blocks.propeller.small.BasePropellerBlock.REVERSED;
 
-public class WoodenPropellerRenderer extends SimplePropellerRenderer<WoodenPropellerBlockEntity> {
+public class WoodenPropellerRenderer extends SimplePropellerRenderer<WoodenPropellerBlockEntity, SimplePropellerRenderer.SimplePropellerRenderState> {
 
     public WoodenPropellerRenderer(final BlockEntityRendererProvider.Context context) {
         super(context);
