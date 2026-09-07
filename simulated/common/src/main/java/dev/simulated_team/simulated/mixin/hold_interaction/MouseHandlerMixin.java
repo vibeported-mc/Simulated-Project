@@ -5,6 +5,7 @@ import dev.simulated_team.simulated.events.SimulatedCommonClientEvents;
 import dev.simulated_team.simulated.util.SimDistUtil;
 import dev.simulated_team.simulated.util.click_interactions.InteractCallback;
 import net.minecraft.client.MouseHandler;
+import net.minecraft.client.input.MouseButtonInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,12 +27,22 @@ public class MouseHandlerMixin {
         }
     }
 
-    @Inject(method = "onPress",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;", ordinal = 0),
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code onPress} became {@code onButton}, and the button and its modifiers arrive together in
+     * a {@code MouseButtonInfo} rather than as two loose ints -- which also retires the two
+     * {@code @Local}s that were only reaching back for the arguments.
+     *
+     * <p>The overlay moved off {@code Minecraft} onto the {@code Gui}, so the injection point is that
+     * call instead: the same place in the method, before anything dispatches the press.
+     */
+    @Inject(method = "onButton",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;overlay()Lnet/minecraft/client/gui/screens/Overlay;", ordinal = 0),
             cancellable = true)
-    private void simulated$preOnPress(final long windowPointer, final int button, final int action, final int modifiers, final CallbackInfo ci, @Local(ordinal = 1, argsOnly = true) final int i, @Local(argsOnly = true, ordinal = 0) final long l) {
+    private void simulated$preOnPress(final long windowPointer, final MouseButtonInfo buttonInfo, final int action, final CallbackInfo ci) {
         if (SimDistUtil.getClientPlayer() != null && !SimDistUtil.getClientPlayer().isSpectator()) {
-            final InteractCallback.Result status = SimulatedCommonClientEvents.onBeforeMouseInput(InteractCallback.Input.mouse(button), modifiers, action);
+            final InteractCallback.Result status = SimulatedCommonClientEvents.onBeforeMouseInput(
+                    InteractCallback.Input.mouse(buttonInfo.button()), buttonInfo.modifiers(), action);
             if (status.cancelled()) {
                 ci.cancel();
             }
@@ -39,7 +50,7 @@ public class MouseHandlerMixin {
     }
 
     @Inject(method = "onScroll",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;", ordinal = 0),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;overlay()Lnet/minecraft/client/gui/screens/Overlay;", ordinal = 0),
             cancellable = true)
     private void simulated$preOnScroll(final long l, final double d, final double e, final CallbackInfo ci, @Local(ordinal = 3) final double deltaX, @Local(ordinal = 4) final double deltaY) {
         if (SimDistUtil.getClientPlayer() != null && !SimDistUtil.getClientPlayer().isSpectator()) {
