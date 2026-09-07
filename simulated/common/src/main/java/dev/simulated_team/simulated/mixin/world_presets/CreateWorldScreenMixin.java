@@ -10,7 +10,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.gamerules.GameRules;
-import net.minecraft.world.level.dimension.end.EndDragonFight;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Final;
@@ -42,7 +41,7 @@ public abstract class CreateWorldScreenMixin {
             return;
         }
 
-        final Identifier location = key.get().location();
+        final Identifier location = key.get().identifier();
         final SimulatedWorldPreset simPreset = SimWorldPresets.PRESETS.get(location);
 
         if (simPreset != null) {
@@ -63,9 +62,12 @@ public abstract class CreateWorldScreenMixin {
             return;
         }
 
-        ((PrimaryLevelDataExtension) worldData).setPreset(key.get().location());
-        if (holder.is(SimWorldPresets.END_SEA.id())) {
-            ((PrimaryLevelDataExtension) worldData).setEndDragonFight(new EndDragonFight.Data(false, true, true, false, Optional.empty(), Optional.empty(), Optional.empty()));
-        }
+        ((PrimaryLevelDataExtension) worldData).setPreset(key.get().identifier());
+        // 26.2 port: the End Sea preset used to pre-complete the dragon fight so the End was
+        // reachable without killing the dragon, by writing PrimaryLevelData's EndDragonFight.Data.
+        // That record is gone: the fight became an EnderDragonFight SavedData with its own
+        // SavedDataType, no longer a field on the level data, so there is nothing to set here.
+        // Restoring it means creating that saved data for the End when the world is made. See
+        // SIMULATED-26.2-OPEN-QUESTIONS.md.
     }
 }

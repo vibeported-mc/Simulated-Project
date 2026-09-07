@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.index;
 
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.data.models.model.TextureSlot;
@@ -233,7 +234,7 @@ public class SimBlocks {
             createHandle(color, HandleBlock.Variant.DYED)
                 .recipe((c, p) -> p.shapeless(RecipeCategory.MISC, c.get(), 1)
                         .requires(IRON_HANDLE)
-                        .requires(DyeItem.byColor(color))
+                        .requires(Items.DYE.pick(color))
                         .unlockedBy("has_ingredient", p.has(IRON_HANDLE))
                         .group("simulated:handle_variants")
                         .save(p))
@@ -344,8 +345,8 @@ public class SimBlocks {
                             new ModelTemplate(java.util.Optional.of(p.modLoc("block/portable_engine/item")),
                                     java.util.Optional.empty(), TextureSlot.create("0"), TextureSlot.PARTICLE),
                             new TextureMapping()
-                                    .put(TextureSlot.create("0"), p.modLoc("block/portable_engine/" + colorName))
-                                    .put(TextureSlot.PARTICLE, p.modLoc("block/portable_engine/" + colorName))))
+                                    .put(TextureSlot.create("0"), new Material(p.modLoc("block/portable_engine/" + colorName)))
+                                    .put(TextureSlot.PARTICLE, new Material(p.modLoc("block/portable_engine/" + colorName)))))
                     .build()
                     .register();
         } else {
@@ -356,8 +357,8 @@ public class SimBlocks {
                             new ModelTemplate(java.util.Optional.of(p.modLoc("block/portable_engine/item")),
                                     java.util.Optional.empty(), TextureSlot.create("0"), TextureSlot.PARTICLE),
                             new TextureMapping()
-                                    .put(TextureSlot.create("0"), p.modLoc("block/portable_engine/" + colorName))
-                                    .put(TextureSlot.PARTICLE, p.modLoc("block/portable_engine/" + colorName))))
+                                    .put(TextureSlot.create("0"), new Material(p.modLoc("block/portable_engine/" + colorName)))
+                                    .put(TextureSlot.PARTICLE, new Material(p.modLoc("block/portable_engine/" + colorName)))))
                     .build()
                     .register();
         }
@@ -884,9 +885,13 @@ public class SimBlocks {
                 if(variant == HandleBlock.Variant.IRON) {
                     return BlockModelGenerators.plainVariant(prov.modLoc("block/handle/block_" + suffix));
                 } else {
-                    return prov.models()
-                            .withExistingParent(ctx.getName() + "_" + suffix, prov.modLoc("block/handle/block_" + suffix))
-                            .texture("0", prov.modLoc("block/handle/" + name));
+                    // 26.2 port: models().withExistingParent(...).texture(...) is gone. Registrate
+                    // keeps a builder of the same shape that writes through the model output and
+                    // hands back the identifier the variant names.
+                    return BlockModelGenerators.plainVariant(prov.getBuilder()
+                            .parent(prov.modLoc("block/handle/block_" + suffix))
+                            .texture(TextureSlot.create("0"), new Material(prov.modLoc("block/handle/" + name)))
+                            .build(prov.modLoc("block/" + ctx.getName() + "_" + suffix)));
                 }
             });
         });
@@ -894,10 +899,11 @@ public class SimBlocks {
         builder.onRegisterAfter(Registries.ITEM, v -> ItemDescription.useKey(v, "block.simulated.handle"));
 
         final ItemBuilder<BlockItem, BlockBuilder<HandleBlock, CreateRegistrate>> itemBuilder = builder.item();
-        itemBuilder.model((ctx, prov) -> {
-                    prov.withExistingParent(ctx.getName(), prov.modLoc("block/handle/item"))
-                            .texture("0", prov.modLoc("block/handle/" + name));
-                });
+        itemBuilder.model(() -> (ctx, prov) -> prov.generateWithTemplate(ctx.getEntry(),
+                new ModelTemplate(java.util.Optional.of(prov.modLoc("block/handle/item")),
+                        java.util.Optional.empty(), TextureSlot.create("0")),
+                new TextureMapping().put(TextureSlot.create("0"),
+                        new Material(prov.modLoc("block/handle/" + name)))));
 
         if(variant != HandleBlock.Variant.IRON) {
             itemBuilder.tag(SimTags.Items.HANDLE_VARIANTS);

@@ -8,12 +8,10 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelSettings;
-import net.minecraft.world.level.dimension.end.EndDragonFight;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,8 +24,7 @@ public class PrimaryLevelDataMixin implements PrimaryLevelDataExtension {
 	@Unique
 	private static final String simulated$WORLD_PRESET_KEY = "simulated:world_preset";
 
-	@Shadow private EndDragonFight.Data endDragonFightData;
-	private Identifier simulated$worldPresetKey = WorldPresets.NORMAL.location();
+	private Identifier simulated$worldPresetKey = WorldPresets.NORMAL.identifier();
 
 	@Inject(method = "parse", at = @At("RETURN"), remap = false)
 	private static <T> void simulated$parse(final Dynamic<T> dynamic, final LevelSettings levelSettings, final PrimaryLevelData.SpecialWorldProperty specialWorldProperty, final WorldOptions worldOptions, final Lifecycle lifecycle, final CallbackInfoReturnable<PrimaryLevelData> cir) {
@@ -50,10 +47,5 @@ public class PrimaryLevelDataMixin implements PrimaryLevelDataExtension {
 	@Override
 	public void setPreset(final Identifier resourceLocation) {
 		this.simulated$worldPresetKey = resourceLocation;
-	}
-
-	@Override
-	public void setEndDragonFight(final EndDragonFight.Data endDragonFight) {
-		this.endDragonFightData = endDragonFight;
 	}
 }
