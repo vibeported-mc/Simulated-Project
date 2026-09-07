@@ -14,6 +14,7 @@ import dev.simulated_team.simulated.content.items.plunger_launcher.PlungerLaunch
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.index.SimRenderTypes;
 import dev.simulated_team.simulated.util.CatmulRomSpline;
+import dev.simulated_team.simulated.util.render.ProjectionUtil;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBufferRenderState;
@@ -59,9 +60,8 @@ import java.util.List;
  * instance serves every plunger in the world and submission may run off the render thread, so they
  * are locals now.
  *
- * <p>{@code GameRenderer.getFov} and {@code getProjectionMatrix} are gone. The camera owns its
- * projection but does not hand it out; it hands out {@code P * V} and {@code V}, so the projection is
- * recovered as {@code (P * V) * V^-1}, which is exact and needs no guess at aspect or clip planes.
+ * <p>{@code GameRenderer.getFov} and {@code getProjectionMatrix} are gone; see
+ * {@link ProjectionUtil} for where the two projections come from now.
  */
 public class LaunchedPlungerEntityRenderer
         extends EntityRenderer<LaunchedPlungerEntity, LaunchedPlungerEntityRenderer.PlungerRenderState> {
@@ -100,7 +100,7 @@ public class LaunchedPlungerEntityRenderer
         orientation.transformInverse(focusPoint);
         final Vector4f v4 = new Vector4f((float) focusPoint.x, (float) focusPoint.y, (float) focusPoint.z, 1.0f);
 
-        final Matrix4f actualProjMat = currentProjectionMatrix(camera);
+        final Matrix4f actualProjMat = ProjectionUtil.levelProjection(camera);
         actualProjMat.invert(new Matrix4f()).transform(v4);
         PlungerLauncherItemRenderer.itemProjMat.transform(v4);
         final Vec3 cameraPosition = camera.position();
@@ -112,16 +112,6 @@ public class LaunchedPlungerEntityRenderer
         focusPoint.add(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
         return JOMLConversion.toMojang(focusPoint);
-    }
-
-    /**
-     * The projection matrix currently in use, recovered from the two matrices the camera does expose:
-     * {@code getViewRotationProjectionMatrix} is {@code P * V}, so multiplying by {@code V^-1} leaves
-     * {@code P}.
-     */
-    public static Matrix4f currentProjectionMatrix(final Camera camera) {
-        final Matrix4f inverseView = camera.getViewRotationMatrix(new Matrix4f()).invert();
-        return camera.getViewRotationProjectionMatrix(new Matrix4f()).mul(inverseView);
     }
 
     @Override

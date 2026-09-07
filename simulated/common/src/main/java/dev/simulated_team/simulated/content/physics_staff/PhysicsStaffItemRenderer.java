@@ -1,9 +1,7 @@
 package dev.simulated_team.simulated.content.physics_staff;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.simibubi.create.foundation.item.render.CustomRenderedItemModel;
 import com.simibubi.create.foundation.item.render.CustomRenderedItemModelRenderer;
 import com.simibubi.create.foundation.item.render.PartialItemModelRenderer;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
@@ -13,14 +11,15 @@ import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.index.SimRenderTypes;
 import dev.simulated_team.simulated.util.SimDistUtil;
 import dev.simulated_team.simulated.util.SimMathUtils;
+import dev.simulated_team.simulated.util.render.ProjectionUtil;
 import foundry.veil.Veil;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.LightCoordsUtil;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -36,7 +35,7 @@ public class PhysicsStaffItemRenderer extends CustomRenderedItemModelRenderer {
 
     public static Vec3 getFirstPersonFocusPos(final float pt) {
         final GameRenderer gameRenderer = Minecraft.getInstance().gameRenderer;
-        final Camera camera = gameRenderer.getMainCamera();
+        final Camera camera = gameRenderer.mainCamera();
 
         final Vector3d focusPoint = new Vector3d(PhysicsStaffItemRenderer.focusPos);
         final Quaternionf orientation = camera.rotation();
@@ -44,21 +43,21 @@ public class PhysicsStaffItemRenderer extends CustomRenderedItemModelRenderer {
         final Vector4f v4 = new Vector4f((float) focusPoint.x, (float) focusPoint.y, (float) focusPoint.z, 1.0f);
 
 
-        final Matrix4f actualProjMat = gameRenderer.getProjectionMatrix(gameRenderer.getFov(camera, AnimationTickHolder.getPartialTicks(), true));
+        final Matrix4f actualProjMat = ProjectionUtil.levelProjection(camera);
         actualProjMat.invert(new Matrix4f()).transform(v4);
         itemProjMat.transform(v4);
         focusPoint.set(v4.x, v4.y, v4.z);
         orientation.transform(focusPoint);
 
-        final double fov = gameRenderer.getFov(camera, pt, true);
+        final double fov = camera.getFov();
         focusPoint.mul(100 / fov);
 
         return JOMLConversion.toMojang(focusPoint);
     }
 
     @Override
-    protected void render(final ItemStack stack, final CustomRenderedItemModel model, final PartialItemModelRenderer renderer, final ItemDisplayContext context, final PoseStack ms,
-                          final MultiBufferSource buffer, final int light, final int overlay) {
+    protected void render(final ItemStack stack, final PartialItemModelRenderer renderer, final ItemDisplayContext context, final PoseStack ms,
+                          final SubmitNodeCollector buffer, final int light, final int overlay) {
         float openAmount = 0;
         float cubeScale = 0;
         final PhysicsStaffClientHandler clientHandler = SimulatedClient.PHYSICS_STAFF_CLIENT_HANDLER;
@@ -100,7 +99,7 @@ public class PhysicsStaffItemRenderer extends CustomRenderedItemModelRenderer {
             if (clientHandler.getDragSession() != null) {
                 final PhysicsStaffClientHandler.ClientDragSession dragSession = clientHandler.getDragSession();
 
-                final Quaternionf rotation = minecraft.gameRenderer.getMainCamera().rotation();
+                final Quaternionf rotation = minecraft.gameRenderer.mainCamera().rotation();
                 final Vector3d globalAnchor = ((ClientSubLevel) dragSession.dragSubLevel()).renderPose().transformPosition(new Vector3d(dragSession.dragLocalAnchor()));
                 final Vector3d dirToAnchor = globalAnchor.sub(JOMLConversion.toJOML(player.getEyePosition(partialTicks))).normalize();
                 rotation.transformInverse(dirToAnchor);
@@ -116,7 +115,7 @@ public class PhysicsStaffItemRenderer extends CustomRenderedItemModelRenderer {
         }
 
 
-        renderer.render(model.getOriginalModel(), Sheets.cutoutBlockSheet(), light);
+        renderer.renderBase(light);
 
         renderer.render(SimPartialModels.PHYSICS_STAFF_CORE.get(), SimRenderTypes.itemGlowingSolid(shadersActive), LightCoordsUtil.FULL_BRIGHT);
         renderer.render(SimPartialModels.PHYSICS_STAFF_CORE_GLOW.get(), SimRenderTypes.itemGlowingTranslucent(shadersActive), LightCoordsUtil.FULL_BRIGHT);
@@ -124,7 +123,7 @@ public class PhysicsStaffItemRenderer extends CustomRenderedItemModelRenderer {
 
         ms.pushPose();
         ms.translate(0, 6.5 / 16.0, 0);
-        renderer.render(SimPartialModels.PHYSICS_STAFF_RING.get(), Sheets.cutoutBlockSheet(), light);
+        renderer.render(SimPartialModels.PHYSICS_STAFF_RING.get(), Sheets.cutoutBlockItemSheet(), light);
         ms.popPose();
 
         ms.translate(0, 9 / 16.0, 0);
@@ -133,7 +132,7 @@ public class PhysicsStaffItemRenderer extends CustomRenderedItemModelRenderer {
             ms.mulPose(Axis.YP.rotationDegrees(i * 180));
             ms.translate(-3 / 16.0, 0, 0);
             ms.mulPose(Axis.ZP.rotationDegrees(openAmount * 20));
-            renderer.render(SimPartialModels.PHYSICS_STAFF_SIGMA.get(), Sheets.cutoutBlockSheet(), light);
+            renderer.render(SimPartialModels.PHYSICS_STAFF_SIGMA.get(), Sheets.cutoutBlockItemSheet(), light);
             ms.popPose();
         }
         ms.translate(0, 6 / 16.0, 0);
@@ -160,16 +159,16 @@ public class PhysicsStaffItemRenderer extends CustomRenderedItemModelRenderer {
             final Vector3f focusPoint = new Vector3f();
             ms.last().pose().transformPosition(focusPoint);
 
-            itemProjMat.set(RenderSystem.getProjectionMatrix());
+            itemProjMat.set(ProjectionUtil.handProjection());
             focusPos.set(focusPoint.x, focusPoint.y, focusPoint.z);
         }
 
         ms.scale(1.2f, 1.2f, 1.2f);
         renderer.render(SimPartialModels.PHYSICS_STAFF_OUTER_CUBE.get(), SimRenderTypes.itemGlowingTranslucent(shadersActive), LightCoordsUtil.FULL_BRIGHT);
 
-        // Iris doesn't allow individual render types to be ended, so all batches must be ended for the translucent parts to draw correctly
-        if (Veil.IRIS && !shadersActive) {
-            Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
-        }
+        // 26.2 port: the Iris workaround here ended every batch, because Iris would not let one
+        // render type be ended on its own. There is nothing left to end -- drawing is submitted and
+        // replayed rather than batched into a buffer source -- and with no Iris build the branch was
+        // unreachable anyway. Revisit it if Iris returns.
     }
 }

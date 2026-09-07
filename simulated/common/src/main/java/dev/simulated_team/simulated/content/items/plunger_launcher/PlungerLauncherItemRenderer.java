@@ -1,9 +1,7 @@
 package dev.simulated_team.simulated.content.items.plunger_launcher;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.equipment.zapper.ShootableGadgetRenderHandler;
-import com.simibubi.create.foundation.item.render.CustomRenderedItemModel;
 import com.simibubi.create.foundation.item.render.CustomRenderedItemModelRenderer;
 import com.simibubi.create.foundation.item.render.PartialItemModelRenderer;
 import com.simibubi.create.foundation.particle.AirParticleData;
@@ -13,14 +11,16 @@ import dev.simulated_team.simulated.content.entities.launched_plunger.LaunchedPl
 import dev.simulated_team.simulated.index.SimItems;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.mixin_interface.PlayerLaunchedPlungerExtension;
+import dev.simulated_team.simulated.util.render.ProjectionUtil;
 import net.createmod.catnip.api.math.VecHelper;
 import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -33,19 +33,29 @@ import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
+/**
+ * <h2>26.2 note</h2>
+ * <p>Custom item rendering is a {@code SpecialModelRenderer} contributing to the frame's submit
+ * queue, so the buffer source is a {@link SubmitNodeCollector} and the item's own model is drawn
+ * through {@code renderBase} rather than fetched off a {@code CustomRenderedItemModel}.
+ *
+ * <p>The hand's projection matrix, which the aiming code reads back through
+ * {@link LaunchedPlungerEntityRenderer#getFirstPersonFocusPos}, is rebuilt by
+ * {@link ProjectionUtil#handProjection()}; {@code RenderSystem.getProjectionMatrix()} is gone.
+ */
 public class PlungerLauncherItemRenderer extends CustomRenderedItemModelRenderer {
 
     public static final Vector3d focusPos = new Vector3d();
     public static final Matrix4f itemProjMat = new Matrix4f();
 
     @Override
-    protected void render(final ItemStack stack, final CustomRenderedItemModel model, final PartialItemModelRenderer renderer, final ItemDisplayContext transformType, final PoseStack ms, final MultiBufferSource buffer, final int light, final int overlay) {
+    protected void render(final ItemStack stack, final PartialItemModelRenderer renderer, final ItemDisplayContext transformType, final PoseStack ms, final SubmitNodeCollector buffer, final int light, final int overlay) {
         ms.scale(0.8f, 0.8f, 0.8f);
         ms.translate(0, 0, 0.15f);
-        renderer.render(model.getOriginalModel(), light);
+        renderer.renderBase(light);
 
         final LocalPlayer player = Minecraft.getInstance().player;
-        final DeltaTracker timer = Minecraft.getInstance().getTimer();
+        final DeltaTracker timer = Minecraft.getInstance().getDeltaTracker();
         final float partialTicks = timer.getGameTimeDeltaPartialTick(false);
 
         final PlayerLaunchedPlungerExtension duck = (PlayerLaunchedPlungerExtension) player;
@@ -66,12 +76,12 @@ public class PlungerLauncherItemRenderer extends CustomRenderedItemModelRenderer
             final Vector3f focusPoint = new Vector3f();
             ms.last().pose().transformPosition(focusPoint);
 
-            itemProjMat.set(RenderSystem.getProjectionMatrix());
+            itemProjMat.set(ProjectionUtil.handProjection());
             focusPos.set(focusPoint.x, focusPoint.y, focusPoint.z);
         }
     }
 
-    private void renderPlunger(final PoseStack ms, final MultiBufferSource buffer, final int light, final boolean first) {
+    private void renderPlunger(final PoseStack ms, final SubmitNodeCollector buffer, final int light, final boolean first) {
         ms.pushPose();
         final SuperByteBuffer body = CachedBufferer.partial(SimPartialModels.LAUNCHED_PLUNGER_BODY, Blocks.AIR.defaultBlockState());
         final SuperByteBuffer spool = CachedBufferer.partial(SimPartialModels.LAUNCHED_PLUNGER_SPOOL, Blocks.AIR.defaultBlockState());
@@ -79,7 +89,7 @@ public class PlungerLauncherItemRenderer extends CustomRenderedItemModelRenderer
 
         ms.translate(2 / 16f * (first ? -1 : 1), -1 / 16f, -5 / 16f);
 
-        final DeltaTracker timer = Minecraft.getInstance().getTimer();
+        final DeltaTracker timer = Minecraft.getInstance().getDeltaTracker();
         final float partialTicks = timer.getGameTimeDeltaPartialTick(false);
 
         final ItemCooldowns cooldowns = Minecraft.getInstance().player.getCooldowns();
@@ -96,11 +106,12 @@ public class PlungerLauncherItemRenderer extends CustomRenderedItemModelRenderer
             }
         }
 
-        body.light(light).renderInto(ms, buffer.getBuffer(RenderType.solid()));
-        joint.light(light).renderInto(ms, buffer.getBuffer(RenderType.solid()));
+        final RenderType renderType = RenderTypes.solidMovingBlock();
+        body.light(light).extractRenderState().submit(ms, renderType, buffer);
+        joint.light(light).extractRenderState().submit(ms, renderType, buffer);
 
         ms.translate(0, 0, 3 / 16f);
-        spool.light(light).renderInto(ms, buffer.getBuffer(RenderType.solid()));
+        spool.light(light).extractRenderState().submit(ms, renderType, buffer);
         ms.popPose();
     }
 
