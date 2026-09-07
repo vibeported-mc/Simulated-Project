@@ -1,5 +1,8 @@
 package dev.simulated_team.simulated.content.entities.launched_plunger;
 
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.simibubi.create.foundation.utility.NbtValueIO;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.entity.EntitySubLevelUtil;
 import dev.ryanhcode.sable.api.physics.constraint.ConstraintJointAxis;
@@ -366,7 +369,8 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
     }
 
     @Override
-    protected void addAdditionalSaveData(final CompoundTag compoundTag) {
+    protected void addAdditionalSaveData(final ValueOutput output) {
+        final CompoundTag compoundTag = new CompoundTag();
         final Optional<UUID> other = this.getData(OTHER_PLUNGER);
         other.ifPresent(value -> compoundTag.putUUID("OtherPlunger", value));
 
@@ -377,11 +381,13 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
 
         compoundTag.putBoolean("IsFirst", this.getData(IS_FIRST));
 
-        super.addAdditionalSaveData(compoundTag);
+        NbtValueIO.store(output, tag);
+        super.addAdditionalSaveData(output);
     }
 
     @Override
-    protected void readAdditionalSaveData(final CompoundTag compoundTag) {
+    protected void readAdditionalSaveData(final ValueInput input) {
+        final CompoundTag compoundTag = NbtValueIO.read(input);
         this.setData(IS_PLUNGED, compoundTag.getBoolean("IsPlunged"));
 
         this.setData(PLUNGED_DIRECTION, NBTHelper.readEnum(compoundTag, "PlungedDir", Direction.class));
@@ -394,7 +400,7 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
             this.setData(OTHER_PLUNGER, Optional.of(compoundTag.getUUID("OtherPlunger")));
         }
 
-        super.readAdditionalSaveData(compoundTag);
+        super.readAdditionalSaveData(input);
     }
 
     public void resetPlunged() {

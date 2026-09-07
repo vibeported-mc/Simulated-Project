@@ -1,5 +1,8 @@
 package dev.eriksonn.aeronautics.content.blocks.hot_air.gust;
 
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.simibubi.create.foundation.utility.NbtValueIO;
 import dev.eriksonn.aeronautics.content.particle.AirPoofParticleData;
 import dev.eriksonn.aeronautics.content.particle.GustParticleData;
 import dev.eriksonn.aeronautics.index.AeroEntityTypes;
@@ -148,7 +151,8 @@ public class GustEntity extends Entity implements IEntityWithComplexSpawn {
     }
 
     @Override
-    protected void readAdditionalSaveData(final CompoundTag compoundTag) {
+    protected void readAdditionalSaveData(final ValueInput input) {
+        final CompoundTag compoundTag = NbtValueIO.read(input);
         compoundTag.put("GustOrientation", SableNBTUtils.writeQuaternion(this.orientation));
     }
 

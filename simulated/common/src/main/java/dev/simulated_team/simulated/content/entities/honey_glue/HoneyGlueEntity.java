@@ -1,5 +1,8 @@
 package dev.simulated_team.simulated.content.entities.honey_glue;
 
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.simibubi.create.foundation.utility.NbtValueIO;
 import com.simibubi.create.api.schematic.requirement.SpecialEntityItemRequirement;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import dev.simulated_team.simulated.Simulated;
@@ -163,7 +166,8 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundTag compound) {
+    public void addAdditionalSaveData(final ValueOutput output) {
+        final CompoundTag compound = new CompoundTag();
         final Vec3 position = this.position();
         final AABB savedBounds = this.getBoundingBox().move(position.scale(-1));
 
@@ -173,6 +177,7 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
         if (!compound.contains("Pos")) {
             compound.put("Pos", VecHelper.writeNBT(position));
         }
+            NbtValueIO.store(output, tag);
     }
 
     @Override

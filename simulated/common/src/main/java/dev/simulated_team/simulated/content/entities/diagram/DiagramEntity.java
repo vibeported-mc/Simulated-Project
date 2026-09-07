@@ -1,5 +1,8 @@
 package dev.simulated_team.simulated.content.entities.diagram;
 
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import com.simibubi.create.foundation.utility.NbtValueIO;
 import com.simibubi.create.api.schematic.requirement.SpecialEntityItemRequirement;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import com.simibubi.create.foundation.networking.ISyncPersistentData;
@@ -195,7 +198,8 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundTag tag) {
+    public void addAdditionalSaveData(final ValueOutput output) {
+        final CompoundTag tag = new CompoundTag();
         tag.putByte("Facing", (byte) this.direction.get3DDataValue());
         tag.putByte("Orientation", (byte) this.verticalOrientation.get3DDataValue());
         tag.putInt("Size", this.size);
@@ -204,11 +208,13 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
             tag.put("Config", DiagramConfig.CODEC.encodeStart(NbtOps.INSTANCE, this.config).getOrThrow());
         }
 
-        super.addAdditionalSaveData(tag);
+        NbtValueIO.store(output, tag);
+        super.addAdditionalSaveData(output);
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundTag tag) {
+    public void readAdditionalSaveData(final ValueInput input) {
+        final CompoundTag tag = NbtValueIO.read(input);
         if (tag.contains("Facing", Tag.TAG_ANY_NUMERIC)) {
             this.direction = Direction.from3DDataValue(tag.getByteOr("Facing", (byte) 0));
             this.verticalOrientation = Direction.from3DDataValue(tag.getByteOr("Orientation", (byte) 0));
@@ -226,7 +232,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
             this.config = DiagramConfig.makeDefault(this);
         }
 
-        super.readAdditionalSaveData(tag);
+        super.readAdditionalSaveData(input);
         this.updateFacingWithBoundingBox(this.direction, this.verticalOrientation);
     }
 
