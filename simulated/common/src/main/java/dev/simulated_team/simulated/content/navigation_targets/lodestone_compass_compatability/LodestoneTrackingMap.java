@@ -68,7 +68,7 @@ public class LodestoneTrackingMap extends SavedData {
 
 	private static LodestoneTrackingMap load(final ServerLevel level, final CompoundTag tag) {
 		final LodestoneTrackingMap lodestoneMap = new LodestoneTrackingMap(level);
-		final ListTag serializedInfo = tag.getList("TrackerInformation", Tag.TAG_COMPOUND);
+		final ListTag serializedInfo = tag.getListOrEmpty("TrackerInformation");
 
 		for (final Tag infoInner : serializedInfo) {
 			lodestoneMap.lodestoneInformationSet.add(LodestoneInformation.loadFromCompound((CompoundTag) infoInner));

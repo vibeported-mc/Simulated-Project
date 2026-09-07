@@ -6,7 +6,7 @@ import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.ponder.records.PonderLineRecord;
 import net.createmod.catnip.api.client.outliner.LineOutline;
 import net.createmod.catnip.api.client.render.PonderRenderTypes;
-import net.createmod.catnip.render.SuperRenderTypeBuffer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -35,18 +35,24 @@ public class LerpedLineOutline extends LineOutline {
         this.set(start, end);
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>An outline is submitted rather than drawn into a buffer source. The colour has to be copied
+     * out of {@code colorTemp} into the closure -- the base class reuses that field between outlines,
+     * and the geometry callback runs after this method has returned.
+     */
     @Override
-    public void render(final PoseStack ms, final SuperRenderTypeBuffer buffer, final Vec3 camera, final float pt) {
+    public void submit(final PoseStack ms, final SubmitNodeCollector queue, final Vec3 camera, final float pt) {
         final float width = this.params.getLineWidth();
         if (width == 0)
             return;
 
-        final VertexConsumer consumer = buffer.getBuffer(PonderRenderTypes.outlineSolid());
         this.params.loadColor(this.colorTemp);
-        final Vector4f color = this.colorTemp;
+        final Vector4f color = new Vector4f(this.colorTemp);
         final int lightmap = LightCoordsUtil.FULL_BRIGHT;
         final boolean disableLineNormals = false;
-        this.renderInner(ms, consumer, camera, pt, width, color, lightmap, disableLineNormals);
+        queue.submitCustomGeometry(ms, PonderRenderTypes.outlineSolid(),
+                (pose, consumer) -> this.renderInner(ms, consumer, camera, pt, width, color, lightmap, disableLineNormals));
     }
 
     @Override

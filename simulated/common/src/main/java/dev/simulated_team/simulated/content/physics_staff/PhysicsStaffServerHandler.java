@@ -95,7 +95,7 @@ public class PhysicsStaffServerHandler extends SavedData {
 
     private static PhysicsStaffServerHandler create(final ServerLevel level, final CompoundTag nbt, final HolderLookup.Provider registries) {
         final PhysicsStaffServerHandler sd = new PhysicsStaffServerHandler(level);
-        sd.loadLocks(nbt.getList(ID, Tag.TAG_INT_ARRAY));
+        sd.loadLocks(nbt.getListOrEmpty(ID));
         return sd;
     }
 

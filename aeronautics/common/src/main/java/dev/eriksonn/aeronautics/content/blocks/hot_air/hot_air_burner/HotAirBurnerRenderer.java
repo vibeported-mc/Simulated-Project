@@ -116,7 +116,7 @@ public class HotAirBurnerRenderer
         final Vec3 center = Vec3.atCenterOf(pos);
 
         final Minecraft minecraft = Minecraft.getInstance();
-        Vec3 camera = minecraft.gameRenderer.getMainCamera().getPosition();
+        Vec3 camera = minecraft.gameRenderer.mainCamera().getPosition();
 
         if (be.getLevel() instanceof PonderLevel) {
             camera = minecraft.getCameraEntity().getPosition(partialTicks);

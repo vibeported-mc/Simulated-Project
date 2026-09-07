@@ -35,7 +35,7 @@ public class LevelRendererMixin {
             Uniform time = shaderinstance.getUniform("time");
             if (time != null) {
                 long ticks = this.level.getGameTime();
-                final float pt = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+                final float pt = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
                 ticks = ticks % 100000;
                 time.set(ticks + pt);
             }

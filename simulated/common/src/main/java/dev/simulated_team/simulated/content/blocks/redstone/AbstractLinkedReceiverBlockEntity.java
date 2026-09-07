@@ -86,9 +86,9 @@ public abstract class AbstractLinkedReceiverBlockEntity extends SmartBlockEntity
             final Direction attachedFace = blockState.getValue(RedstoneLinkBlock.FACING)
                     .getOpposite();
             final BlockPos attachedPos = this.worldPosition.relative(attachedFace);
-            this.level.blockUpdated(this.worldPosition, this.level.getBlockState(this.worldPosition)
+            this.level.updateNeighborsAt(this.worldPosition, this.level.getBlockState(this.worldPosition)
                     .getBlock());
-            this.level.blockUpdated(attachedPos, this.level.getBlockState(attachedPos)
+            this.level.updateNeighborsAt(attachedPos, this.level.getBlockState(attachedPos)
                     .getBlock());
             this.receivedSignalChanged = false;
             //sendData();
@@ -168,9 +168,9 @@ public abstract class AbstractLinkedReceiverBlockEntity extends SmartBlockEntity
         final Direction attachedFace = this.getBlockState().getValue(RedstoneLinkBlock.FACING)
                 .getOpposite();
         final BlockPos attachedPos = this.worldPosition.relative(attachedFace);
-        this.level.blockUpdated(this.worldPosition, this.level.getBlockState(this.worldPosition)
+        this.level.updateNeighborsAt(this.worldPosition, this.level.getBlockState(this.worldPosition)
                 .getBlock());
-        this.level.blockUpdated(attachedPos, this.level.getBlockState(attachedPos)
+        this.level.updateNeighborsAt(attachedPos, this.level.getBlockState(attachedPos)
                 .getBlock());
     }
 }

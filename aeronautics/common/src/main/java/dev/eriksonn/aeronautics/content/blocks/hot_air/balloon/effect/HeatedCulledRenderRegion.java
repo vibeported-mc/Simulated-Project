@@ -60,7 +60,7 @@ public class HeatedCulledRenderRegion implements NativeResource {
             globalOrientation.set(renderPose.orientation());
         }
 
-        final Vec3 relativePos = globalOrigin.subtract(client.gameRenderer.getMainCamera().getPosition());
+        final Vec3 relativePos = globalOrigin.subtract(client.gameRenderer.mainCamera().getPosition());
 
         final Matrix4f modelViewMatrix = new Matrix4f(modelView)
                 .setTranslation(0.0f, 0.0f, 0.0f)

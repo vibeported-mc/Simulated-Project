@@ -139,7 +139,7 @@ public class LevititeShaderManager {
     }
 
     public void prepareShaderForSublevel(ClientSubLevel subLevel, ShaderInstance shader, double camX, double camY, double camZ) {
-        final float pt = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+        final float pt = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
 
         Pose3dc currentPose = subLevel.renderPose(pt);
         currentPos.set(currentPose.position());

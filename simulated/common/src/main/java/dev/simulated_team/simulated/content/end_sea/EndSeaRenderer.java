@@ -112,7 +112,7 @@ public class EndSeaRenderer {
         }
 
         final LocalPlayer player = minecraft.player;
-        final float renderTime = player.tickCount + minecraft.getTimer().getGameTimeDeltaPartialTick(false);
+        final float renderTime = player.tickCount + minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
 
         for (int i = 0; i < LAYER_COUNT; i++) {
             final Vec3 layer = LAYER_COLORS[i % LAYER_COLORS.length];

@@ -23,7 +23,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.util.LightCoordsUtil;
-import net.minecraft.client.renderer.MultiBufferSource;
+import foundry.veil.api.client.render.CachedBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -46,15 +46,15 @@ public class PhysicsStaffRenderHandler {
     /**
      * Renders the selection / hovering box for the staff
      */
-    public static void renderSelectionBox(final VeilRenderLevelStageEvent.Stage stage, final LevelRenderer renderer, final MultiBufferSource.BufferSource bufferSource, final MatrixStack ps, final Matrix4fc frustrumMat, final Matrix4fc projectionMat, final int renderTick, final DeltaTracker tracker, final Camera camera, final Frustum frustrum) {
+    public static void renderSelectionBox(final VeilRenderLevelStageEvent.Stage stage, final LevelRenderer renderer, final CachedBufferSource bufferSource, final MatrixStack ps, final Matrix4fc frustrumMat, final Matrix4fc projectionMat, final int renderTick, final DeltaTracker tracker, final Camera camera, final Frustum frustrum) {
         if (stage != VeilRenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
 
-        if (Minecraft.getInstance().options.hideGui) {
+        if (Minecraft.getInstance().gui.hud.isHidden()) {
             return;
         }
 
         ps.matrixPush();
-        SimulatedClient.PHYSICS_STAFF_CLIENT_HANDLER.onRender(ps.toPoseStack());
+        SimulatedClient.PHYSICS_STAFF_CLIENT_HANDLER.onRender(ps.toPoseStack(), bufferSource);
         ps.matrixPop();
 
         final Minecraft minecraft = Minecraft.getInstance();
@@ -88,7 +88,7 @@ public class PhysicsStaffRenderHandler {
      */
     private static void updateHoverPos(final Minecraft minecraft, final LocalPlayer player) {
         final ClientLevel level = minecraft.level;
-        final float partialTicks = minecraft.getTimer().getGameTimeDeltaPartialTick(false);
+        final float partialTicks = minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
 
         hoverBlockPos = null;
 
@@ -122,7 +122,7 @@ public class PhysicsStaffRenderHandler {
     /**
      * Renders all the locks our client is aware about
      */
-    private static void renderAllLocks(final MultiBufferSource.BufferSource bufferSource, final MatrixStack ps, final Level level, final Vec3 cameraPos) {
+    private static void renderAllLocks(final CachedBufferSource bufferSource, final MatrixStack ps, final Level level, final Vec3 cameraPos) {
         final Minecraft client = Minecraft.getInstance();
         final List<UUID> locks = SimulatedClient.PHYSICS_STAFF_CLIENT_HANDLER.getLocks(level);
         final SubLevelContainer container = SubLevelContainer.getContainer(level);

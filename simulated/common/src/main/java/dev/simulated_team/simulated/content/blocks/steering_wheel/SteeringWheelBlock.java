@@ -72,7 +72,7 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock
                 player.isLocalPlayer()) {
             final VoxelShape wheel = (onFloor ? SimBlockShapes.STEERING_WHEEL_FLOOR : SimBlockShapes.STEERING_WHEEL_CEILING).get(facing);
             final VoxelShape mount = SimBlockShapes.STEERING_WHEEL_MOUNT.get(facing);
-            return lookingAtWheel(player, pos, Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), wheel, mount) ? wheel : mount;
+            return lookingAtWheel(player, pos, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), wheel, mount) ? wheel : mount;
         }
 
         if (state.getValue(ON_FLOOR)) {
@@ -143,7 +143,7 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock
 
     @Override
     public @Nullable InteractionResult quietUse(final Player player, final InteractionHand hand, final BlockPos pos, final BlockState state) {
-        if (lookingAtWheel(player, pos, Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), state)) {
+        if (lookingAtWheel(player, pos, Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true), state)) {
             return this.getBlockEntityOptional(player.level(), pos).map( be -> {
                 if (!be.held &&
                         !be.isMaterialValid(player.getItemInHand(hand)) &&

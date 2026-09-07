@@ -224,7 +224,7 @@ public class DiagramStickyNote extends DiagramButton {
         if (this.renderTime >= 20.0f / DiagramScreen.FPS) {
             this.renderTime = 0.0f;
         } else {
-            this.renderTime += Minecraft.getInstance().getTimer().getRealtimeDeltaTicks();
+            this.renderTime += Minecraft.getInstance().getDeltaTracker().getRealtimeDeltaTicks();
             return;
         }
 

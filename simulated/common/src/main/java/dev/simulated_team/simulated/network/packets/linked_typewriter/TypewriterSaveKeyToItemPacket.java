@@ -54,7 +54,7 @@ public record TypewriterSaveKeyToItemPacket(InteractionHand hand, LinkedTypewrit
             currentTag.put("Keys", new ListTag());
         }
 
-        final ListTag keys = currentTag.getList("Keys", Tag.TAG_COMPOUND);
+        final ListTag keys = currentTag.getListOrEmpty("Keys");
         boolean alreadyPresent = false;
 
         for (int i = 0; i < keys.size(); i++) {

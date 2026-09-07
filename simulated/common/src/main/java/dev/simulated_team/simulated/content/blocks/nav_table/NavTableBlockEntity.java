@@ -287,7 +287,7 @@ public class NavTableBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     private Vec3 readCurrentTarget(final CompoundTag tag) {
-        final ListTag targetList = tag.getList("CurrentTarget", Tag.TAG_DOUBLE);
+        final ListTag targetList = tag.getListOrEmpty("CurrentTarget");
         return VecHelper.readNBT(targetList);
     }
 

@@ -124,7 +124,7 @@ public class LinkedTypewriterItemBindHandler {
         }
 
         final Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui) {
+        if (mc.gui.hud.isHidden()) {
             return;
         }
 

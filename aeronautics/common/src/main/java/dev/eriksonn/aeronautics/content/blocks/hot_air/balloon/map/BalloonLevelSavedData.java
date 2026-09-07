@@ -27,7 +27,7 @@ public class BalloonLevelSavedData extends SavedData {
         final BalloonLevelSavedData sd = new BalloonLevelSavedData();
 
         if (tag.contains(ID)) {
-            final DataResult<Pair<List<SavedBalloon>, Tag>> result = CODEC.decode(NbtOps.INSTANCE, tag.getList(ID, Tag.TAG_COMPOUND));
+            final DataResult<Pair<List<SavedBalloon>, Tag>> result = CODEC.decode(NbtOps.INSTANCE, tag.getListOrEmpty(ID));
 
             final BalloonMap map = BalloonMap.MAP.get(level);
             result.ifSuccess(x -> map.getUnloadedBalloons().addAll(x.getFirst()));

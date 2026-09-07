@@ -1,6 +1,5 @@
 package dev.simulated_team.simulated.content.physics_staff;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.CreateClient;
 import dev.ryanhcode.sable.Sable;
@@ -23,8 +22,12 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.createmod.catnip.api.data.Pair;
 import net.createmod.catnip.api.client.outliner.LineOutline;
-import net.createmod.catnip.render.DefaultSuperRenderTypeBuffer;
-import net.createmod.catnip.render.SuperRenderTypeBuffer;
+import net.createmod.catnip.api.client.render.PonderRenderTypes;
+import foundry.veil.api.client.render.CachedBufferSource;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.util.LightCoordsUtil;
+import org.joml.Vector3d;
+import org.joml.Vector4f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -82,7 +85,7 @@ public class PhysicsStaffClientHandler {
 
     public static Vec3 getStaffFocusPos(final Player player, final boolean mainHand, final float pt) {
         final Minecraft minecraft = Minecraft.getInstance();
-        final Camera camera = minecraft.gameRenderer.getMainCamera();
+        final Camera camera = minecraft.gameRenderer.mainCamera();
 
         if (player.isLocalPlayer() && !camera.isDetached()) {
             final Vec3 savedPos = PhysicsStaffItemRenderer.getFirstPersonFocusPos(pt)
@@ -354,11 +357,17 @@ public class PhysicsStaffClientHandler {
         }
     }
 
-    public void onRender(final PoseStack ms) {
-        final SuperRenderTypeBuffer buffer = DefaultSuperRenderTypeBuffer.getInstance();
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code SuperRenderTypeBuffer} is gone with {@code MultiBufferSource}. This runs from a Veil
+     * render-level stage, which hands over Veil's own buffer source and no submit queue, so the beam
+     * is written into that rather than into a global one -- and there is nothing left to
+     * {@code draw()}, because the stage drains it.
+     */
+    public void onRender(final PoseStack ms, final CachedBufferSource buffer) {
         final float pt = AnimationTickHolder.getPartialTicks();
         final Minecraft client = Minecraft.getInstance();
-        final Vec3 camera = client.gameRenderer.getMainCamera().getPosition();
+        final Vec3 camera = client.gameRenderer.mainCamera().position();
 
         this.beams.forEach((uuid, beam) -> {
             final Player player = client.level.getPlayerByUUID(uuid);
@@ -384,9 +393,6 @@ public class PhysicsStaffClientHandler {
                 beam.render(focusPos, interpolatedBeamEnd, ms, buffer, camera, pt);
             }
         });
-
-        buffer.draw();
-        RenderSystem.enableCull();
     }
 
     public void updateBeam(final Level level, final UUID uuid, final Vec3 start, final Vec3 end) {
@@ -500,16 +506,32 @@ public class PhysicsStaffClientHandler {
             this.cubeScale = this.extension;
         }
 
-        private void render(final Vec3 start, final Vec3 end, final PoseStack ms, final SuperRenderTypeBuffer buffer, final Vec3 camera, final float pt) {
+        private void render(final Vec3 start, final Vec3 end, final PoseStack ms, final CachedBufferSource buffer, final Vec3 camera, final float pt) {
             final Vec3 relative = end.subtract(start);
             this.length = relative.length();
 
+            // 26.2 port: an Outline submits itself to a queue now, and there is no queue at a Veil
+            // render stage. Its geometry builder is still public, so the segments are written
+            // directly -- the same quads the outline would have submitted.
+            final float width = this.line.getParams().getLineWidth();
+            if (width == 0)
+                return;
+
+            final Vector4f color = new Vector4f();
+            this.line.getParams().loadColor(color);
+            final VertexConsumer consumer = buffer.getBuffer(PonderRenderTypes.outlineSolid());
+
+            final Vector3d segmentStart = new Vector3d();
+            final Vector3d segmentEnd = new Vector3d();
             Vec3 lastPos = start;
 
             for (int i = 1; i < this.nodes.size(); i++) {
                 final Vec3 offset = this.nodes.get(i).previousPosition.lerp(this.nodes.get(i).position, pt);
                 final Vec3 currentPos = start.add(relative.scale(i / (float) this.nodes.size()).add(offset.scale(this.currentNodeRadius)));
-                this.line.set(lastPos, currentPos).render(ms, buffer, camera, pt);
+                segmentStart.set(lastPos.x, lastPos.y, lastPos.z);
+                segmentEnd.set(currentPos.x, currentPos.y, currentPos.z);
+                this.line.bufferCuboidLine(ms, consumer, camera, segmentStart, segmentEnd, width, color,
+                        LightCoordsUtil.FULL_BRIGHT, true);
                 lastPos = currentPos;
             }
         }

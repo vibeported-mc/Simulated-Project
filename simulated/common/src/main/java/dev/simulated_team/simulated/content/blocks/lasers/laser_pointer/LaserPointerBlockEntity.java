@@ -126,7 +126,7 @@ public class LaserPointerBlockEntity extends AbstractLaserBlockEntity implements
         Vec3 currentHit = Vec3.ZERO;
 
         if (tag.contains("HitPos")) {
-            currentHit = VecHelper.readNBT(tag.getList("HitPos", Tag.TAG_COMPOUND));
+            currentHit = VecHelper.readNBT(tag.getListOrEmpty("HitPos"));
         }
 
         return currentHit;

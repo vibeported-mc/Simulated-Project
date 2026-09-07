@@ -392,20 +392,20 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
 
         compoundTag.putBoolean("IsFirst", this.getData(IS_FIRST));
 
-        NbtValueIO.store(output, tag);
+        NbtValueIO.store(output, compoundTag);
         super.addAdditionalSaveData(output);
     }
 
     @Override
     protected void readAdditionalSaveData(final ValueInput input) {
         final CompoundTag compoundTag = NbtValueIO.read(input);
-        this.setData(IS_PLUNGED, compoundTag.getBoolean("IsPlunged"));
+        this.setData(IS_PLUNGED, compoundTag.getBooleanOr("IsPlunged", false));
 
         this.setData(PLUNGED_DIRECTION, NBTHelper.readEnum(compoundTag, "PlungedDir", Direction.class));
         this.setData(PLUNGED_BLOCK_POS, compoundTag.read("PlungedBlockPos", BlockPos.CODEC).get());
         this.setData(TARGET_POS, VecHelper.readNBT((ListTag) compoundTag.get("TargetPos")));
 
-        this.setData(IS_FIRST, compoundTag.getBoolean("IsFirst"));
+        this.setData(IS_FIRST, compoundTag.getBooleanOr("IsFirst", false));
 
         if (compoundTag.contains("OtherPlunger")) {
             this.setData(OTHER_PLUNGER, Optional.of(compoundTag.read("OtherPlunger", UUIDUtil.CODEC).orElseThrow()));
@@ -510,8 +510,8 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
     }
 
     @Override
-    public void load(final CompoundTag compound) {
-        super.load(compound);
+    public void load(final ValueInput input) {
+        super.load(input);
         this.setOwner(null); // Sets the owner to null so that plungers without a pair will be removed when loaded
         this.ownerUUID = null;
     }
