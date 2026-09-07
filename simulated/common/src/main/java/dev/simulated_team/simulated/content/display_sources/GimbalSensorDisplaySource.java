@@ -36,7 +36,7 @@ public class GimbalSensorDisplaySource extends AbstractNumericDisplaysource {
             return ZERO.copy();
         }
 
-        switch (displayLinkContext.sourceConfig().getInt(this.getSelectionKey())) {
+        switch (displayLinkContext.sourceConfig().getIntOr(this.getSelectionKey(), 0)) {
             case (0) -> {
                 return SimLang.number(Math.toDegrees(be.getXAngle())).component();
             }

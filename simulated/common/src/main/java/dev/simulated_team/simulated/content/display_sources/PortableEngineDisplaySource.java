@@ -32,7 +32,7 @@ public class PortableEngineDisplaySource extends AbstractNumericDisplaysource {
             return ZERO.copy();
         }
 
-        switch (displayLinkContext.sourceConfig().getInt(this.getSelectionKey())) {
+        switch (displayLinkContext.sourceConfig().getIntOr(this.getSelectionKey(), 0)) {
             case 0 -> {
                 if (be.isCurrentFuelInfinite()) {
                     return SimLang.translate("portable_engine.infinite").component();

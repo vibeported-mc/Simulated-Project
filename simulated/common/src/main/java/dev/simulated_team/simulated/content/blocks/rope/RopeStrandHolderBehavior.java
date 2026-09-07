@@ -442,7 +442,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
 
         final ServerRopeStrand strand = this.getOwnedStrand();
         if (strand != null && this.strandOwner && !clientPacket) {
-            nbt.store("Strand", ServerRopeStrand.CODEC, strand).getOrThrow();
+            nbt.store("Strand", ServerRopeStrand.CODEC, strand);
         }
     }
 
