@@ -1,17 +1,18 @@
 package dev.eriksonn.aeronautics.neoforge.content.fluids;
 
-import com.mojang.blaze3d.shaders.FogShape;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.tterrag.registrate.builders.FluidBuilder;
 import net.createmod.catnip.api.theme.Color;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.client.renderer.fog.environment.FogEnvironment;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.function.Supplier;
 
@@ -50,21 +51,36 @@ public abstract class AeroFluidType extends FluidType implements IClientFluidTyp
 		return this.flowingTexture;
 	}
 
+	/**
+	 * <h2>26.2 note</h2>
+	 * <p>The fog colour is written into a {@code Vector4f} the caller owns rather than returned, and
+	 * the alpha channel it arrives with is left alone -- this fluid only ever had a colour to give.
+	 */
 	@Override
-	public Vector3f modifyFogColor(Camera camera, float partialTick, ClientLevel level, int renderDistance, float darkenWorldAmount, Vector3f fluidFogColor) {
+	public void modifyFogColor(Camera camera, float partialTick, ClientLevel level, int renderDistance,
+			float darkenWorldAmount, Vector4f fluidFogColor) {
 		Vector3f customFogColor = this.getCustomFogColor();
-		return customFogColor == null ? fluidFogColor : customFogColor;
+		if (customFogColor != null)
+			fluidFogColor.set(customFogColor.x, customFogColor.y, customFogColor.z, fluidFogColor.w);
 	}
 
+	/**
+	 * <h2>26.2 note</h2>
+	 * <p>Fog is described by filling in a {@link FogData} rather than by pushing uniforms through
+	 * {@code RenderSystem}, and the {@code FogMode} became a {@code FogEnvironment} that may be null.
+	 *
+	 * <p>The cylindrical fog shape has no equivalent to set: {@code FogData} carries distances only,
+	 * and the shape is the renderer's to choose. Everything else is the same pair of distances this
+	 * always wrote.
+	 */
 	@Override
-	public void modifyFogRender(Camera camera, FogRenderer.FogMode mode, float renderDistance, float partialTick, float nearDistance, float farDistance, FogShape shape) {
-		IClientFluidTypeExtensions.super.modifyFogRender(camera, mode, renderDistance, partialTick, nearDistance, farDistance, shape);
+	public void modifyFogRender(Camera camera, @Nullable FogEnvironment environment, float renderDistance,
+			float partialTick, FogData fogData) {
 		float modifier = this.getFogDistanceModifier();
 		float baseWaterFog = 96.0f;
-		if(modifier != 1.0f) {
-			RenderSystem.setShaderFogShape(FogShape.CYLINDER);
-			RenderSystem.setShaderFogStart(-8);
-			RenderSystem.setShaderFogEnd(baseWaterFog * modifier);
+		if (modifier != 1.0f) {
+			fogData.environmentalStart = -8;
+			fogData.environmentalEnd = baseWaterFog * modifier;
 		}
 	}
 

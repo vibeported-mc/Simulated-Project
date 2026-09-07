@@ -2,25 +2,13 @@ package dev.eriksonn.aeronautics.neoforge.events;
 
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.events.AeronauticsClientEvents;
-import dev.eriksonn.aeronautics.index.AeroBlocks;
-import dev.eriksonn.aeronautics.index.client.AeroRenderTypes;
-import dev.eriksonn.aeronautics.mixin.levitite.ChunkRenderTypeSetAccessor;
 import dev.eriksonn.aeronautics.neoforge.content.fluids.AeroFluidType;
 import dev.eriksonn.aeronautics.neoforge.index.AeroFluidsNeoForge;
-import foundry.veil.forge.event.ForgeVeilRegisterBlockLayersEvent;
-import foundry.veil.forge.event.ForgeVeilRegisterFixedBuffersEvent;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-
-import java.util.List;
 
 @EventBusSubscriber(modid = Aeronautics.MOD_ID, value = Dist.CLIENT)
 public class AeroNeoForgeClientEvents {
@@ -45,33 +33,25 @@ public class AeroNeoForgeClientEvents {
             event.registerFluidType(type, type);
         }
 
-        @SubscribeEvent
-        public static void clientSetup(final FMLClientSetupEvent event) {
-            final ChunkRenderTypeSet set = ChunkRenderTypeSet.of(RenderType.SOLID, AeroRenderTypes.levitite(), AeroRenderTypes.levititeGhosts());
-            ItemBlockRenderTypes.setRenderLayer(AeroBlocks.LEVITITE.get(), set);
-            ItemBlockRenderTypes.setRenderLayer(AeroBlocks.PEARLESCENT_LEVITITE.get(), set);
-
-            fixChunkRenderTypeSet();
-        }
-
         /**
-         * Certain mods (like Bookshelf) cause the ChunkRenderTypeSet class in NeoForge to get initialized early,
-         * cementing the chunk render layers inside it. We do this as an unfortunate safety measure to "fix" the
-         * static collections in ChunkRenderTypeSet to include the Levitite layers, if the class is loaded before
-         * us.
+         * <h2>26.2 note</h2>
+         * <p>Three things lived here and none of them has a target any more. All are the same
+         * feature -- levitite drawn as a chunk layer with its own shader -- and all are recorded in
+         * AERONAUTICS-26.2-OPEN-QUESTIONS.md alongside the three mixins parked for it.
+         *
+         * <ul>
+         *   <li>{@code clientSetup} assigned both levitite render types to the levitite blocks
+         *       through {@code ItemBlockRenderTypes}. That class is gone: 26.2 derives a block's
+         *       chunk layer from its texture's alpha channel rather than letting a mod name one, and
+         *       {@code ChunkSectionLayer} is a closed enum a render type cannot join.</li>
+         *   <li>{@code fixChunkRenderTypeSet} reached into NeoForge's {@code ChunkRenderTypeSet} to
+         *       re-open its static layer list, for mods that forced the class to initialise early.
+         *       The class no longer exists, and neither does {@code RenderType.chunkBufferLayers}.</li>
+         *   <li>{@code registerRegisterStageEvent} added the two types as render-level stages
+         *       through {@code RenderLevelStageEvent.RegisterStageEvent}, which is gone as well.
+         *       Veil's own fixed-buffer registration in {@code AeronauticsClient} covers the same
+         *       ground and does survive.</li>
+         * </ul>
          */
-        private static void fixChunkRenderTypeSet() {
-            final List<RenderType> list = RenderType.chunkBufferLayers();
-
-            ChunkRenderTypeSetAccessor.setChunkRenderTypesList(list);
-            ChunkRenderTypeSetAccessor.setChunkRenderTypes(list.toArray(new RenderType[0]));
-            ((ChunkRenderTypeSetAccessor) (Object) ChunkRenderTypeSet.all()).getBits().set(0, list.size());
-        }
-
-        @SubscribeEvent
-        public static void registerRegisterStageEvent(final RenderLevelStageEvent.RegisterStageEvent event) {
-            event.register(Aeronautics.path("levitite"), AeroRenderTypes.levitite());
-            event.register(Aeronautics.path("levitite_ghosts"), AeroRenderTypes.levititeGhosts());
-        }
     }
 }
