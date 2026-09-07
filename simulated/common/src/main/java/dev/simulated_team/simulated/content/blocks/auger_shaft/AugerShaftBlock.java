@@ -19,7 +19,6 @@ import dev.simulated_team.simulated.index.SimSoundEvents;
 import net.createmod.catnip.api.placement.IPlacementHelper;
 import net.createmod.catnip.api.placement.PlacementHelpers;
 import net.createmod.catnip.api.placement.PlacementOffset;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
