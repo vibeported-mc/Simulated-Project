@@ -66,7 +66,7 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
         if (!level.isClientSide()) {
             if (player.isShiftKeyDown()) {
                 LaunchedPlungerServerHandler.removePlayerPlungers(player);
-                player.displayClientMessage(SimLang.translate("plunger_launcher.clear_plungers").color(0xaaaaaa).component(),true);
+                player.sendSystemMessage(SimLang.translate("plunger_launcher.clear_plungers").color(0xaaaaaa).component(),true);
                 return InteractionResult.SUCCESS;
             }
 
@@ -89,7 +89,7 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
 
             final LaunchedPlungerEntity plunger = duck.simulated$getLaunchedPlunger();
             if (plunger == null || plunger.isRemoved()) {
-                newPlunger.setData(LaunchedPlungerEntity.IS_FIRST, true);
+                newPlunger.setData(LaunchedPlungerEntity.IS_FIRST);
                 duck.simulated$setLaunchedPlunger(newPlunger);
                 ShootableGadgetItemMethods.applyCooldown(player, heldStack, interactionHand, b -> b.getItem() instanceof PlungerLauncherItem, 4);
                 reloadCooldown = false;

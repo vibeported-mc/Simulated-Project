@@ -130,12 +130,12 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
 
     public void sendConnectMessage(final Player player) {
         final Component customName = this.components().getOrDefault(DataComponents.CUSTOM_NAME, SimLang.translate("linked_typewriter.title").component());
-        player.displayClientMessage(SimLang.translate("linked_typewriter.start_controlling", customName.getString()).component(), true);
+        player.sendSystemMessage(SimLang.translate("linked_typewriter.start_controlling", customName.getString()).component());
     }
 
     public void sendDisconnectMessage(final Player player) {
         final Component customName = this.components().getOrDefault(DataComponents.CUSTOM_NAME, SimLang.translate("linked_typewriter.title").component());
-        player.displayClientMessage(SimLang.translate("linked_typewriter.stop_controlling", customName.getString()).component(), true);
+        player.sendSystemMessage(SimLang.translate("linked_typewriter.stop_controlling", customName.getString()).component());
     }
 
     public boolean checkUser(final UUID user) {

@@ -200,7 +200,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
     @Override
     public void addAdditionalSaveData(final ValueOutput output) {
         final CompoundTag tag = new CompoundTag();
-        tag.putByte("Facing", (byte) this.direction.get3DDataValue());
+        tag.putByte("Facing", (byte) this.getDirection().get3DDataValue());
         tag.putByte("Orientation", (byte) this.verticalOrientation.get3DDataValue());
         tag.putInt("Size", this.size);
 
@@ -215,17 +215,17 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
     @Override
     public void readAdditionalSaveData(final ValueInput input) {
         final CompoundTag tag = NbtValueIO.read(input);
-        if (tag.contains("Facing", Tag.TAG_ANY_NUMERIC)) {
-            this.direction = Direction.from3DDataValue(tag.getByteOr("Facing", (byte) 0));
+        if (tag.contains("Facing")) {
+            this.setDirectionRaw(Direction.from3DDataValue(tag.getByteOr("Facing", (byte) 0)));
             this.verticalOrientation = Direction.from3DDataValue(tag.getByteOr("Orientation", (byte) 0));
             this.size = tag.getIntOr("Size", 0);
         } else {
-            this.direction = Direction.SOUTH;
+            this.setDirectionRaw(Direction.SOUTH);
             this.verticalOrientation = Direction.DOWN;
             this.size = 1;
         }
 
-        if (tag.contains("Config", Tag.TAG_COMPOUND)) {
+        if (tag.contains("Config")) {
             final CompoundTag configTag = tag.getCompoundOrEmpty("Config");
             this.config = DiagramConfig.CODEC.parse(NbtOps.INSTANCE, configTag).getOrThrow();
         } else {
@@ -233,17 +233,17 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
         }
 
         super.readAdditionalSaveData(input);
-        this.updateFacingWithBoundingBox(this.direction, this.verticalOrientation);
+        this.updateFacingWithBoundingBox(this.getDirection(), this.verticalOrientation);
     }
 
     protected void updateFacingWithBoundingBox(final Direction facing, final Direction verticalOrientation) {
         Objects.requireNonNull(facing);
-        this.direction = facing;
+        this.setDirectionRaw(facing);
         this.verticalOrientation = verticalOrientation;
         if (facing.getAxis()
                 .isHorizontal()) {
             this.setXRot(0.0F);
-            this.setYRot(this.direction.get2DDataValue() * 90);
+            this.setYRot(this.getDirection().get2DDataValue() * 90);
         } else {
             this.setXRot(-90 * facing.getAxisDirection()
                     .getStep());
@@ -281,7 +281,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
                             .scale(0.5))
                     .add(Vec3
                             .atLowerCornerOf(axis.isHorizontal() ? Direction.UP.getUnitVec3i()
-                                    : direction == Direction.UP ? this.verticalOrientation.getUnitVec3i()
+                                    : this.getDirection() == Direction.UP ? this.verticalOrientation.getUnitVec3i()
                                     : this.verticalOrientation.getOpposite()
                                     .getUnitVec3i())
                             .scale(0.5));
@@ -293,7 +293,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
         double d4 = this.getWidth();
         double d5 = this.getHeight();
         double d6 = this.getWidth();
-        final Axis direction$axis = this.direction.getAxis();
+        final Axis direction$axis = this.getDirection().getAxis();
         switch (direction$axis) {
             case X:
                 d4 = 1.0D;
@@ -314,8 +314,8 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
 
     @Override
     public void recalculateBoundingBox() {
-        if (this.direction != null && this.verticalOrientation != null) {
-            this.setBoundingBox(this.calculateBoundingBox(this.pos, this.direction));
+        if (this.getDirection() != null && this.verticalOrientation != null) {
+            this.setBoundingBox(this.calculateBoundingBox(this.pos, this.getDirection()));
         }
     }
 
@@ -331,12 +331,12 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
         }
         final int i = Math.max(1, this.getWidth() / 16);
         final int j = Math.max(1, this.getHeight() / 16);
-        final BlockPos blockpos = this.pos.relative(this.direction.getOpposite());
-        final Direction upDirection = this.direction.getAxis()
+        final BlockPos blockpos = this.pos.relative(this.getDirection().getOpposite());
+        final Direction upDirection = this.getDirection().getAxis()
                 .isHorizontal() ? Direction.UP
-                : this.direction == Direction.UP ? this.verticalOrientation : this.verticalOrientation.getOpposite();
-        final Direction newDirection = this.direction.getAxis()
-                .isVertical() ? this.verticalOrientation.getClockWise() : this.direction.getCounterClockWise();
+                : this.getDirection() == Direction.UP ? this.verticalOrientation : this.verticalOrientation.getOpposite();
+        final Direction newDirection = this.getDirection().getAxis()
+                .isVertical() ? this.verticalOrientation.getClockWise() : this.getDirection().getCounterClockWise();
         final BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos();
 
         for (int k = 0; k < i; ++k) {
@@ -347,7 +347,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
                         .move(newDirection, k + i1)
                         .move(upDirection, l + j1);
                 final BlockState blockstate = this.level().getBlockState(blockpos$mutable);
-                if (Block.canSupportCenter(this.level(), blockpos$mutable, this.direction)) {
+                if (Block.canSupportCenter(this.level(), blockpos$mutable, this.getDirection())) {
                     continue;
                 }
                 if (!blockstate.isSolid() && !DiodeBlock.isDiode(blockstate)) {
@@ -356,8 +356,9 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
             }
         }
 
-        return this.level().getEntities(this, this.getBoundingBox(), HANGING_ENTITY)
-                .isEmpty();
+        // 26.2: the EntitySelector this used is gone; HangingEntity does the same test itself,
+        // including the "same type may not intersect" rule this relied on.
+        return this.canCoexist(false);
     }
 
     public int getWidth() {
@@ -369,9 +370,9 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
     }
 
     @Override
-    public void dropItem(@Nullable final Entity p_110128_1_) {
-        if (!this.level().getGameRules()
-                .getBoolean(GameRules.ENTITY_DROPS)) {
+    public void dropItem(final ServerLevel level, @Nullable final Entity p_110128_1_) {
+        if (!level.getGameRules()
+                .get(GameRules.ENTITY_DROPS)) {
             return;
         }
 
@@ -382,7 +383,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
             }
         }
 
-        this.spawnAtLocation(SimItems.CONTRAPTION_DIAGRAM.asStack());
+        this.spawnAtLocation(level, SimItems.CONTRAPTION_DIAGRAM.asStack());
     }
 
     @Override
@@ -401,17 +402,13 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
     }
 
     @Override
-    public void moveTo(final double x, final double y, final double z, final float p_70012_7_, final float p_70012_8_) {
+    public void snapTo(final double x, final double y, final double z, final float p_70012_7_, final float p_70012_8_) {
         this.setPos(x, y, z);
     }
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void lerpTo(final double pX, final double pY, final double pZ, final float pYRot, final float pXRot, final int pSteps) {
-        final BlockPos blockpos =
-                this.pos.offset(BlockPos.containing(pX - this.getX(), pY - this.getY(), pZ - this.getZ()));
-        this.setPos(blockpos.getX(), blockpos.getY(), blockpos.getZ());
-    }
+    // 26.2 port: Entity.lerpTo is gone -- position interpolation is driven by the entity's own
+    // InterpolationHandler now. A diagram is attached to a block and never moves under its own
+    // power, so there is nothing to interpolate and nothing to replace this with.
 
     @Override
     public void setPos(final double pX, final double pY, final double pZ) {
@@ -426,7 +423,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
             final SubLevel subLevel = Sable.HELPER.getContaining(this);
 
             if (subLevel == null) {
-                player.displayClientMessage(SimLang.translate("contraption_diagram.cannot_use").color(SimColors.NUH_UH_RED).component(), true);
+                player.sendSystemMessage(SimLang.translate("contraption_diagram.cannot_use").color(SimColors.NUH_UH_RED).component());
             }
         } else {
             final SubLevel subLevel = Sable.HELPER.getContaining(this);
