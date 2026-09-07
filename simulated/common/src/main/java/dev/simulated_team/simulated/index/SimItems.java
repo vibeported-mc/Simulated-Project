@@ -99,7 +99,8 @@ public class SimItems {
                     // renderer asks the item's client extension instead, which keeps
                     // AbstractClientPlayer out of a descriptor on a class the dedicated server loads.
                     .clientExtension(() -> () -> CustomArmPoseClientExtension.INSTANCE)
-                    .properties(p -> p.stacksTo(1).durability(200))
+                    // 26.2: enchantability is a data component rather than an Item override.
+                    .properties(p -> p.stacksTo(1).durability(200).enchantable(1))
                     .model(AssetLookup.itemModelWithPartials())
                     .tag(Tags.Items.ENCHANTABLES, ItemTags.DURABILITY_ENCHANTABLE)
                     .register();

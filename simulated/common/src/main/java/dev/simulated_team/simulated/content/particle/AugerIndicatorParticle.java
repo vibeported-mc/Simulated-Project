@@ -1,10 +1,10 @@
 package dev.simulated_team.simulated.content.particle;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.createmod.catnip.api.math.VecHelper;
 import net.createmod.catnip.api.theme.Color;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -69,11 +69,16 @@ public class AugerIndicatorParticle extends SimpleAnimatedParticle {
         this.radius += (this.radius2 - this.radius) * .1f;
     }
 
+    /**
+      * <h2>26.2 note</h2>
+      * <p>Particles extract into a render state rather than drawing into a buffer, so an invisible
+      * particle contributes nothing by declining to extract.
+      */
     @Override
-    public void render(final VertexConsumer buffer, final Camera renderInfo, final float partialTicks) {
+    public void extract(final QuadParticleRenderState renderState, final Camera camera, final float partialTicks) {
         if (!this.isVisible)
             return;
-        super.render(buffer, renderInfo, partialTicks);
+        super.extract(renderState, camera, partialTicks);
     }
 
     public void move(final double x, final double y, final double z) {

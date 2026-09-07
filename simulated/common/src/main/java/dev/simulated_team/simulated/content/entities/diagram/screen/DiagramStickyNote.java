@@ -181,7 +181,7 @@ public class DiagramStickyNote extends DiagramButton {
     }
 
     @Override
-    protected void renderWidget(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void extractWidgetRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
         final Matrix3x2fStack ps = guiGraphics.pose();
         ps.pushMatrix();
 

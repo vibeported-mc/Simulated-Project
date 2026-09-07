@@ -6,6 +6,7 @@ import io.github.ocelot.glslprocessor.api.GlslParser;
 import io.github.ocelot.glslprocessor.api.GlslSyntaxException;
 import io.github.ocelot.glslprocessor.api.node.GlslNode;
 import io.github.ocelot.glslprocessor.api.node.GlslTree;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
 import java.util.List;
@@ -15,7 +16,8 @@ public class EndSeaFadeTransformer implements ShaderPreProcessor {
     @Override
     public void modify(final Context ctx, final GlslTree tree) throws GlslSyntaxException {
         if (ctx instanceof final MinecraftContext minecraftContext) {
-            final List<RenderType> renderTypes = RenderType.chunkBufferLayers();
+            // 26.2: the chunk layers are a closed ChunkSectionLayer enum rather than a list of render types.
+            final ChunkSectionLayer[] renderTypes = ChunkSectionLayer.values();
 
             boolean anyMatches = false;
 

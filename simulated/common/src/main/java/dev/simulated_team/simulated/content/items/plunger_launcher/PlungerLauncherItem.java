@@ -176,10 +176,8 @@ public class PlungerLauncherItem extends Item {
         return false;
     }
 
-    @Override
-    public int getEnchantmentValue() {
-        return 1;
-    }
+    // 26.2 port: Item.getEnchantmentValue is gone -- enchantability is a DataComponents
+    // .ENCHANTABLE on the item's properties, set where the item is registered.
 
     public record BarrelAndCorrectionInfo(Vec3 barrelPos, Vec3 motion) {
     }

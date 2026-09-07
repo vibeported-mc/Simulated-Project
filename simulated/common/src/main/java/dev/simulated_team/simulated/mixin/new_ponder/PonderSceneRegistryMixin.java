@@ -15,6 +15,6 @@ import java.util.List;
 public class PonderSceneRegistryMixin {
 	@Inject(method = "compile(Lnet/minecraft/resources/Identifier;)Ljava/util/List;", at = @At("RETURN"))
 	private void simulated$compile(final Identifier id, final CallbackInfoReturnable<List<PonderScene>> cir) {
-		NewPonderTooltipManager.setSceneWatched(cir.getReturnValue().getFirst().getId());
+		NewPonderTooltipManager.setSceneWatched(cir.getReturnValue().getFirst().getIdentifier());
 	}
 }

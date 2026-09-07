@@ -80,7 +80,7 @@ public class SimulatedAdvancement {
     public boolean isAlreadyAwardedTo(final Player player) {
         if (!(player instanceof final ServerPlayer sp))
             return true;
-        final AdvancementHolder advancement = sp.getServer()
+        final AdvancementHolder advancement = sp.level().getServer()
                 .getAdvancements()
                 .get(Identifier.fromNamespaceAndPath(this.modid, this.id));
         if (advancement == null)
