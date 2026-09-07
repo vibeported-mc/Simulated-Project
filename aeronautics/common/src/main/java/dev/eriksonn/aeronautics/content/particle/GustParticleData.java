@@ -17,11 +17,11 @@ public record GustParticleData(
         Quaternionf orientation) implements ParticleOptions, ICustomParticleDataWithSprite<GustParticleData> {
 
     private static final MapCodec<GustParticleData> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ExtraCodecs.QUATERNIONF.fieldOf("orientation").forGetter(o -> o.orientation)
+            ExtraCodecs.QUATERNIONF.xmap(Quaternionf::new, q -> q).fieldOf("orientation").forGetter(o -> o.orientation)
     ).apply(instance, GustParticleData::new));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, GustParticleData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.QUATERNIONF, (o -> o.orientation),
+            ByteBufCodecs.QUATERNIONF.map(Quaternionf::new, q -> q), (o -> o.orientation),
             GustParticleData::new
     );
 

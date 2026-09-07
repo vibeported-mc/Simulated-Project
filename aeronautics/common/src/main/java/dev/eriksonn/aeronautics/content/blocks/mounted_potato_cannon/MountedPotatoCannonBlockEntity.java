@@ -21,6 +21,7 @@ import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import net.createmod.catnip.api.math.VecHelper;
 import net.createmod.catnip.api.nbt.NBTHelper;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -180,7 +181,7 @@ public class MountedPotatoCannonBlockEntity extends KineticBlockEntity implement
 							final float sprayChange = 360.0f / (float) type.split();
 
 							for (int i = 0; i < type.split(); i++) {
-								final PotatoProjectileEntity shootyBoomBoom = AllEntityTypes.POTATO_PROJECTILE.create(this.getLevel());
+								final PotatoProjectileEntity shootyBoomBoom = AllEntityTypes.POTATO_PROJECTILE.create(this.getLevel(), EntitySpawnReason.TRIGGERED);
 								if (shootyBoomBoom != null) {
 									shootyBoomBoom.setItem(ammo.stack());
 									((PotatoProjectileEntityExtension) shootyBoomBoom).aeronautics$setDamageMultiplier(2);
@@ -306,7 +307,7 @@ public class MountedPotatoCannonBlockEntity extends KineticBlockEntity implement
 	protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
 		super.read(compound, registries, clientPacket);
 
-		this.inventory.read(registries, compound.getCompound("inventory"));
+		this.inventory.read(registries, compound.getCompoundOrEmpty("inventory"));
 		this.inventory.updateCachedType(registries, this.inventory.slot.getStack());
 		if (clientPacket && compound.getBooleanOr("NeedsUpdate", false)) {
 			this.resetAndUpdate();

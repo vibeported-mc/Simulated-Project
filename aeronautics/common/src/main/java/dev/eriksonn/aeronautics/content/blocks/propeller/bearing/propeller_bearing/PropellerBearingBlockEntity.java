@@ -404,7 +404,7 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
     public float getSailPower(final StructureTemplate.StructureBlockInfo info) {
         BlockState state = info.state();
         if (AllBlocks.COPYCAT_PANEL.has(state)) {
-            final BlockState newState = NbtUtils.readBlockState(this.blockHolderGetter(), info.nbt().getCompound("Material"));
+            final BlockState newState = NbtUtils.readBlockState(this.blockHolderGetter(), info.nbt().getCompoundOrEmpty("Material"));
             if (!newState.isAir()) {
                 state = newState;
             }
@@ -442,10 +442,10 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
                     if (layerHashMap.containsKey(offset)) {
                         final Pair<Integer, Integer> tuple = layerHashMap.get(offset);
                         if (radius < tuple.getFirst()) {
-                            tuple.setA(radius);
+                            tuple.setFirst(radius);
                         }
                         if (radius > tuple.getSecond()) {
-                            tuple.setB(radius);
+                            tuple.setSecond(radius);
                         }
                     } else {
                         layerHashMap.put(offset, Pair.of(radius, radius));

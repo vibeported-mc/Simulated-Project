@@ -88,7 +88,7 @@ public class EnvelopeEncasedShaftBlock extends EncasedShaftBlock implements Enve
     }
 
     @Override
-    public void fallOn(final Level pLevel, final BlockState pState, final BlockPos pPos, final Entity pEntity, final float pFallDistance) {
+    public void fallOn(final Level pLevel, final BlockState pState, final BlockPos pPos, final Entity pEntity, final double pFallDistance) {
         if (pEntity.isSuppressingBounce()) {
             super.fallOn(pLevel, pState, pPos, pEntity, pFallDistance);
         } else {
@@ -96,26 +96,21 @@ public class EnvelopeEncasedShaftBlock extends EncasedShaftBlock implements Enve
         }
     }
 
-    @Override
-    public void updateEntityAfterFallOn(final BlockGetter pLevel, final Entity pEntity) {
-        if (pEntity.isSuppressingBounce()) {
-            super.updateEntityAfterFallOn(pLevel, pEntity);
-        } else {
-            this.bounceUp(pEntity);
-        }
-    }
+    /**
+     * <h2>26.2 note</h2>
+     * <p>The encased shaft broke a fall and bounced the entity through {@code fallOn} plus
+     * {@code updateEntityAfterFallOn}. The second hook does not exist: bouncing is a
+     * {@code bounceRestitution} on the block's properties, which {@code Entity} reads while resolving
+     * the collision -- and it already applies the 0.8 scale for non-living entities and honours
+     * {@code isSuppressingBounce}, both of which {@code bounceUp} did by hand.
+     *
+     * <p>The restitution is named where the block is registered, in {@code AeroBlocks}.
+     */
 
     @Override
-    public ItemStack getCloneItemStack(final BlockState state, final HitResult target, final LevelReader level, final BlockPos pos, final Player player) {
+    public ItemStack getCloneItemStack(final LevelReader level, final BlockPos pos, final BlockState state,
+            final boolean includeData, final Player player) {
         return this.getCasing().asItem().getDefaultInstance();
-    }
-
-    public void bounceUp(final Entity pEntity) {
-        final Vec3 vec3 = pEntity.getDeltaMovement();
-        if (vec3.y < 0.0D) {
-            final double d0 = pEntity instanceof LivingEntity ? 0.5D : 0.25D;
-            pEntity.setDeltaMovement(vec3.x, -vec3.y * d0, vec3.z);
-        }
     }
 
     @Override

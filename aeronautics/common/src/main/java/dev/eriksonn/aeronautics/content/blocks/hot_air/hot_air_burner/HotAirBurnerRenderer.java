@@ -116,7 +116,7 @@ public class HotAirBurnerRenderer
         final Vec3 center = Vec3.atCenterOf(pos);
 
         final Minecraft minecraft = Minecraft.getInstance();
-        Vec3 camera = minecraft.gameRenderer.mainCamera().getPosition();
+        Vec3 camera = minecraft.gameRenderer.mainCamera().position();
 
         if (be.getLevel() instanceof PonderLevel) {
             camera = minecraft.getCameraEntity().getPosition(partialTicks);
@@ -159,12 +159,15 @@ public class HotAirBurnerRenderer
         ms.translate(-0.5, 0.35, 0.5);
         ms.rotateAround(Axis.YP.rotation(state.billboardAngle), 1.0f, 0.0f, 0.0f);
 
+        // 26.2: setLight takes one packed int now. This flame never carried real light -- it
+        // smuggles a fixed-point time through the two lightmap channels -- so it writes them
+        // directly with setUv2, which is what setLight unpacks into.
         queue.submitCustomGeometry(ms, state.flameType, (transform, builder) -> {
             final Matrix4f pose = transform.pose();
-            builder.addVertex(pose, 0.0f, 0.0f, 0.0f).setColor(intensityByte, 0, 0, 255).setUv(0.0f, 1.0f).setLight(timeLow, timeHigh);
-            builder.addVertex(pose, FLAME_SIZE, 0.0f, 0.0f).setColor(intensityByte, 0, 0, 255).setUv(1.0f, 1.0f).setLight(timeLow, timeHigh);
-            builder.addVertex(pose, FLAME_SIZE, FLAME_SIZE, 0.0f).setColor(intensityByte, 0, 0, 255).setUv(1.0f, 0.0f).setLight(timeLow, timeHigh);
-            builder.addVertex(pose, 0.0f, FLAME_SIZE, 0.0f).setColor(intensityByte, 0, 0, 255).setUv(0.0f, 0.0f).setLight(timeLow, timeHigh);
+            builder.addVertex(pose, 0.0f, 0.0f, 0.0f).setColor(intensityByte, 0, 0, 255).setUv(0.0f, 1.0f).setUv2(timeLow, timeHigh);
+            builder.addVertex(pose, FLAME_SIZE, 0.0f, 0.0f).setColor(intensityByte, 0, 0, 255).setUv(1.0f, 1.0f).setUv2(timeLow, timeHigh);
+            builder.addVertex(pose, FLAME_SIZE, FLAME_SIZE, 0.0f).setColor(intensityByte, 0, 0, 255).setUv(1.0f, 0.0f).setUv2(timeLow, timeHigh);
+            builder.addVertex(pose, 0.0f, FLAME_SIZE, 0.0f).setColor(intensityByte, 0, 0, 255).setUv(0.0f, 0.0f).setUv2(timeLow, timeHigh);
         });
 
         ms.popPose();

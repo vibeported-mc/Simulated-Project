@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.block.DyedBlockList;
 import com.simibubi.create.foundation.block.connected.SimpleCTBehaviour;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.BlockStateGen;
+import com.simibubi.create.foundation.data.ModelSlots;
 import com.simibubi.create.foundation.data.SharedProperties;
 import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import com.simibubi.create.foundation.utility.DyeHelper;
@@ -37,6 +38,7 @@ import dev.simulated_team.simulated.index.sounds.SimLazySoundType;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import dev.simulated_team.simulated.registrate.simulated_tab.CreativeTabItemTransforms;
 import net.minecraft.core.BlockPos;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -82,8 +84,11 @@ public class AeroBlocks {
                     AeroSoundEvents.ENVELOPE_HIT::event,
                     () -> SoundEvents.WOOL_FALL)))
             .properties(p -> p.mapColor(DyeColor.WHITE))
-            .blockstate(() -> (c, p) -> p.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(c.get(), p.models()
-                    .cubeAll(c.getName(), p.modLoc("block/envelope_block/envelope_" + DyeColor.WHITE.getName())))))
+            // 26.2: the bounce moved off the block class and onto its properties.
+            .properties(p -> p.bounceRestitution(0.65f))
+            // 26.2: RegistrateBlockModelGenerator has no models(); a cube-all model is built and
+            // named by Create's own helper, which is the same shape this asked for.
+            .blockstate(() -> (c, p) -> BlockStateGen.cubeAll(c, p, "envelope_block/", "envelope_" + DyeColor.WHITE.getName()))
             .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 4)
                     .pattern("WS")
                     .pattern("SW")
@@ -118,8 +123,8 @@ public class AeroBlocks {
                                     AeroSoundEvents.ENVELOPE_HIT::event,
                                     () -> SoundEvents.WOOL_FALL)))
                     .properties(p -> p.mapColor(color))
-                    .blockstate(() -> (c, p) -> p.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(c.get(), p.models()
-                            .cubeAll(c.getName(), p.modLoc("block/envelope_block/envelope_" + colorName)))))
+                    .properties(p -> p.bounceRestitution(0.65f))
+                    .blockstate(() -> (c, p) -> BlockStateGen.cubeAll(c, p, "envelope_block/", "envelope_" + colorName))
                     .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 4)
                             .pattern("WS")
                             .pattern("SW")
@@ -147,6 +152,10 @@ public class AeroBlocks {
                 .initialProperties(SharedProperties::wooden)
                 .properties(p -> p.sound(SoundType.SCAFFOLDING))
                 .properties(BlockBehaviour.Properties::noOcclusion)
+                // 26.2: the bounce moved onto the properties. The old bounceUp used 0.5 for living
+                // entities and 0.25 for everything else; vanilla's own non-living scale is 0.8, so
+                // items and the like now bounce a little higher than they did.
+                .properties(p -> p.bounceRestitution(0.5f))
                 .properties(p -> p.sound(
                         new SimLazySoundType(1.0f, 1.0f,
                                 AeroSoundEvents.ENVELOPE_BREAK::event,
@@ -156,10 +165,13 @@ public class AeroBlocks {
                                 () -> SoundEvents.WOOL_FALL)))
                 .properties(p -> p.mapColor(color))
                 .transform(b -> b.transform(EncasingRegistry.addVariantTo(AllBlocks.SHAFT)))
-                .blockstate(() -> (c, p) -> BlockStateGen.axisBlock(c, p, blockState -> p.models()
-                        .withExistingParent(colorName + "_envelope_encased_shaft",
-                                p.modLoc("block/envelope_encased_shaft/block"))
-                        .texture("0", p.modLoc("block/envelope_block/envelope_" + colorName))))
+                // 26.2: a parented model with a texture override is built through the generator's own
+                // builder -- models() and withExistingParent are gone, and a texture slot is a
+                // TextureSlot holding a Material rather than a name and a path.
+                .blockstate(() -> (c, p) -> BlockStateGen.axisBlock(c, p, blockState -> BlockModelGenerators.plainVariant(p.getBuilder()
+                        .parent(p.modLoc("block/envelope_encased_shaft/block"))
+                        .texture(ModelSlots.SLOT_0, new Material(p.modLoc("block/envelope_block/envelope_" + colorName)))
+                        .build(p.modLoc("block/" + colorName + "_envelope_encased_shaft")))))
                 .loot((p, b) -> p.add(b, p.createSingleItemTable(DYED_ENVELOPE_BLOCKS.get(color))
                         .withPool(p.applyExplosionCondition(AllBlocks.SHAFT.get(), LootPool.lootPool()
                                 .setRolls(ConstantValue.exactly(1.0F))
@@ -170,7 +182,7 @@ public class AeroBlocks {
                 .transform(CreativeTabItemTransforms.VisibilityType.INVISIBLE.applyBlock())
                 .item()
                 .tag(AeroTags.ItemTags.ENVELOPE)
-                .transform(b -> b.model(SimBlockStateGen.coloredBlockItemModel("envelope_block/envelope_" + colorName, "envelope_encased_shaft/item")).build())
+                .transform(b -> b.model(() -> SimBlockStateGen.coloredBlockItemModel("envelope_block/envelope_" + colorName, "envelope_encased_shaft/item")).build())
                 .register();
     });
 
@@ -180,6 +192,10 @@ public class AeroBlocks {
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
                     .properties(BlockBehaviour.Properties::noOcclusion)
+                // 26.2: the bounce moved onto the properties. The old bounceUp used 0.5 for living
+                // entities and 0.25 for everything else; vanilla's own non-living scale is 0.8, so
+                // items and the like now bounce a little higher than they did.
+                .properties(p -> p.bounceRestitution(0.5f))
                     .properties(p -> p.lightLevel(HotAirBurnerBlock::getLightPower))
                     .blockstate(() -> (ctx, prov) ->
                             BlockStateGen.simpleBlock(ctx, prov,
@@ -208,6 +224,10 @@ public class AeroBlocks {
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
                     .properties(BlockBehaviour.Properties::noOcclusion)
+                // 26.2: the bounce moved onto the properties. The old bounceUp used 0.5 for living
+                // entities and 0.25 for everything else; vanilla's own non-living scale is 0.8, so
+                // items and the like now bounce a little higher than they did.
+                .properties(p -> p.bounceRestitution(0.5f))
                     .blockstate(() -> (ctx, prov) ->
                             BlockStateGen.horizontalBlock(ctx, prov, blockState -> BlockModelGenerators.plainVariant(prov.modLoc("block/" + ctx.getName() + "/block_" + (blockState.getValue(SteamVentBlock.VARIANT).getSerializedName())))))
                     .item()
@@ -218,7 +238,7 @@ public class AeroBlocks {
                             .pattern("G")
                             .pattern("C")
                             .define('G', AeroTags.ItemTags.GOLD_SHEET)
-                            .define('C', Blocks.COPPER_BLOCK)
+                            .define('C', Blocks.COPPER_BLOCK.weathering().unaffected())
                             .unlockedBy("has_ingredient", p.has(CommonMetal.COPPER.ingots))
                             .save(p))
                     .register();
@@ -228,6 +248,10 @@ public class AeroBlocks {
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.sound(SoundType.COPPER))
                     .properties(BlockBehaviour.Properties::noOcclusion)
+                // 26.2: the bounce moved onto the properties. The old bounceUp used 0.5 for living
+                // entities and 0.25 for everything else; vanilla's own non-living scale is 0.8, so
+                // items and the like now bounce a little higher than they did.
+                .properties(p -> p.bounceRestitution(0.5f))
                     .transform(AeroStress.setImpact(2.0))
                     .blockstate(() -> (ctx, prov) -> SimBlockStateGen.facingBlockstate(ctx, prov, "block/propeller_bearing/block"))
                     .transform(axeOrPickaxe())
@@ -249,6 +273,10 @@ public class AeroBlocks {
                     .properties(p -> p.sound(SoundType.COPPER))
                     .transform(AeroStress.setImpact(2.0))
                     .properties(BlockBehaviour.Properties::noOcclusion)
+                // 26.2: the bounce moved onto the properties. The old bounceUp used 0.5 for living
+                // entities and 0.25 for everything else; vanilla's own non-living scale is 0.8, so
+                // items and the like now bounce a little higher than they did.
+                .properties(p -> p.bounceRestitution(0.5f))
                     .blockstate(() -> 
                             (ctx, prov) -> SimBlockStateGen.facingBlockstate(ctx, prov, "block/gyroscopic_propeller_bearing/block"))
                     .transform(axeOrPickaxe())
@@ -274,7 +302,7 @@ public class AeroBlocks {
                     // getVariantBuilder. A state's model is a MultiVariant now, and a rotation is a
                     // mutator applied to it -- Create keeps both the walk and the turns.
                     .blockstate(() -> (ctx, prov) -> BlockStateGen.forAllStates(ctx, prov, state -> BlockStateGen.rotateX(
-                            BlockStateGen.rotateY(AssetLookup.partialBaseModel(ctx, prov),
+                            BlockStateGen.rotateY(BlockModelGenerators.plainVariant(AssetLookup.partialBaseModel(ctx, prov)),
                                     state.getValue(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.X ? 90 : 0),
                             state.getValue(SmartPropellerBlock.CEILING) ? 180 : 0)))
                     .item()
@@ -342,6 +370,10 @@ public class AeroBlocks {
                     .initialProperties(SharedProperties::stone)
                     .blockstate(() -> AeroBlockStateGen::directionalPoweredAxisBlockstate)
                     .properties(BlockBehaviour.Properties::noOcclusion)
+                // 26.2: the bounce moved onto the properties. The old bounceUp used 0.5 for living
+                // entities and 0.25 for everything else; vanilla's own non-living scale is 0.8, so
+                // items and the like now bounce a little higher than they did.
+                .properties(p -> p.bounceRestitution(0.5f))
                     .transform(AeroStress.setImpact(2.0))
                     .transform(pickaxeOnly())
                     .item()

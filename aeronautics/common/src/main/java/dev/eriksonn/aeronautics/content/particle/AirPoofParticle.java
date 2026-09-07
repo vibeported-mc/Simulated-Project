@@ -7,7 +7,8 @@ import net.minecraft.client.particle.*;
 
 public class AirPoofParticle extends SingleQuadParticle implements ParticleSubLevelKickable {
     protected AirPoofParticle(final ClientLevel level, final double x, final double y, final double z, final double xSpeed, final double ySpeed, final double zSpeed) {
-        super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+        // 26.2: SingleQuadParticle always takes a sprite; the factory sets the real one.
+        super(level, x, y, z, xSpeed, ySpeed, zSpeed, null);
         this.alpha = level.getRandom().nextFloat() * 0.2f + 0.3f;
         this.xd = xSpeed;
         this.yd = ySpeed;

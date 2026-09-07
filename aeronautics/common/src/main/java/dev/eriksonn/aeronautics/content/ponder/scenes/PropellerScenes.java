@@ -893,7 +893,7 @@ public class PropellerScenes {
 
         world.setKineticSpeed(util.select().fromTo(4, 1, 3, 4, 1, 5), -16);
         world.setKineticSpeed(util.select().position(3, 1, 5), 16);
-        world.modifyBlockEntityNBT(util.select().position(3, 1, 5), KineticBlockEntity.class, nbt -> nbt.getCompound("SwivelCog").putFloat("Speed", 16));
+        world.modifyBlockEntityNBT(util.select().position(3, 1, 5), KineticBlockEntity.class, nbt -> nbt.getCompoundOrEmpty("SwivelCog").putFloat("Speed", 16));
 
         scene.addInstruction(CustomAnimateWorldSectionInstruction.rotate(valve,new Vec3(0,90,0),30,SmoothMovementUtils.cubicSmoothing()));
         scene.addInstruction(CustomAnimateWorldSectionInstruction.rotate(propellerSection, new Vec3(0, 0, 90), 30, SmoothMovementUtils.cubicSmoothing()));
@@ -904,7 +904,7 @@ public class PropellerScenes {
         world.setKineticSpeed(util.select().position(4, 2, 3), 0);
         world.setKineticSpeed(util.select().fromTo(4, 1, 3, 4, 1, 5), 0);
         world.setKineticSpeed(util.select().position(3, 1, 5), 0);
-        world.modifyBlockEntityNBT(util.select().position(3, 1, 5), KineticBlockEntity.class, nbt -> nbt.getCompound("SwivelCog").putFloat("Speed", 0));
+        world.modifyBlockEntityNBT(util.select().position(3, 1, 5), KineticBlockEntity.class, nbt -> nbt.getCompoundOrEmpty("SwivelCog").putFloat("Speed", 0));
 
         scene.idle(20);
 

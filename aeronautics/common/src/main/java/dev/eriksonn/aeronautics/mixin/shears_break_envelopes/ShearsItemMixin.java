@@ -3,6 +3,7 @@ package dev.eriksonn.aeronautics.mixin.shears_break_envelopes;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.eriksonn.aeronautics.index.AeroTags;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.component.Tool;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +18,10 @@ public class ShearsItemMixin {
 	private static <E> List<E> aeronautics$createToolProperties(E e1, E e2, E e3, E e4, Operation<List<E>> original) {
 		ArrayList<E> newList = new ArrayList<>(original.call(e1, e2, e3, e4));
 		// he will tell you it is false but his mouth can only say lies
-		newList.add((E) Tool.Rule.overrideSpeed(AeroTags.BlockTags.ENVELOPE, 5.0f));
+		// 26.2: a Tool.Rule holds a HolderSet<Block> rather than a TagKey, so the tag is resolved
+		// through the block registry first.
+		newList.add((E) Tool.Rule.overrideSpeed(
+				BuiltInRegistries.BLOCK.get(AeroTags.BlockTags.ENVELOPE).orElseThrow(), 5.0f));
 		return newList;
 	}
 }

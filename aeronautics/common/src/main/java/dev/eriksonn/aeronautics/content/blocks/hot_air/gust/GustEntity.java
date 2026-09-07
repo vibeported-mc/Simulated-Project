@@ -1,5 +1,7 @@
 package dev.eriksonn.aeronautics.content.blocks.hot_air.gust;
 
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import com.simibubi.create.foundation.utility.NbtValueIO;
@@ -41,7 +43,7 @@ public class GustEntity extends Entity implements IEntityWithComplexSpawn {
         final Quaterniond orientation = new Quaterniond(direction.getRotation());
 
         final GustEntity gust = new GustEntity(AeroEntityTypes.GUST.get(), level, orientation);
-        gust.setPos(pos.getCenter());
+        gust.setPos(Vec3.atCenterOf(pos));
 
         level.addFreshEntity(gust);
     }
@@ -134,14 +136,30 @@ public class GustEntity extends Entity implements IEntityWithComplexSpawn {
         }
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code hurt} split into a server side and a client side. A gust is not damageable on
+     * either, which is what the entity's lack of a hurt override used to mean by default.
+     */
+    @Override
+    public boolean hurtServer(final ServerLevel level, final DamageSource source, final float amount) {
+        return false;
+    }
+
     @Override
     public @NotNull PushReaction getPistonPushReaction() {
         return PushReaction.IGNORE;
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>The no-argument {@code makeBoundingBox} is final -- it delegates to this one, which is where
+     * a position other than the entity's own can be asked about. Taking the position as an argument
+     * is also what lets vanilla test a box at a target it has not moved to yet.
+     */
     @Override
-    protected @NotNull AABB makeBoundingBox() {
-        final AABB boundingBox = this.getDimensions(this.getPose()).makeBoundingBox(this.position());
+    protected @NotNull AABB makeBoundingBox(final Vec3 position) {
+        final AABB boundingBox = this.getDimensions(this.getPose()).makeBoundingBox(position);
         return boundingBox.move(0, -boundingBox.getYsize() / 2.0, 0);
     }
 
@@ -150,15 +168,29 @@ public class GustEntity extends Entity implements IEntityWithComplexSpawn {
 
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>An entity reads and writes through {@code ValueInput}/{@code ValueOutput} rather than a
+     * {@code CompoundTag}. Sable's quaternion helpers still speak tags, so the tag is bridged across
+     * at the boundary.
+     *
+     * <p>The 1.21.1 bodies were <em>swapped</em>: {@code readAdditionalSaveData} wrote the
+     * orientation into the tag it was given to read, and {@code addAdditionalSaveData} read one back
+     * out of the empty tag it was given to fill. A gust's orientation therefore never survived a
+     * save, and the write used the key {@code GustOrientation} while the read looked at the whole
+     * tag. Both signatures changed here, so the swap could not be carried across as-is; the two
+     * methods do what their names say, and agree on the key.
+     */
     @Override
-    protected void readAdditionalSaveData(final ValueInput input) {
-        final CompoundTag compoundTag = NbtValueIO.read(input);
-        compoundTag.put("GustOrientation", SableNBTUtils.writeQuaternion(this.orientation));
+    protected void readAdditionalSaveData(final @NotNull ValueInput input) {
+        this.orientation.set(SableNBTUtils.readQuaternion(NbtValueIO.read(input).getCompoundOrEmpty("GustOrientation")));
     }
 
     @Override
-    protected void addAdditionalSaveData(final @NotNull CompoundTag compoundTag) {
-        this.orientation.set(SableNBTUtils.readQuaternion(compoundTag));
+    protected void addAdditionalSaveData(final @NotNull ValueOutput output) {
+        final CompoundTag compoundTag = new CompoundTag();
+        compoundTag.put("GustOrientation", SableNBTUtils.writeQuaternion(this.orientation));
+        NbtValueIO.store(output, compoundTag);
     }
 
     @Override

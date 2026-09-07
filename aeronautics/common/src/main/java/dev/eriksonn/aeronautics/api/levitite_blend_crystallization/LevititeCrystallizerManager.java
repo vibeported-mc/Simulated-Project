@@ -71,7 +71,7 @@ public class LevititeCrystallizerManager {
 		final ListTag data = tag.getListOrEmpty("Levitite Manager Data");
 		final List<LevititeBlendTicker> newTickers = new ArrayList<>();
 		for (int i = 0; i < data.size(); i++) {
-			newTickers.add(new LevititeBlendTicker(data.getCompound(i), level));
+			newTickers.add(new LevititeBlendTicker(data.getCompoundOrEmpty(i), level));
 		}
 
 		tickers.put(level, newTickers);

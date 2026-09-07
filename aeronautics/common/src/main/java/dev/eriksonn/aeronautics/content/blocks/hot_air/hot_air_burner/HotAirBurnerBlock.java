@@ -14,6 +14,7 @@ import dev.ryanhcode.sable.mixinterface.entity.entity_sublevel_collision.LevelEx
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import org.jspecify.annotations.Nullable;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -58,7 +59,16 @@ public class HotAirBurnerBlock extends Block implements IBE<HotAirBurnerBlockEnt
         return state.getValue(POWERED) ? 15 : 0;
     }
 
-    public void entityInside(final BlockState state, final Level level, final BlockPos pos, final Entity entity) {
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code entityInside} gained the effect applier -- which is how a block queues an effect it
+     * wants applied once the whole move is resolved rather than mid-step -- and a flag saying whether
+     * the caller is testing a precise position. Neither changes what this burner does; both have to
+     * be carried through to super.
+     */
+    @Override
+    public void entityInside(final BlockState state, final Level level, final BlockPos pos, final Entity entity,
+            final InsideBlockEffectApplier effectApplier, final boolean isPrecise) {
         final BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof final HotAirBurnerBlockEntity be) {
             if (!entity.fireImmune() && state.getValue(POWERED) && entity instanceof LivingEntity) {
@@ -80,7 +90,7 @@ public class HotAirBurnerBlock extends Block implements IBE<HotAirBurnerBlockEnt
                 }
             }
 
-            super.entityInside(state, level, pos, entity);
+            super.entityInside(state, level, pos, entity, effectApplier, isPrecise);
         }
     }
 

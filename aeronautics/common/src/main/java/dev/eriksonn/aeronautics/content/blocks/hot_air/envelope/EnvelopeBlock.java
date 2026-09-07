@@ -130,7 +130,7 @@ public class EnvelopeBlock extends CasingBlock implements Envelope, SpecialBlock
     }
 
     @Override
-    protected int getLightBlock(final BlockState state, final BlockGetter level, final BlockPos pos) {
+    protected int getLightDampening(final BlockState state) {
         return 1;
     }
 
@@ -160,7 +160,7 @@ public class EnvelopeBlock extends CasingBlock implements Envelope, SpecialBlock
     }
 
     @Override
-    public void fallOn(final Level pLevel, final BlockState pState, final BlockPos pPos, final Entity pEntity, final float pFallDistance) {
+    public void fallOn(final Level pLevel, final BlockState pState, final BlockPos pPos, final Entity pEntity, final double pFallDistance) {
         if (pEntity.isSuppressingBounce()) {
             super.fallOn(pLevel, pState, pPos, pEntity, pFallDistance);
         } else {
@@ -169,22 +169,16 @@ public class EnvelopeBlock extends CasingBlock implements Envelope, SpecialBlock
 
     }
 
-    @Override
-    public void updateEntityAfterFallOn(final BlockGetter pLevel, final Entity pEntity) {
-        if (pEntity.isSuppressingBounce()) {
-            super.updateEntityAfterFallOn(pLevel, pEntity);
-        } else {
-            this.bounceUp(pEntity);
-        }
-    }
-
-    private void bounceUp(final Entity entity) {
-        final Vec3 vec3 = entity.getDeltaMovement();
-        if (vec3.y < 0.0) {
-            final double scale = 0.65 * (entity instanceof LivingEntity ? 1.0 : 0.8);
-            entity.setDeltaMovement(vec3.x, -vec3.y * scale, vec3.z);
-        }
-    }
+    /**
+     * <h2>26.2 note</h2>
+     * <p>The envelope broke a fall and bounced the entity through {@code fallOn} plus
+     * {@code updateEntityAfterFallOn}. The second hook does not exist: bouncing is a
+     * {@code bounceRestitution} on the block's properties, which {@code Entity} reads while resolving
+     * the collision -- and it already applies the 0.8 scale for non-living entities and honours
+     * {@code isSuppressingBounce}, both of which {@code bounceUp} did by hand.
+     *
+     * <p>The restitution is named where the block is registered, in {@code AeroBlocks}.
+     */
 
     @Override
     public ItemRequirement getRequiredItems(BlockState state, @Nullable BlockEntity blockEntity) {

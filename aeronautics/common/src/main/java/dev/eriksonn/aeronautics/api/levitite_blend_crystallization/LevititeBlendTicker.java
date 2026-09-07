@@ -1,5 +1,6 @@
 package dev.eriksonn.aeronautics.api.levitite_blend_crystallization;
 
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.NbtOps;
 import dev.eriksonn.aeronautics.index.AeroRegistries;
 import net.minecraft.core.BlockPos;
@@ -24,7 +25,11 @@ public class LevititeBlendTicker {
 	public LevititeBlendTicker(final CompoundTag toDeserialize, final Level level) {
 		this.level = level;
 		this.pos = toDeserialize.read("pos", BlockPos.CODEC).get();
-		this.context = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().get(Identifier.parse(toDeserialize.getStringOr("context", "")));
+		// 26.2: a registry lookup by identifier hands back an Optional<Holder.Reference<T>>.
+		this.context = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry()
+				.get(Identifier.parse(toDeserialize.getStringOr("context", "")))
+				.map(Holder::value)
+				.orElse(null);
 
 		this.deserialize(toDeserialize);
 	}

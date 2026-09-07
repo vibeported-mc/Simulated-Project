@@ -13,7 +13,8 @@ public class HotAirEmberParticle extends SingleQuadParticle implements ParticleS
     private final boolean isSoul;
 
     protected HotAirEmberParticle(final ClientLevel level, final double x, final double y, final double z, final double xSpeed, final double ySpeed, final double zSpeed, final boolean isSoul) {
-        super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+        // 26.2: SingleQuadParticle always takes a sprite; the factory sets the real one.
+        super(level, x, y, z, xSpeed, ySpeed, zSpeed, null);
         this.isSoul = isSoul;
         this.quadSize = 1.0f / 16.0f / 2.0f;
         this.lifetime = 18;

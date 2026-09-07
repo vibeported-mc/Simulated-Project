@@ -4,6 +4,7 @@ import dev.eriksonn.aeronautics.content.blocks.propeller.behaviour.PropellerActo
 import dev.eriksonn.aeronautics.data.AeroLang;
 import dev.ryanhcode.sable.physics.config.dimension_physics.DimensionPhysicsData;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -18,7 +19,7 @@ public class GyroActorBehaviour<T extends GyroscopicPropellerBearingBlockEntity>
 
     @Override
     public void additionalTooltipInfo(final List<Component> tooltip, final boolean isPlayerSneaking) {
-        final double gravStrength = DimensionPhysicsData.getGravity(this.getWorld(), JOMLConversion.toJOML(this.getPos().getCenter())).length();
+        final double gravStrength = DimensionPhysicsData.getGravity(this.getWorld(), JOMLConversion.toJOML(Vec3.atCenterOf(this.getPos()))).length();
 
         final MutableComponent canLiftComponent = AeroLang.kilopixelGram(Math.abs(this.propeller.getScaledThrust()) / gravStrength)
                 .style(ChatFormatting.AQUA)
