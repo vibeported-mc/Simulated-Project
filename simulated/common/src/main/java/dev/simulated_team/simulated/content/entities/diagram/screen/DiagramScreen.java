@@ -597,7 +597,7 @@ public class DiagramScreen extends AbstractSimiScreen {
             return;
         }
 
-        this.note.renderWidget(graphics, mouseX, mouseY, partialTicks);
+        this.note.extractRenderState(graphics, mouseX, mouseY, partialTicks);
         this.renderContents(this.subLevel, partialTicks);
 
         // genuinely how can this be null they are assigned values in the constructor

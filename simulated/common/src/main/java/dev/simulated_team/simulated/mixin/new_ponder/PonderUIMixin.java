@@ -19,6 +19,6 @@ public class PonderUIMixin {
 
     @Inject(method = "scroll", at = @At(value = "INVOKE", target = "Lnet/createmod/ponder/foundation/PonderScene;begin()V"))
     private void simulated$begin(final boolean forward, final CallbackInfoReturnable<Boolean> cir) {
-        NewPonderTooltipManager.setSceneWatched(this.scenes.get(this.index).getId());
+        NewPonderTooltipManager.setSceneWatched(this.scenes.get(this.index).getIdentifier());
     }
 }

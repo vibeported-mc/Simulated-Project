@@ -29,7 +29,7 @@ public class CompassNavigationTarget implements NavigationTarget {
 
 		// 26.2: the world spawn is RespawnData on the server rather than a position on the level.
 		return level instanceof final ServerLevel serverLevel
-				? serverLevel.getRespawnData().globalPos().pos().getCenter()
+				? Vec3.atCenterOf(serverLevel.getRespawnData().globalPos().pos())
 				: Vec3.ZERO;
 	}
 }

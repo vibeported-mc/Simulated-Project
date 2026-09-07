@@ -12,6 +12,8 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.data.AtlasIds;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -192,7 +194,10 @@ public class SimulatedCreativeTab {
 	}
 
 	public static void setPlaying(Identifier resourceLocation, boolean playing) {
-		TextureAtlasSprite sprite = Minecraft.getInstance().getGuiSprites().getSprite(resourceLocation);
+		// 26.2: the GUI sprite atlas is not exposed on Minecraft any more; it is the atlas the
+		// texture manager holds under the GUI atlas id.
+		TextureAtlas atlas = (TextureAtlas) Minecraft.getInstance().getTextureManager().getTexture(AtlasIds.GUI);
+		TextureAtlasSprite sprite = atlas.getSprite(resourceLocation);
 		SpriteContents.AnimationState state = ((SpriteContentsExtension) sprite.contents()).simulated$getAnimationState();
 		if (state instanceof AnimationStateExtension extension) {
 			extension.simulated$setPlaying(playing);
