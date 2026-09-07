@@ -18,7 +18,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -26,7 +25,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
@@ -128,7 +126,7 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
                                         .add(normal3.scale(max3 * o2));
 
                                 serverLevel.sendParticles(
-                                        new ItemParticleOption(ParticleTypes.ITEM, new ItemStack(Blocks.HONEY_BLOCK)), v.x,
+                                        new ItemParticleOption(ParticleTypes.ITEM, Blocks.HONEY_BLOCK.asItem()), v.x,
                                         v.y, v.z, 1, 0, 0, 0, 0);
 
                             }
@@ -177,15 +175,21 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
         if (!compound.contains("Pos")) {
             compound.put("Pos", VecHelper.writeNBT(position));
         }
-            NbtValueIO.store(output, tag);
+
+        NbtValueIO.store(output, compound);
     }
 
     @Override
-    public void readAdditionalSaveData(final @NotNull CompoundTag compound) {
-        final Vec3 pos = VecHelper.readNBT(compound.getList("Pos", Tag.TAG_DOUBLE)); // we need to grab this from the NBT due to schematics
+    public void readAdditionalSaveData(final @NotNull ValueInput input) {
+        // 26.2 port: entity NBT arrives as a ValueInput now. This entity's bounds are written by
+        // schematics as well as by the game, so it keeps reading the same compound shape rather than
+        // moving to typed accessors -- NbtValueIO bridges the two.
+        final CompoundTag compound = NbtValueIO.read(input);
 
-        final Vec3 from = VecHelper.readNBT(compound.getList("From", Tag.TAG_DOUBLE));
-        final Vec3 to = VecHelper.readNBT(compound.getList("To", Tag.TAG_DOUBLE));
+        final Vec3 pos = VecHelper.readNBT(compound.getListOrEmpty("Pos")); // we need to grab this from the NBT due to schematics
+
+        final Vec3 from = VecHelper.readNBT(compound.getListOrEmpty("From"));
+        final Vec3 to = VecHelper.readNBT(compound.getListOrEmpty("To"));
         final AABB bb = new AABB(from, to).move(pos);
 
         final Level level = this.level();
@@ -248,7 +252,7 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
     }
 
     @Override
-    public InteractionResult interact(final Player player, final InteractionHand hand) {
+    public InteractionResult interact(final Player player, final InteractionHand hand, final Vec3 location) {
         return InteractionResult.PASS;
     }
 
@@ -257,7 +261,12 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
     }
 
     @Override
-    public boolean hurt(final DamageSource source, final float amount) {
+    public boolean hurtServer(final ServerLevel level, final DamageSource source, final float amount) {
+        return false;
+    }
+
+    @Override
+    public boolean hurtClient(final DamageSource source) {
         return false;
     }
 

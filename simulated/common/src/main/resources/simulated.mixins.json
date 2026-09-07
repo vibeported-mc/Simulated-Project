@@ -12,7 +12,7 @@
     "creative_tab_sections.CreativeModeInventoryScreenMixin",
     "creative_tab_sections.ItemPickerMenuMixin",
     "creative_tab_sections.SpriteContentsMixin",
-    "creative_tab_sections.SpriteContentsTickerMixin",
+    "creative_tab_sections.SpriteAnimationStateMixin",
     "diagram.LightTextureMixin",
     "diagram.VanillaSubLevelRenderDispatcherMixin",
     "end_sea.LevelRendererMixin",

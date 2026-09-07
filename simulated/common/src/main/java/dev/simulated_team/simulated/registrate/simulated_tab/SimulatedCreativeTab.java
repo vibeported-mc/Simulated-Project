@@ -1,13 +1,10 @@
 package dev.simulated_team.simulated.registrate.simulated_tab;
 
-import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.simulated_team.simulated.client.sections.SimulatedSection;
 import dev.simulated_team.simulated.index.SimResourceManagers;
 import dev.simulated_team.simulated.mixin.accessor.CreativeModeInventoryScreenAccessor;
 import dev.simulated_team.simulated.mixin_interface.SpriteContentsExtension;
-import dev.simulated_team.simulated.mixin_interface.TickerExtension;
+import dev.simulated_team.simulated.mixin_interface.AnimationStateExtension;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.Colorc;
@@ -19,14 +16,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import org.joml.Matrix3x2fStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,14 +41,14 @@ public class SimulatedCreativeTab {
 	private static final IntList SECTION_ITEM_COUNTS = new IntArrayList();
 
 	public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
-		final PoseStack ps = graphics.pose();
-		ps.pushPose();
+		// 26.2 port: the GUI pose is a 2D matrix stack, and depth test and shader colour are no
+		// longer global switches -- each element carries its own pipeline and colour.
+		final Matrix3x2fStack ps = graphics.pose();
+		ps.pushMatrix();
 
-		RenderSystem.enableDepthTest();
-		RenderSystem.setShaderColor(1, 1, 1, 1);
 		int left = ((CreativeModeInventoryScreenAccessor) screen).getLeftPos() + 8;
 		int top = ((CreativeModeInventoryScreenAccessor) screen).getTopPos() + 17;
-		ps.translate(left, top, 0);
+		ps.translate(left, top);
 
 		final List<SimulatedSection> sections = SimResourceManagers.SIMULATED_SECTION.sortedEntries();
 
@@ -78,7 +75,7 @@ public class SimulatedCreativeTab {
 				setPlaying(bannerTexture, isHovering);
 			}
 
-			graphics.blitSprite(bannerTexture, x, y, w, h);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, bannerTexture, x, y, w, h);
 
 			Component text = section.title().text();
 			int textWidth = font.width(text);
@@ -91,40 +88,24 @@ public class SimulatedCreativeTab {
 					.orElse(light.darken(0.2f, new Color()));
 			drawAuraText(graphics, text, dark.argb(), light.argb(), x + 5, y + 5);
 		}
-		ps.popPose();
-		RenderSystem.disableDepthTest();
+		ps.popMatrix();
 	}
 
 	public static void drawAuraText(GuiGraphicsExtractor graphics, Component text, int color1, int color2, int x, int y) {
 		Font font = Minecraft.getInstance().font;
-		Window window = Minecraft.getInstance().getWindow();
-		float scale = (float) window.getGuiScale();
 
 		graphics.text(font, text, x, y, color1, true);
 
-		PoseStack ps = graphics.pose();
-		ps.pushPose();
-		ps.translate(0, 0, 1);
-		Matrix4f pose = ps.last().copy().pose();
-		Vector3f position = pose.transformPosition(new Vector3f(x, y, 0));
-		Vector3f corner = pose.transformPosition(new Vector3f(x + font.width(text), y + font.lineHeight / 1.8f, 0));
-
-		position.mul(scale);
-		corner.mul(scale);
-		int height = (int) (corner.y - position.y);
-		int width = (int) (corner.x - position.x);
-		RenderSystem.enableScissor(
-				(int) position.x,
-				window.getHeight() - (int) position.y - height,
-				width,
-				height
-		);
-
+		// 26.2 port: the highlight is the same text redrawn with only its top half visible. This used
+		// to scissor in window pixels, working the rectangle out by hand from the pose and the GUI
+		// scale; GuiGraphics scissors in GUI coordinates and applies the pose itself, so the maths
+		// the old code did is now the thing being asked for.
+		Matrix3x2fStack ps = graphics.pose();
+		ps.pushMatrix();
+		graphics.enableScissor(x, y, x + font.width(text), y + (int) (font.lineHeight / 1.8f));
 		graphics.text(font, text, x, y, color2, false);
-
-		RenderSystem.disableScissor();
-
-		ps.popPose();
+		graphics.disableScissor();
+		ps.popMatrix();
 	}
 
 	public static void processItems(final Consumer<ItemStack> displayItems, final Consumer<ItemStack> searchItems) {
@@ -212,8 +193,8 @@ public class SimulatedCreativeTab {
 
 	public static void setPlaying(Identifier resourceLocation, boolean playing) {
 		TextureAtlasSprite sprite = Minecraft.getInstance().getGuiSprites().getSprite(resourceLocation);
-		SpriteContents.Ticker ticker = ((SpriteContentsExtension) sprite.contents()).simulated$getTicker();
-		if (ticker instanceof TickerExtension extension) {
+		SpriteContents.AnimationState state = ((SpriteContentsExtension) sprite.contents()).simulated$getAnimationState();
+		if (state instanceof AnimationStateExtension extension) {
 			extension.simulated$setPlaying(playing);
 		}
 	}
