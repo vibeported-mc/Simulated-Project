@@ -4,11 +4,11 @@ import net.minecraft.client.data.models.BlockModelGenerators;
 import com.simibubi.create.content.redstone.thresholdSwitch.ThresholdSwitchBlock;
 import com.simibubi.create.foundation.data.SpecialBlockStateGen;
 import com.tterrag.registrate.providers.DataGenContext;
-import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
+import com.tterrag.registrate.providers.generators.RegistrateBlockModelGenerator;
 import dev.simulated_team.simulated.Simulated;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.minecraft.client.data.models.MultiVariant;
 
 public class SteeringWheelGenerator extends SpecialBlockStateGen {
     @Override
@@ -22,7 +22,7 @@ public class SteeringWheelGenerator extends SpecialBlockStateGen {
     }
 
     @Override
-    public <T extends Block> ModelFile getModel(final DataGenContext<Block, T> ctx, final RegistrateBlockstateProvider prov, final BlockState state) {
+    public <T extends Block> MultiVariant getModel(final DataGenContext<Block, T> ctx, final RegistrateBlockModelGenerator prov, final BlockState state) {
         return BlockModelGenerators.plainVariant(Simulated.path(state.getValue(
                 SteeringWheelBlock.ON_FLOOR) ? "block/steering_wheel/block" : "block/steering_wheel/block_up"
         ));
