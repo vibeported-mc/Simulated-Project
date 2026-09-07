@@ -123,7 +123,7 @@ public class RopeStrandElement extends AnimatedSceneElementBase implements Anima
             ps.mulPose(orientation);
             ps.translate(-0.5, -0.5, -0.5);
             final BlockPos pos = BlockPos.containing(globalRenderPos.x, globalRenderPos.y, globalRenderPos.z);
-            final int worldLight = LightCoordsUtil.FULL_BLOCK;
+            final int worldLight = LightCoordsUtil.FULL_BRIGHT;
 
             knot.light(worldLight)
                     .renderInto(ps, vb);

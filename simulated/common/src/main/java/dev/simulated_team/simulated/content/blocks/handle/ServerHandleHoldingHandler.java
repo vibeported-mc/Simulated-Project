@@ -5,7 +5,7 @@ import dev.simulated_team.simulated.network.packets.handle.ClientboundPlayersHol
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import net.createmod.catnip.platform.CatnipServices;
+import net.createmod.catnip.api.network.NetworkHelper;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
@@ -57,6 +57,6 @@ public class ServerHandleHoldingHandler {
 	}
 
 	public static void sync() {
-		CatnipServices.NETWORK.sendToAllClients(new ClientboundPlayersHoldingHandlePacket(holdingPlayers.keySet()));
+		NetworkHelper.INSTANCE.sendToAllClients(new ClientboundPlayersHoldingHandlePacket(holdingPlayers.keySet()));
 	}
 }

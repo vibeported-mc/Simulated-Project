@@ -11,7 +11,7 @@ import dev.ryanhcode.sable.api.command.SubLevelArgumentType;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.simulated_team.simulated.content.entities.honey_glue.HoneyGlueEntity;
 import dev.simulated_team.simulated.content.physics_staff.PhysicsStaffServerHandler;
-import net.createmod.catnip.platform.CatnipServices;
+import net.createmod.catnip.api.platform.services.PlatformHelper;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -26,9 +26,9 @@ public class SimCommand {
     public static void register(final CommandDispatcher<CommandSourceStack> dispatcher, final CommandBuildContext buildContext) {
         final LiteralArgumentBuilder<CommandSourceStack> cmd = Commands.literal("simulated");
 
-        if(CatnipServices.PLATFORM.isDevelopmentEnvironment()) {
+        if(PlatformHelper.INSTANCE.isDevelopmentEnvironment()) {
             cmd.then(Commands.literal("debugthing")
-                    .requires(command -> command.hasPermission(2))
+                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                     .then(Commands.literal("start")
                             .then(Commands.argument("steps", IntegerArgumentType.integer()).executes(SimDebugThingCommands::start)))
                     .then(Commands.literal("stop").executes(SimDebugThingCommands::stop))
@@ -37,13 +37,13 @@ public class SimCommand {
         }
 
         cmd.then(Commands.literal("lock")
-                .requires(command -> command.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("sub_levels", SubLevelArgumentType.subLevels())
                         .executes(ctx -> lockSubLevels(ctx, true))
                         .then(Commands.argument("locked", BoolArgumentType.bool())
                                 .executes(ctx -> lockSubLevels(ctx, false)))));
         cmd.then(Commands.literal("glue")
-                .requires(command -> command.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("from", BlockPosArgument.blockPos())
                         .then(Commands.argument("to", BlockPosArgument.blockPos())
                                 .executes(SimCommand::glueArea))));

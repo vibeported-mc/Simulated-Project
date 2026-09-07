@@ -1,12 +1,14 @@
 package dev.simulated_team.simulated.content.particle;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
+import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -48,8 +50,14 @@ public class MagnetFieldParticle2 extends SimpleAnimatedParticle {
             this.setColor(1,0.7f,0.7f);
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    /**
+     * <h2>26.2 note</h2>
+     * <p>A particle names the layer it belongs in rather than a render type; the group it batches
+     * with comes from the base class.
+     */
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
     private void dissipate() {
@@ -57,44 +65,37 @@ public class MagnetFieldParticle2 extends SimpleAnimatedParticle {
     }
 
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>Particles are extracted into a render state rather than drawn into a buffer, so this builds
+     * the same rotation and hands the quad to {@code extractRotatedQuad}.
+     *
+     * <p>The camera position now comes from {@code camera.position()}, and the quad is placed
+     * relative to it exactly as before -- this particle deliberately does not interpolate its own
+     * position the way the base class does, because it is drawn stretched along its velocity.
+     */
     @Override
-    public void render(final VertexConsumer buffer, final Camera renderInfo, final float partialTicks) {
+    public void extract(final QuadParticleRenderState renderState, final Camera camera, final float partialTicks) {
         final Quaternionf quaternionf = new Quaternionf();
-        this.getFacingCameraMode().setRotation(quaternionf, renderInfo, partialTicks);
-        if (this.roll != 0.0F) {
-            quaternionf.rotateZ(Mth.lerp(partialTicks, this.oRoll, this.roll));
-        }
-        final Vector3f v = new Vector3f(1,1,1);
-        float t = (Minecraft.getInstance().level.getGameTime()%1000)+partialTicks;
-        t*=0.2;
 
-        final Vector3f v2 = new Vector3f();
+        final Vec3 vec3 = camera.position();
+        final float x = (float) (this.x - vec3.x());
+        final float y = (float) (this.y - vec3.y());
+        final float z = (float) (this.z - vec3.z());
 
+        final float dirX = (float) Mth.lerp(partialTicks, this.xo, this.xd);
+        final float dirY = (float) Mth.lerp(partialTicks, this.yo, this.yd);
+        final float dirZ = (float) Mth.lerp(partialTicks, this.zo, this.zd);
 
-        //quaternionf.rotateZ((float)(Math.PI/2.0)+t);
-
-
-        //quaternionf.set(1,1,-1,1);
-        //quaternionf.set(new Quaternionf().slerp(quaternionf,partialTicks));
-
-        final Vec3 vec3 = renderInfo.getPosition();
-        final float x = (float)(this.x - vec3.x());
-        final float y = (float)(this.y - vec3.y());
-        final float z = (float)(this.z - vec3.z());
-
-        final float dirX = (float)Mth.lerp(partialTicks,this.xo,this.xd);
-        final float dirY = (float)Mth.lerp(partialTicks,this.yo,this.yd);
-        final float dirZ = (float)Mth.lerp(partialTicks,this.zo,this.zd);
-
-        final float offsetX = (float)Mth.lerp(partialTicks,-this.xo,this.xd)*0.5f;
-        final float offsetY = (float)Mth.lerp(partialTicks,-this.yo,this.yd)*0.5f;
-        final float offsetZ = (float)Mth.lerp(partialTicks,-this.zo,this.zd)*0.5f;
+        final float offsetX = (float) Mth.lerp(partialTicks, -this.xo, this.xd) * 0.5f;
+        final float offsetY = (float) Mth.lerp(partialTicks, -this.yo, this.yd) * 0.5f;
+        final float offsetZ = (float) Mth.lerp(partialTicks, -this.zo, this.zd) * 0.5f;
 
         quaternionf.identity();
-        quaternionf.lookAlong(new Vector3f(dirX,dirY,dirZ),new Vector3f(x,y,z)).conjugate();
-        quaternionf.rotateX((float)(Math.PI/2.0));
+        quaternionf.lookAlong(new Vector3f(dirX, dirY, dirZ), new Vector3f(x, y, z)).conjugate();
+        quaternionf.rotateX((float) (Math.PI / 2.0));
 
-        this.renderRotatedQuad(buffer, quaternionf, x+offsetX, y+offsetY, z+offsetZ, partialTicks);
+        this.extractRotatedQuad(renderState, quaternionf, x + offsetX, y + offsetY, z + offsetZ, partialTicks);
     }
 
     @Override
@@ -115,9 +116,10 @@ public class MagnetFieldParticle2 extends SimpleAnimatedParticle {
         this.selectSprite(this.age +1);
     }
 
-    public int getLightColor(final float partialTick) {
-        final BlockPos blockpos = new BlockPos((int) this.x, (int) this.y, (int) this.z);
-        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightColor(this.level, blockpos) : 0;
+    @Override
+    public int getLightCoords(final float partialTick) {
+        final BlockPos blockpos = BlockPos.containing(this.x, this.y, this.z);
+        return this.level.hasChunkAt(blockpos) ? LightCoordsUtil.getLightCoords(this.level, blockpos) : 0;
     }
 
     private void selectSprite(final int index) {
@@ -135,8 +137,9 @@ public class MagnetFieldParticle2 extends SimpleAnimatedParticle {
             this.spriteSet = animatedSprite;
         }
 
+        @Override
         public Particle createParticle(final MagnetFieldParticleData2 data, final ClientLevel level, final double x, final double y, final double z,
-                                       final double xSpeed, final double ySpeed, final double zSpeed) {
+                                       final double xSpeed, final double ySpeed, final double zSpeed, final RandomSource random) {
             return new MagnetFieldParticle2(level, x, y, z, data.previousOffset.x,data.previousOffset.y,data.previousOffset.z,data.nextOffset.x,data.nextOffset.y,data.nextOffset.z, this.spriteSet, data.isNegative(),data.getTimeUntilEnd());
         }
     }
