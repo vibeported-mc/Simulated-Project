@@ -1,6 +1,7 @@
 package dev.simulated_team.simulated.content.blocks.directional_gearshift;
 
-import net.minecraft.client.data.models.BlockModelGenerators;com.tterrag.registrate.providers.DataGenContext;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import dev.simulated_team.simulated.Simulated;
 import net.minecraft.core.Direction;

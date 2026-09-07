@@ -1,6 +1,7 @@
 package dev.eriksonn.aeronautics.data;
 
-import net.minecraft.client.data.models.BlockModelGenerators;com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.simibubi.create.foundation.data.BlockStateGen;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;

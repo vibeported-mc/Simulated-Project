@@ -1,6 +1,7 @@
 package dev.eriksonn.aeronautics.index;
 
-import net.minecraft.client.data.models.BlockModelGenerators;com.simibubi.create.AllBlocks;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.api.behaviour.display.DisplaySource;
 import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
@@ -86,7 +87,7 @@ public class AeroBlocks {
                     () -> SoundEvents.WOOL_FALL)))
             .properties(p -> p.mapColor(DyeColor.WHITE))
             .blockstate(() -> (c, p) -> p.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(c.get(), p.models()
-                    .cubeAll(c.getName(), p.modLoc("block/envelope_block/envelope_" + DyeColor.WHITE.getName()))))
+                    .cubeAll(c.getName(), p.modLoc("block/envelope_block/envelope_" + DyeColor.WHITE.getName())))))
             .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 4)
                     .pattern("WS")
                     .pattern("SW")
@@ -122,7 +123,7 @@ public class AeroBlocks {
                                     () -> SoundEvents.WOOL_FALL)))
                     .properties(p -> p.mapColor(color))
                     .blockstate(() -> (c, p) -> p.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(c.get(), p.models()
-                            .cubeAll(c.getName(), p.modLoc("block/envelope_block/envelope_" + colorName))))
+                            .cubeAll(c.getName(), p.modLoc("block/envelope_block/envelope_" + colorName)))))
                     .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 4)
                             .pattern("WS")
                             .pattern("SW")

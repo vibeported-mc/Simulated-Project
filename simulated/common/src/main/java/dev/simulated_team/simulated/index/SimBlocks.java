@@ -1,6 +1,7 @@
 package dev.simulated_team.simulated.index;
 
-import net.minecraft.client.data.models.BlockModelGenerators;com.simibubi.create.AllBlocks;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllTags;
 import com.simibubi.create.Create;
@@ -551,7 +552,7 @@ public class SimBlocks {
             REGISTRATE.block("paired_docking_connector", PairedDockingConnectorBlock::new)
                     .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
-                    .blockstate(() -> (c, p) -> p.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(c.get(), BlockModelGenerators.plainVariant(p.modLoc("block/docking_connector/block"))))
+                    .blockstate(() -> (c, p) -> p.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(c.get(), BlockModelGenerators.plainVariant(p.modLoc("block/docking_connector/block")))))
                     .transform(pickaxeOnly())
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
                     .properties(properties -> properties

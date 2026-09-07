@@ -1,6 +1,7 @@
 package dev.simulated_team.simulated.content.blocks.redstone.redstone_accumulator;
 
-import net.minecraft.client.data.models.BlockModelGenerators;com.tterrag.registrate.providers.DataGenContext;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import dev.simulated_team.simulated.Simulated;
