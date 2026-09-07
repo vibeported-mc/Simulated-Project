@@ -35,16 +35,16 @@ public class OffroadNeoForge {
         modBus.register(NeoForgeOffroadConfigService.class);
 
         modBus.addListener(OffroadNeoForge::init);
-        modBus.addListener(EventPriority.HIGHEST, OffroadDatagen::gatherDataHighPriority);
-        modBus.addListener(EventPriority.LOWEST, OffroadDatagen::gatherData);
         modBus.addListener(OffroadDatagen::registerEvent);
         modBus.addListener((ModifyDefaultComponentsEvent event) -> OffroadCommonEvents.modifyDefaultComponents(event::modify));
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post event) -> OffroadCommonEvents.tickLevelEvent(event.getLevel()));
 
-        modBus.addListener((final GatherDataEvent.Server e) -> OffroadDatagen.gatherDataHighPriority(e));
-        modBus.addListener((final GatherDataEvent.Client e) -> OffroadDatagen.gatherDataHighPriority(e));
-        modBus.addListener((final GatherDataEvent.Server e) -> OffroadDatagen.gatherData(e));
-        modBus.addListener((final GatherDataEvent.Client e) -> OffroadDatagen.gatherData(e));
+        // 26.2: one GatherDataEvent per side, so each of the two hooks is registered twice. The
+        // priorities are what they were: tags first, providers last.
+        modBus.addListener(EventPriority.HIGHEST, (final GatherDataEvent.Server e) -> OffroadDatagen.gatherDataHighPriority(e));
+        modBus.addListener(EventPriority.HIGHEST, (final GatherDataEvent.Client e) -> OffroadDatagen.gatherDataHighPriority(e));
+        modBus.addListener(EventPriority.LOWEST, (final GatherDataEvent.Server e) -> OffroadDatagen.gatherData(e));
+        modBus.addListener(EventPriority.LOWEST, (final GatherDataEvent.Client e) -> OffroadDatagen.gatherData(e));
 
         Offroad.getRegistrate().registerEventListeners(modBus);
     }

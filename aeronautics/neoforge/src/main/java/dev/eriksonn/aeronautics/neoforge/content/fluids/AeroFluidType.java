@@ -6,31 +6,34 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.FogEnvironment;
-import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidType;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.function.Supplier;
 
+/**
+ * <h2>26.2 note</h2>
+ * <p>A fluid type no longer carries its textures: they moved into a baked model held by the model
+ * manager, which is also where the tint now lives. The two identifiers and their getters are gone,
+ * and with them the third and second arguments of the factory -- {@code FluidTypeFactory} takes only
+ * the properties, so the textures are named where the fluid is registered instead.
+ *
+ * <p>Only the fog is still a client extension.
+ */
 public abstract class AeroFluidType extends FluidType implements IClientFluidTypeExtensions {
 	private Vector3f fogColor;
 	private Supplier<Float> fogDistance;
-	private final Identifier stillTexture;
-	private final Identifier flowingTexture;
 
-	public AeroFluidType(Properties properties, Identifier stillTexture, Identifier flowingTexture) {
+	public AeroFluidType(Properties properties) {
 		super(properties);
-		this.stillTexture = stillTexture;
-		this.flowingTexture = flowingTexture;
 	}
 
 	public static FluidBuilder.FluidTypeFactory create(int fogColor, Supplier<Float> fogDistance, Factory factory) {
-		return (p, s, f) -> {
-			AeroFluidType fluidType = factory.create(p, s, f);
+		return p -> {
+			AeroFluidType fluidType = factory.create(p);
 			fluidType.fogColor = new Color(fogColor, false).asVectorF();
 			fluidType.fogDistance = fogDistance;
 			return fluidType;
@@ -38,17 +41,7 @@ public abstract class AeroFluidType extends FluidType implements IClientFluidTyp
 	}
 
 	public interface Factory {
-		AeroFluidType create(Properties properties, Identifier stillTexture, Identifier flowingTexture);
-	}
-
-	@Override
-	public @NotNull Identifier getStillTexture() {
-		return this.stillTexture;
-	}
-
-	@Override
-	public @NotNull Identifier getFlowingTexture() {
-		return this.flowingTexture;
+		AeroFluidType create(Properties properties);
 	}
 
 	/**

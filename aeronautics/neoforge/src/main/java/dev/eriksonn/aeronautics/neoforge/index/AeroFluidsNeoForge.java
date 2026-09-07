@@ -9,6 +9,9 @@ import dev.eriksonn.aeronautics.neoforge.content.fluids.AeroFluidType;
 import dev.eriksonn.aeronautics.neoforge.content.fluids.levitite.LevititeBlendFluidType;
 import dev.eriksonn.aeronautics.neoforge.content.fluids.levitite.LevititeBlendNeoForge;
 import dev.eriksonn.aeronautics.util.AeroColors;
+import java.util.function.Supplier;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.SoundActions;
@@ -22,6 +25,9 @@ public class AeroFluidsNeoForge {
 			.standardFluid("levitite_blend", AeroFluidType.create(AeroColors.LEVIBLEND_THE_FOG_IS_COMING,
 					() -> 1f / 32f * AllConfigs.client().chocolateTransparencyMultiplier.getF(),
 					LevititeBlendFluidType::new))
+			// 26.2: a fluid's textures live in its baked model rather than on its type. Create's own
+			// helper names them under its namespace, so this one is Aeronautics'.
+			.model(() -> fluidModel("levitite_blend"))
 			.lang("Levitite Blend")
 			.properties(b -> b.viscosity(1500)
 					.density(1400)
@@ -43,6 +49,19 @@ public class AeroFluidsNeoForge {
 				fluidState.isSource() ? Blocks.OBSIDIAN.defaultBlockState() : Blocks.CALCITE.defaultBlockState());
 
 		FluidInteractionRegistry.addInteraction(NeoForgeMod.LAVA_TYPE.value(), interaction);
+	}
+
+	/**
+	 * <h2>26.2 note</h2>
+	 * <p>A fluid's still and flowing textures moved off the fluid type and into a baked model held by
+	 * the model manager. Levitite blend is untinted, so the model is the pair of textures and
+	 * nothing else; the names follow what the fluid builders have always used.
+	 */
+	private static Supplier<FluidModel.Unbaked> fluidModel(final String name) {
+		return () -> new FluidModel.Unbaked(
+				new Material(Aeronautics.path("fluid/" + name + "_still")),
+				new Material(Aeronautics.path("fluid/" + name + "_flow")),
+				null, null);
 	}
 
 	public static void init() {
