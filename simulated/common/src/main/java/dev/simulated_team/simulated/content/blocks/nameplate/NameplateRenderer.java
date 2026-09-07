@@ -1,5 +1,9 @@
 package dev.simulated_team.simulated.content.blocks.nameplate;
 
+import java.util.ArrayList;
+
+import org.jspecify.annotations.Nullable;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
@@ -7,7 +11,8 @@ import dev.simulated_team.simulated.data.SimLang;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,25 +26,55 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-public class NameplateRenderer extends SafeBlockEntityRenderer<NameplateBlockEntity> {
+/**
+ * <h2>26.2 note</h2>
+ * <p>Text goes through the queue now: {@code Font.drawInBatch} and {@code drawInBatch8xOutline} both
+ * became {@code SubmitNodeCollector.submitText}, where the outlined form is the same call with a
+ * non-zero outline colour.
+ *
+ * <p>Laying the text out needs the block entity -- its name, its width, whether it glows -- so the
+ * trimming, splitting and centring all happen during extraction, and submission does the pose walk
+ * and queues the finished lines.
+ */
+public class NameplateRenderer
+        extends SafeBlockEntityRenderer<NameplateBlockEntity, NameplateRenderer.NameplateRenderState> {
 
     //taken from sign renderer
     private static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
 
+    public static class NameplateRenderState extends SafeRenderState {
+        public final List<FormattedCharSequence> lines = new ArrayList<>();
+        public @Nullable Direction facing;
+        public int pixelsTall;
+        public double centerPixels;
+        public int textColor;
+        public int outlineColor;
+        public int textLight;
+    }
+
     private final BlockEntityRendererProvider.Context context;
+
     public NameplateRenderer(final BlockEntityRendererProvider.Context context) {
         this.context = context;
     }
 
     @Override
-    public void renderSafe(final NameplateBlockEntity be, final float pPartialTick, final PoseStack ps, final MultiBufferSource pBuffer, int packedLight, final int pPackedOverlay) {
-        final Font font = this.context.getFont();
+    public NameplateRenderState createRenderState() {
+        return new NameplateRenderState();
+    }
 
-        final BlockState state = be.getBlockState();
-        final Direction facing = state.getValue(NameplateBlock.FACING);
+    @Override
+    protected void extractSafe(final NameplateBlockEntity be, final NameplateRenderState state, final float partialTicks, final Vec3 cameraPosition) {
+        // Reused between frames, so a plate that is no longer the controller has to clear its text.
+        state.lines.clear();
+
+        final Font font = this.context.font();
+
+        final BlockState blockState = be.getBlockState();
+        state.facing = blockState.getValue(NameplateBlock.FACING);
 
         // can't just use be.isController() because it is never set properly on create contraptions
-        final NameplateBlock.Position pos = state.getValue(NameplateBlock.POSITION);
+        final NameplateBlock.Position pos = blockState.getValue(NameplateBlock.POSITION);
         if (pos == NameplateBlock.Position.LEFT) {
             // the controllerWidth also isn't set properly, so this needs to be called
 //            be.controllerCheckTick();
@@ -47,10 +82,44 @@ public class NameplateRenderer extends SafeBlockEntityRenderer<NameplateBlockEnt
             return;
         }
 
+        final int pixelsTall = be.glowing ? 5 : 6;
+        final int pixelsLeft = 3;
+        state.pixelsTall = pixelsTall;
+
+        final int availableSpace = ((be.getControllerWidth()) * 16 - pixelsLeft * 2) * 7 / pixelsTall + 1;
+        final String trimmed = font.plainSubstrByWidth(be.getName(), availableSpace);
+
+        final int width = font.width(trimmed);
+
+        state.centerPixels = (availableSpace - 1) / 2.0 - width / 2.0;
+
+        final MutableComponent textComponent = SimLang.text(trimmed).component();
+        state.lines.addAll(font.split(textComponent, width));
+
+        if (be.glowing) {
+            state.textColor = be.getTextColor().getTextColor();
+            // 26.2 folds drawInBatch8xOutline into submitText: an outline is a non-zero outline
+            // colour rather than a separate call.
+            state.outlineColor = isOutlineVisible(be.getBlockPos(), state.textColor)
+                    ? be.getDarkColor(be.getTextColor())
+                    : 0;
+            state.textLight = 15728880;
+        } else {
+            state.textColor = be.getDarkColor(be.getTextColor());
+            state.outlineColor = 0;
+            state.textLight = state.lightCoords;
+        }
+    }
+
+    @Override
+    protected void submitSafe(final NameplateRenderState state, final PoseStack ps, final SubmitNodeCollector queue, final CameraRenderState camera) {
+        if (state.lines.isEmpty() || state.facing == null)
+            return;
+
         ps.pushPose();
 
         ps.translate(0.5, 0.5, 0.5);
-        ps.mulPose(Axis.YP.rotationDegrees(-facing.toYRot() + 180.0f));
+        ps.mulPose(Axis.YP.rotationDegrees(-state.facing.toYRot() + 180.0f));
         ps.translate(-0.5, -0.5, -0.5);
 
         ps.translate(1.0, 1.0, 1.0);
@@ -58,46 +127,21 @@ public class NameplateRenderer extends SafeBlockEntityRenderer<NameplateBlockEnt
         // push 4 pixels out
         ps.translate(0.0, 0.0, -4.05 / 16.0);
 
-        final int pixelsTall = be.glowing ? 5 : 6;
         final int pixelsLeft = 3;
 
-        ps.translate(-pixelsLeft / 16.0f, -(16.0 - pixelsTall) / 16.0 / 2.0, 0.0);
-        ps.scale((float) (pixelsTall / 16.0), (float) (pixelsTall / 16.0), (float) (pixelsTall / 16.0));
+        ps.translate(-pixelsLeft / 16.0f, -(16.0 - state.pixelsTall) / 16.0 / 2.0, 0.0);
+        ps.scale((float) (state.pixelsTall / 16.0), (float) (state.pixelsTall / 16.0), (float) (state.pixelsTall / 16.0));
 
         ps.scale(1 / 7f, 1 / 7f, 1 / 7f);
 
         ps.mulPose(Axis.ZP.rotationDegrees(180.0f));
 
-        final int availableSpace = ((be.getControllerWidth()) * 16 - pixelsLeft * 2) * 7 / pixelsTall + 1;
-        final String trimmed = font.plainSubstrByWidth(be.getName(), availableSpace);
-
-        final int width = font.width(trimmed);
-
-        final double centerPixels = (availableSpace - 1) / 2.0 - width / 2.0;
-
         // translate to center
-        ps.translate(centerPixels, 0.0, 0.0);
+        ps.translate(state.centerPixels, 0.0, 0.0);
 
-        final MutableComponent textComponent = SimLang.text(trimmed).component();
-        final List<FormattedCharSequence> sequences = font.split(textComponent, width);
-
-        final int textColor;
-        final boolean glowing;
-        if (be.glowing) {
-            textColor = be.getTextColor().getTextColor();
-            glowing = isOutlineVisible(be.getBlockPos(), textColor);
-            packedLight = 15728880;
-        } else {
-            textColor = be.getDarkColor(be.getTextColor());
-            glowing = false;
-        }
-
-        for (final FormattedCharSequence sequence : sequences) {
-            if (glowing) {
-                font.drawInBatch8xOutline(sequence, 0, 0, textColor, be.getDarkColor(be.getTextColor()), ps.last().pose(), pBuffer, packedLight);
-            } else {
-                font.drawInBatch(sequence, 0f /*x offset*/, 0f /*y offset*/, textColor, false, ps.last().pose(), pBuffer, Font.DisplayMode.NORMAL, 0x000000, packedLight);
-            }
+        for (final FormattedCharSequence sequence : state.lines) {
+            queue.submitText(ps, 0f /*x offset*/, 0f /*y offset*/, sequence, false,
+                    Font.DisplayMode.NORMAL, state.textLight, state.textColor, 0x000000, state.outlineColor);
         }
 
         ps.popPose();
