@@ -1,25 +1,30 @@
 package dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.screen.widgets;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.LinkedTypewriterEntries;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.screen.LinkedTypewriterScreen;
 import dev.simulated_team.simulated.index.SimGUITextures;
 import net.createmod.catnip.api.data.Couple;
+import net.createmod.catnip.api.client.gui.TextureSheetSegment;
+import net.createmod.catnip.api.client.gui.UIRenderHelper;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
+import net.createmod.catnip.api.theme.Color;
 import net.createmod.catnip.api.client.gui.widget.AbstractSimiWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 public class KeyWidget extends AbstractSimiWidget {
 
     private final LinkedTypewriterEntries.KeyboardEntry EMPTY = new LinkedTypewriterEntries.KeyboardEntry(RedstoneLinkNetworkHandler.Frequency.EMPTY, RedstoneLinkNetworkHandler.Frequency.EMPTY, this.keyNum, BlockPos.ZERO);
+
+    private static final Color BOUND_ICON = new Color(0.447f, 0.278f, 0.192f, 1.0f);
+    private static final Color UNBOUND_ICON = new Color(0.318f, 0.125f, 0.094f, 1.0f);
 
     public int keyNum;
 
@@ -48,7 +53,7 @@ public class KeyWidget extends AbstractSimiWidget {
     }
 
     @Override
-    public void renderWidget(@NotNull final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void extractWidgetRenderState(@NotNull final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
         final SimGUITextures start = this.bound ? SimGUITextures.KEY_START : SimGUITextures.INACTIVE_KEY_START;
         final SimGUITextures middle = this.bound ? SimGUITextures.KEY_MIDDLE : SimGUITextures.INACTIVE_KEY_MIDDLE;
         final SimGUITextures end = this.bound ? SimGUITextures.KEY_END : SimGUITextures.INACTIVE_KEY_END;
@@ -67,10 +72,16 @@ public class KeyWidget extends AbstractSimiWidget {
         end.render(graphics, this.getX() + endX, y);
 
         if (this.icon != null) {
-            if (this.bound) RenderSystem.setShaderColor(0.447f, 0.278f, 0.192f, 1.0f);
-                else RenderSystem.setShaderColor(0.318f, 0.125f, 0.094f, 1.0f);
-            this.icon.render(graphics, this.getX() + 3, y + 4);
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            // 26.2 port: setShaderColor is gone -- a tint is a property of the element being drawn,
+            // not a mode switched around the draw. Every icon reaching this widget is a sheet
+            // segment, so the tint travels with the quad; anything else falls back to untinted.
+            final Color tint = this.bound ? BOUND_ICON : UNBOUND_ICON;
+            if (this.icon instanceof final TextureSheetSegment segment) {
+                UIRenderHelper.drawColoredTexture(graphics, segment.bind(), tint, this.getX() + 3, y + 4,
+                        segment.getStartX(), segment.getStartY(), segment.getWidth(), segment.getHeight());
+            } else {
+                this.icon.render(graphics, this.getX() + 3, y + 4);
+            }
         }
 
         if (this.isHovered) {
@@ -119,12 +130,12 @@ public class KeyWidget extends AbstractSimiWidget {
     }
 
     private Component keyName() {
-        return InputConstants.getKey(this.keyNum, GLFW.glfwGetKeyScancode(this.keyNum))
+        return InputConstants.Type.KEYSYM.getOrCreate(this.keyNum)
                 .getDisplayName();
     }
 
     private void extractBackground(@NotNull final GuiGraphicsExtractor pGuiGraphics, final int x, final int y, final int w, final int h) {
         final SimGUITextures bg = SimGUITextures.LINKED_TYPEWRITER_TOOLTIP_BACKGROUND;
-        pGuiGraphics.blitSprite(bg.location, x, y, 0, w, h);
+        pGuiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, bg.location, x, y, w, h);
     }
 }
