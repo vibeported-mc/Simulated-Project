@@ -6,7 +6,6 @@ import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
-import dev.simulated_team.simulated.compat.computercraft.AttachedComputerHandler;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.screen.LinkedTypewriterMenuCommon;
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimBlocks;
@@ -44,16 +43,14 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
     private String typedEntry = "";
 
     public boolean powered;
-    public final AttachedComputerHandler computerHandler;
+    // 26.2 port: ComputerCraft has no 26.2 build, so its whole compat package is excluded from
+    // the build (see simulated/common/build.gradle). The references it held from here are removed
+    // rather than guarded, because the types themselves are gone from the compile. Restoring CC
+    // means restoring this alongside the exclusion.
 
     public LinkedTypewriterBlockEntity(final BlockEntityType<?> type, final BlockPos pos, final BlockState state) {
         super(type, pos, state);
         this.entryMap = new LinkedTypewriterEntries();
-        if (CC_LOADED) {
-            this.computerHandler = new AttachedComputerHandler();
-        } else {
-            this.computerHandler = null;
-        }
     }
 
     @Override
@@ -214,9 +211,6 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         if (this.typedEntry.length() >= 25) {
             this.typedEntry = this.typedEntry.substring(1);
         }
-        if (this.computerHandler != null) {
-            this.computerHandler.queueEvent("key", key, this.entryMap.getEntry(key).isAlive());
-        }
         this.entryMap.activateKey(key, this);
     }
 
@@ -226,9 +220,6 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
     public void releaseKey(final int key) {
         this.pressedKeys.remove((Integer) key);
         this.entryMap.deactivateKey(key);
-        if (this.computerHandler != null) {
-            this.computerHandler.queueEvent("key_up", key);
-        }
     }
 
     @Override

@@ -15,7 +15,6 @@ import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
-import dev.simulated_team.simulated.compat.computercraft.wired.DockingConnectorWiredElement;
 import dev.simulated_team.simulated.content.blocks.redstone_magnet.*;
 import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.index.SimSoundEvents;
@@ -66,7 +65,10 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     protected double closestPairDistance = 0;
     private MagnetBehaviour magnetBehaviour;
     private FixedConstraintHandle constraintHandle;
-    public final DockingConnectorWiredElement ccWiredElement;
+    // 26.2 port: ComputerCraft has no 26.2 build, so its whole compat package is excluded from
+    // the build (see simulated/common/build.gradle). The references it held from here are removed
+    // rather than guarded, because the types themselves are gone from the compile. Restoring CC
+    // means restoring this alongside the exclusion.
 
     private ConstraintSmoother constraintSmoother = null;
 
@@ -78,7 +80,6 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
                 SimConfigService.INSTANCE.server().blocks.dockingConnectorFECapacity.get(),
                 SimConfigService.INSTANCE.server().blocks.dockingConnectorFEThroughput.get()
         );
-        this.ccWiredElement = DockingConnectorWiredElement.create(this);
     }
 
     @Nullable
@@ -383,7 +384,6 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
                 this.state = DockingConnectorState.LOCKED;
                 this.tank.connect(this.otherConnectorPosition, otherConnector.tank);
                 this.battery.connect(otherConnector.battery);
-                this.ccWiredElement.connect(otherConnector.ccWiredElement);
 
                 this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
                 if (this.constraintSmoother != null) {
@@ -404,9 +404,6 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
 
     public void unDock() {
         final DockingConnectorBlockEntity otherConnector = this.getOtherConnector();
-        if (otherConnector != null) {
-            this.ccWiredElement.disconnect(otherConnector.ccWiredElement);
-        }
 
         this.closestPairDistance = Double.MAX_VALUE;
 
@@ -499,9 +496,6 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     public void remove() {
         super.remove();
         this.removeConstraint();
-        if (this.level == null || !this.level.isClientSide()) {
-            this.ccWiredElement.remove();
-        }
     }
 
     @Override
@@ -536,7 +530,9 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
     }
 
     public AABB getBoundingBox(final BlockState state) {
-        return Shulker.getProgressAabb(1, state.getValue(ShulkerBoxBlock.FACING), this.getExtensionDistance(1.0F));
+        // 26.2: getProgressAabb takes the shulker's scale and its position, which used to be
+        // implicit -- scale 1 and the origin, which is what this box was already relative to.
+        return Shulker.getProgressAabb(1.0f, state.getValue(ShulkerBoxBlock.FACING), this.getExtensionDistance(1.0F), Vec3.ZERO);
     }
 
     @Override

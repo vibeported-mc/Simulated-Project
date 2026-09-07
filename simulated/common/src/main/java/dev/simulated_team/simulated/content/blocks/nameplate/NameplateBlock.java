@@ -184,7 +184,7 @@ public class NameplateBlock extends HorizontalDirectionalBlock implements IBE<Na
                     dummySign.setText(text, true);
                     dummySign.setWaxed(controller.waxed);
 
-                    if (signApplicator.canApplyToSign(text, player) && signApplicator.tryApplyToSign(controller.getLevel(), dummySign, true, player)) {
+                    if (signApplicator.canApplyToSign(text, itemStack, player) && signApplicator.tryApplyToSign(controller.getLevel(), dummySign, true, itemStack, player)) {
                         text = dummySign.getFrontText();
                         controller.setTextColor(text.getColor(), true);
                         controller.glowing = text.hasGlowingText();

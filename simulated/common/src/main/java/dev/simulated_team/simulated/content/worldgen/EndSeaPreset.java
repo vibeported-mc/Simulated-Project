@@ -5,6 +5,9 @@ import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.level.portal.TeleportTransition;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -13,7 +16,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 
 public class EndSeaPreset extends SimulatedWorldPreset {
@@ -26,12 +28,18 @@ public class EndSeaPreset extends SimulatedWorldPreset {
 	@Override
 	public void onPlayerJoin(final ServerLevel level, final ServerPlayer player) {
 		if(!level.dimension().equals(Level.END)) {
-			player.setRespawnPosition(Level.END, BlockPos.containing(PLAYER_SPAWN_POS), 0.0f, true, false);
+			// 26.2 port: a respawn point is a RespawnConfig -- a dimension, position and facing
+			// wrapped together -- rather than five loose arguments, and DimensionTransition became
+			// TeleportTransition, which takes the destination position rather than deriving it from
+			// the entity. Passing the spawn position to the transition also folds the teleportTo
+			// that used to follow it into the same move.
+			final BlockPos spawnPos = BlockPos.containing(PLAYER_SPAWN_POS);
+			player.setRespawnPosition(new ServerPlayer.RespawnConfig(
+					new LevelData.RespawnData(GlobalPos.of(Level.END, spawnPos), 0.0f, 0.0f), true), false);
 
 			final ServerLevel endLevel = level.getServer().getLevel(Level.END);
-			final DimensionTransition transition = new DimensionTransition(endLevel, player, DimensionTransition.DO_NOTHING);
-			player.changeDimension(transition);
-			player.teleportTo(PLAYER_SPAWN_POS.x(), PLAYER_SPAWN_POS.y(), PLAYER_SPAWN_POS.z());
+			player.teleport(new TeleportTransition(endLevel, PLAYER_SPAWN_POS, Vec3.ZERO,
+					player.getYRot(), player.getXRot(), TeleportTransition.DO_NOTHING));
 		}
 	}
 
