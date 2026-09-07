@@ -8,7 +8,6 @@
     "accessor.CreativeModeInventoryScreenAccessor",
     "accessor.CreativeModeInventoryScreenSelectedTabAccessor",
     "accessor.KeyMappingsAccessor",
-    "accessor.LevelRendererAccessor",
     "conditional_display_target.DisplayLinkScreenMixin",
     "creative_tab_sections.CreativeModeInventoryScreenMixin",
     "creative_tab_sections.ItemPickerMenuMixin",
