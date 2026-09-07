@@ -92,7 +92,7 @@ public class LinkedTypewriterItem extends BlockItem {
         // alongside the tag; contains() asks the same question copyTag().contains() did.
         final TypedEntityData<BlockEntityType<?>> data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
         if (data != null && data.contains("Keys")) {
-            final int keyCount = data.copyTag().getListOrEmpty("Keys").size();
+            final int keyCount = data.copyTagWithoutId().getListOrEmpty("Keys").size();
             tooltipComponents.accept(Component.translatable("simulated.linked_typewriter.key_count", keyCount).withStyle(ChatFormatting.GOLD));
         }
     }

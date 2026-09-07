@@ -168,8 +168,8 @@ public class HandleBlock extends AbstractDirectionalAxisBlock implements IBE<Han
         // 26.2 port: Ingredient.of takes a HolderSet rather than a TagKey, so the tag is looked
         // up in the item registry. The lookup is deferred because these run at class-init, before
         // the registry is populated.
-        IRON(BuiltInRegistries.ITEM.getValue(Tags.Items.NUGGETS_IRON).map(Ingredient::of).orElse(null)),
-        COPPER(BuiltInRegistries.ITEM.getValue(AllTags.commonItemTag("nuggets/copper")).map(Ingredient::of).orElse(null)),
+        IRON(BuiltInRegistries.ITEM.get(Tags.Items.NUGGETS_IRON).map(Ingredient::of).orElse(null)),
+        COPPER(BuiltInRegistries.ITEM.get(AllTags.commonItemTag("nuggets/copper")).map(Ingredient::of).orElse(null)),
         DYED(null);
 
         @Nullable final Ingredient ingredient;

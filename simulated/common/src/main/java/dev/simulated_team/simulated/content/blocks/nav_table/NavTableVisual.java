@@ -47,7 +47,7 @@ public class NavTableVisual extends AbstractBlockEntityVisual<NavTableBlockEntit
             inst.translate(0, 0, 0.5);
 
             facingRot.transform(dir.getStepX(), dir.getStepY(), dir.getStepZ(), this.tempVec);
-            final Direction logicalDirection = Direction.getNearest(this.tempVec.x, this.tempVec.y, this.tempVec.z);
+            final Direction logicalDirection = Direction.getApproximateNearest(this.tempVec.x, this.tempVec.y, this.tempVec.z);
 
             inst.colorRgb(
                     SimColors.redstone(navBE.isPowering ? Math.max(navBE.getRedstoneStrength(logicalDirection), 0) / 15.0F : 0)

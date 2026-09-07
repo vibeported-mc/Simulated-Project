@@ -9,6 +9,7 @@ import dev.simulated_team.simulated.index.SimItems;
 import dev.simulated_team.simulated.index.SimSoundEvents;
 import foundry.veil.api.network.handler.PacketContext;
 import net.createmod.catnip.api.data.Pair;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -69,7 +70,10 @@ public record HoneyGlueSpawnPacket(BlockPos from, BlockPos to) implements Custom
             final ItemStack honeyGlueItem = player.getItemInHand(hand);
             honeyGlueItem.hurtAndBreak(1, level, player, (item) -> {});
 
-            final HoneyGlueEntity entity = SimEntityTypes.HONEY_GLUE.create(level);
+            final HoneyGlueEntity entity = SimEntityTypes.HONEY_GLUE.create(level, EntitySpawnReason.TRIGGERED);
+        if (entity == null) {
+            return;
+        }
             assert entity != null;
 
             entity.setBounds(newBounds);

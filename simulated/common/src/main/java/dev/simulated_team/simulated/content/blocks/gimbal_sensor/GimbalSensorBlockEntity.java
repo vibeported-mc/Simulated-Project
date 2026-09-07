@@ -558,7 +558,9 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
         private boolean isRandom = false;
 
         public void update(final Vec3 pos, final Level level) {
-            this.isRandom = !level.dimensionType().natural();
+            // 26.2: DimensionType.natural is gone. A dimension keeps ordinary time when it has a
+            // default clock, which is the question this was asking.
+            this.isRandom = level.dimensionType().defaultClock().isEmpty();
             if (!this.isRandom) {
                 this.target.set(0, 0, -1);
             } else {
