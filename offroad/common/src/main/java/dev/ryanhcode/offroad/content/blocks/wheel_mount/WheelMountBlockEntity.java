@@ -34,6 +34,7 @@ import dev.simulated_team.simulated.multiloader.inventory.SingleSlotContainer;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.createmod.catnip.api.math.AngleHelper;
 import net.createmod.catnip.api.math.VecHelper;
+import com.simibubi.create.foundation.utility.RegistryNbt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.core.Direction;
@@ -478,7 +479,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
 
     @Override
     protected void write(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
-        tag.put("CurrentStack", this.getHeldItem().saveOptional(registries));
+        tag.store("CurrentStack", ItemStack.OPTIONAL_CODEC, RegistryNbt.ops(registries), this.getHeldItem());
 
         if (clientPacket) {
             tag.putInt("SteeringSignalStrength", this.lastServerSteeringSignal);
@@ -491,7 +492,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
 
     @Override
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
-        final ItemStack stack = ItemStack.parseOptional(registries, tag.getCompound("CurrentStack"));
+        final ItemStack stack = tag.read("CurrentStack", ItemStack.OPTIONAL_CODEC, RegistryNbt.ops(registries)).orElse(ItemStack.EMPTY);
 
         this.inventory.suppressUpdate = true;
         this.inventory.slot.setStack(stack);

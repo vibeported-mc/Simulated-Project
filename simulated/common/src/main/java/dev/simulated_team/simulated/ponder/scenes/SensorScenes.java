@@ -32,6 +32,7 @@ import net.createmod.ponder.impl.client.element.ElementLinkImpl;
 import net.createmod.ponder.impl.client.instruction.CreateParrotInstruction;
 import net.createmod.ponder.impl.client.instruction.FadeOutOfSceneInstruction;
 import net.createmod.ponder.impl.client.instruction.RotateSceneInstruction;
+import com.simibubi.create.foundation.utility.RegistryNbt;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -388,14 +389,14 @@ public class SensorScenes {
         world.toggleRedstonePower(util.select().position(3, 1, 3));
 
         world.modifyBlockEntityNBT(util.select().position(3, 1, 3), OpticalSensorBlockEntity.class,
-                nbt -> nbt.put("Filter", gold.saveOptional(world.getHolderLookupProvider())));
+                nbt -> nbt.store("Filter", ItemStack.OPTIONAL_CODEC, RegistryNbt.ops(world.getHolderLookupProvider()), gold));
 
         scene.idle(20);
 
         scene.overlay().showControls(rightSlot, Pointing.DOWN, 40).withItem(iron);
 
         world.modifyBlockEntityNBT(util.select().position(1, 1, 3), OpticalSensorBlockEntity.class,
-                nbt -> nbt.put("Filter", iron.saveOptional(world.getHolderLookupProvider())));
+                nbt -> nbt.store("Filter", ItemStack.OPTIONAL_CODEC, RegistryNbt.ops(world.getHolderLookupProvider()), iron));
 
         scene.idle(60);
 
@@ -533,7 +534,7 @@ public class SensorScenes {
 
         scene.overlay().showControls(sensorFilterPos, Pointing.DOWN, 40).withItem(dye);
 
-        world.modifyBlockEntityNBT(laserSensor, LaserSensorBlockEntity.class, nbt -> nbt.put("Filter", dye.saveOptional(world.getHolderLookupProvider())));
+        world.modifyBlockEntityNBT(laserSensor, LaserSensorBlockEntity.class, nbt -> nbt.store("Filter", ItemStack.OPTIONAL_CODEC, RegistryNbt.ops(world.getHolderLookupProvider()), dye));
         world.toggleRedstonePower(laserSensor);
         laserSetRedstone(0, world, laserNixiePos, laserRedstonePos);
 
@@ -1132,7 +1133,7 @@ public class SensorScenes {
         scene.overlay().showControls(util.vector().blockSurface(navigationTable2, Direction.UP), Pointing.DOWN, 50).withItem(lodestoneCompass);
         scene.idle(5);
         world.modifyBlockEntityNBT(util.select().position(navigationTable2), NavTableBlockEntity.class,
-                tag -> tag.put("CurrentStack", lodestoneCompass.saveOptional(world.getHolderLookupProvider())), true);
+                tag -> tag.store("CurrentStack", ItemStack.OPTIONAL_CODEC, RegistryNbt.ops(world.getHolderLookupProvider()), lodestoneCompass), true);
         world.showSection(lodestone, Direction.SOUTH);
 
         world.toggleRedstonePower(navTable2Left);

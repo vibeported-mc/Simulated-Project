@@ -106,7 +106,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
                 LinkedControllerClientHandler.MODE = LinkedControllerClientHandler.Mode.IDLE;
             }
 
-            return InteractionResult.sidedSuccess(level.isClientSide());
+            return InteractionResult.SUCCESS;
         }
 
         if (heldItem.isEmpty() && interactionHand == InteractionHand.MAIN_HAND) {

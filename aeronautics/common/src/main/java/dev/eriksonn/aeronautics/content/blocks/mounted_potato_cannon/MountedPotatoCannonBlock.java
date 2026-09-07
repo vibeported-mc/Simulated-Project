@@ -7,6 +7,7 @@ import dev.eriksonn.aeronautics.index.AeroBlockShapes;
 import dev.simulated_team.simulated.multiloader.inventory.ContainerSlot;
 import dev.simulated_team.simulated.multiloader.inventory.ItemInfoWrapper;
 import dev.simulated_team.simulated.util.DirectionalAxisShaper;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -65,7 +66,7 @@ public class MountedPotatoCannonBlock extends DirectionalAxisKineticBlock implem
 					if (!player.hasInfiniteMaterials()) {
 						heldItem.shrink((int) inserted);
 					}
-					return InteractionResult.sidedSuccess(level.isClientSide());
+					return InteractionResult.SUCCESS;
 				}
 			}
 

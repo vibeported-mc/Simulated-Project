@@ -11,6 +11,7 @@ import net.createmod.catnip.api.animation.LerpedFloat;
 import net.createmod.catnip.api.data.Iterate;
 import net.createmod.catnip.api.math.AngleHelper;
 import net.createmod.catnip.api.math.VecHelper;
+import com.simibubi.create.foundation.utility.RegistryNbt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -250,7 +251,7 @@ public class NavTableBlockEntity extends SmartBlockEntity implements Clearable {
 
     @Override
     protected void write(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
-        tag.put("CurrentStack", this.getHeldItem().saveOptional(registries));
+        tag.store("CurrentStack", ItemStack.OPTIONAL_CODEC, RegistryNbt.ops(registries), this.getHeldItem());
 
         if (this.currentTarget != null) {
             this.writeCurrentTarget(tag);
@@ -263,7 +264,7 @@ public class NavTableBlockEntity extends SmartBlockEntity implements Clearable {
 
     @Override
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
-        final ItemStack stack = ItemStack.parseOptional(registries, tag.getCompound("CurrentStack"));
+        final ItemStack stack = tag.read("CurrentStack", ItemStack.OPTIONAL_CODEC, RegistryNbt.ops(registries)).orElse(ItemStack.EMPTY);
         this.inventory.slot.setStack(stack);
 
         if (tag.contains("CurrentTarget")) {

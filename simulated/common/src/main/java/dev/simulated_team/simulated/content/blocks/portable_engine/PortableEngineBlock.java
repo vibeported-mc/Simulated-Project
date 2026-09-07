@@ -135,7 +135,7 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
                 final int transferAmount = Math.min(targetAmount - currentItemStack.getCount(), heldItem.getCount());
 
                 if (transferAmount <= 0)
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                    return InteractionResult.SUCCESS;
 
                 slot.shrink(-transferAmount);
                 heldItem.shrink(transferAmount);
@@ -158,7 +158,7 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
 
         be.notifyUpdate();
 
-        return InteractionResult.sidedSuccess(level.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     @Override

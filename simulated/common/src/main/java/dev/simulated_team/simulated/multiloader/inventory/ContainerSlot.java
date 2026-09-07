@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.multiloader.inventory;
 
+import com.simibubi.create.foundation.utility.RegistryNbt;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
@@ -159,7 +160,7 @@ public class ContainerSlot implements NBTSerializable {
         this.stack = ItemStack.EMPTY;
 
         if (nbt.contains("item")) {
-            this.stack = ItemStack.parseOptional(provider, nbt.getCompound("item"));
+            this.stack = nbt.read("item", ItemStack.OPTIONAL_CODEC, RegistryNbt.ops(provider)).orElse(ItemStack.EMPTY);
         }
 
         this.type = this.stack.getItem();
