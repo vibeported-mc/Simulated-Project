@@ -7,7 +7,7 @@ import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import dev.eriksonn.aeronautics.content.blocks.propeller.small.SimplePropellerRenderer;
 import dev.eriksonn.aeronautics.index.AeroPartialModels;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -34,9 +34,9 @@ public class SmartPropellerRenderer extends SimplePropellerRenderer<SmartPropell
 
         final VertexConsumer vb = buffer.getBuffer(RenderType.solid());
 
-        final SuperByteBuffer propeller = CachedBuffers.partialFacing(this.getCurrentModel(be), state, Direction.UP)
+        final SuperByteBuffer propeller = CachedBufferer.partialFacing(this.getCurrentModel(be), state, Direction.UP)
                 .light(light);
-        final SuperByteBuffer hinge = CachedBuffers.partialFacing(AeroPartialModels.SMART_PROPELLER_HINGE, state, Direction.UP)
+        final SuperByteBuffer hinge = CachedBufferer.partialFacing(AeroPartialModels.SMART_PROPELLER_HINGE, state, Direction.UP)
                 .light(light);
 
         final float hingeAngle = be.getLerpedHingeAngle(partialTicks);
@@ -70,6 +70,6 @@ public class SmartPropellerRenderer extends SimplePropellerRenderer<SmartPropell
 
     @Override
     protected SuperByteBuffer getRotatedModel(final SmartPropellerBlockEntity be, final BlockState state) {
-        return CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, Direction.DOWN);
+        return CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, state, Direction.DOWN);
     }
 }

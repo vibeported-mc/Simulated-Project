@@ -12,7 +12,7 @@ import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.mixin.accessor.LevelRendererAccessor;
 import dev.simulated_team.simulated.util.SimColors;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -65,11 +65,11 @@ public class ThrottleLeverRenderer extends SafeBlockEntityRenderer<ThrottleLever
         if (!VisualizationManager.supportsVisualization(be.getLevel())) {
             final VertexConsumer vb = bufferSource.getBuffer(RenderType.cutoutMipped());
 
-            final SuperByteBuffer handle = CachedBuffers.partial(SimPartialModels.THROTTLE_LEVER_HANDLE, leverState);
-            final SuperByteBuffer button = CachedBuffers.partial(SimPartialModels.THROTTLE_LEVER_BUTTON, leverState);
+            final SuperByteBuffer handle = CachedBufferer.partial(SimPartialModels.THROTTLE_LEVER_HANDLE, leverState);
+            final SuperByteBuffer button = CachedBufferer.partial(SimPartialModels.THROTTLE_LEVER_BUTTON, leverState);
 
             final float signalStrength = Math.max(0, be.state / 15F);
-            final SuperByteBuffer diode = CachedBuffers.partial(SimPartialModels.THROTTLE_LEVER_DIODE, leverState);
+            final SuperByteBuffer diode = CachedBufferer.partial(SimPartialModels.THROTTLE_LEVER_DIODE, leverState);
             final int color = SimColors.redstone(signalStrength);
 
             final double buttonAngle = be.clientPressedLerp.getValue(partialTicks) * -7f;

@@ -22,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public record PlaceSpringPacket(BlockPos parentPos, BlockPos childPos, Direction parentFacing, Direction childFacing,
                                 InteractionHand hand) implements CustomPacketPayload {
@@ -50,7 +51,7 @@ public record PlaceSpringPacket(BlockPos parentPos, BlockPos childPos, Direction
         final BlockPos childRelative = this.childPos().relative(this.childFacing);
 
         final ItemStack spring = player.getItemInHand(this.hand);
-        final double distanceSquared = Sable.HELPER.distanceSquaredWithSubLevels(level, parentRelative.getCenter(), childRelative.getCenter());
+        final double distanceSquared = Sable.HELPER.distanceSquaredWithSubLevels(level, Vec3.atCenterOf(parentRelative), Vec3.atCenterOf(childRelative));
         if (!(spring.getItem() instanceof SpringItem) || distanceSquared > (SpringItemHandler.MAX_LENGTH + 1) * (SpringItemHandler.MAX_LENGTH + 1)) {
             return;
         }

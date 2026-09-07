@@ -8,7 +8,7 @@ import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
@@ -34,7 +34,7 @@ public class RedstoneAccumulatorRenderer extends SmartBlockEntityRenderer<Redsto
 
     @Override
     protected void renderSafe(final RedstoneAccumulatorBlockEntity be, final float partialTicks, final PoseStack ms, final MultiBufferSource buffer, final int light, final int overlay) {
-        final SuperByteBuffer render = CachedBuffers.partial(SimPartialModels.REDSTONE_ACCUMULATOR_DIODE, be.getBlockState())
+        final SuperByteBuffer render = CachedBufferer.partial(SimPartialModels.REDSTONE_ACCUMULATOR_DIODE, be.getBlockState())
                 .color(255, 255, 255, this.getLitAmount(be, partialTicks));
 
         final Direction facing = be.getBlockState().getValue(RedstoneAccumulatorBlock.FACING);

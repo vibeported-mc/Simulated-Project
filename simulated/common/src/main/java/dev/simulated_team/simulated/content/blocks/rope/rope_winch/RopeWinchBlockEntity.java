@@ -176,7 +176,7 @@ public class RopeWinchBlockEntity extends KineticBlockEntity implements RopeStra
 
     @Override
     public Vec3 getAttachmentPoint(final BlockPos pos, final BlockState state) {
-        return pos.getCenter();
+        return Vec3.atCenterOf(pos);
     }
 
     @Override

@@ -94,6 +94,7 @@ import org.jetbrains.annotations.Nullable;
 import static com.simibubi.create.api.behaviour.movement.MovementBehaviour.movementBehaviour;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.*;
+import com.tterrag.registrate.providers.generators.RegistrateRecipeProvider;
 
 @SuppressWarnings("removal")
 public class SimBlocks {

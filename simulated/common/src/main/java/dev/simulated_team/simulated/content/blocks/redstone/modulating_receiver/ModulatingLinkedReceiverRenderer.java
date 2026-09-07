@@ -7,7 +7,7 @@ import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import net.createmod.catnip.api.data.Iterate;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -44,7 +44,7 @@ public class ModulatingLinkedReceiverRenderer extends SmartBlockEntityRenderer<M
         final float maxPos = 5.5f * ((be.maxRange - 1) * (SMOOTHING + MAX_DISTANCE - 1)) / ((MAX_DISTANCE - 1) * (SMOOTHING + be.maxRange - 1));
 
         for (final boolean bottom : Iterate.trueAndFalse) {
-            final SuperByteBuffer superBuffer = CachedBuffers.partial(SimPartialModels.MODULATING_RECEIVER_PLATE, be.getBlockState());
+            final SuperByteBuffer superBuffer = CachedBufferer.partial(SimPartialModels.MODULATING_RECEIVER_PLATE, be.getBlockState());
 
             if (bottom) {
                 superBuffer.translate(pixelNormal.scale(minPos));

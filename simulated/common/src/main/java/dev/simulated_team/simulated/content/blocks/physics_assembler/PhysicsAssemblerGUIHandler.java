@@ -20,6 +20,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 
 public class PhysicsAssemblerGUIHandler extends BlockHoldInteraction {
     private static final double PULLED_THRESHOLD = 0.015;
@@ -70,7 +71,7 @@ public class PhysicsAssemblerGUIHandler extends BlockHoldInteraction {
         }
 
         if (level.getBlockEntity(this.getInteractionPos()) instanceof final PhysicsAssemblerBlockEntity be) {
-            if (BlockHoldInteraction.inInteractionRange(player, this.getInteractionPos().getCenter(), 2)) {
+            if (BlockHoldInteraction.inInteractionRange(player, Vec3.atCenterOf(this.getInteractionPos()), 2)) {
                 lastAnimatedValue = animatedValue;
                 animatedValue += animatedVelocity;
                 animatedVelocity *= 0.8f;

@@ -6,7 +6,7 @@ import dev.simulated_team.simulated.content.blocks.lasers.LaserBehaviour;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.index.SimRenderTypes;
 import dev.simulated_team.simulated.util.SimColors;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.util.Util;
 import net.minecraft.util.LightCoordsUtil;
@@ -30,9 +30,9 @@ public class LaserPointerRenderer extends AbstractLaserRenderer<LaserPointerBloc
         final Vector4f colors = this.getColors(blockEntity, partialTicks);
         final boolean isDarkerThanDark = colors.x == 0 && colors.y == 0 && colors.z == 0;
         if (blockEntity.shouldCast() && !isDarkerThanDark) {
-            superBuffer = CachedBuffers.partial(SimPartialModels.LASER_POINTER_LENS_ON, blockEntity.getBlockState());
+            superBuffer = CachedBufferer.partial(SimPartialModels.LASER_POINTER_LENS_ON, blockEntity.getBlockState());
         } else {
-            superBuffer = CachedBuffers.partial(SimPartialModels.LASER_POINTER_LENS_OFF, blockEntity.getBlockState());
+            superBuffer = CachedBufferer.partial(SimPartialModels.LASER_POINTER_LENS_OFF, blockEntity.getBlockState());
         }
         superBuffer.translate(0.5, 0.5, 0.5);
         superBuffer.rotateToFace(blockEntity.getBlockState().getValue(LaserPointerBlock.FACING));

@@ -9,7 +9,7 @@ import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import dev.eriksonn.aeronautics.index.AeroPartialModels;
 import net.createmod.catnip.api.math.AngleHelper;
 import net.createmod.catnip.api.math.VecHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -42,7 +42,7 @@ public class GyroscopicPropellerBearingRenderer extends KineticBlockEntityRender
         final Vec3 contraptionNormal = new Vec3(Q.x(), Q.y(), Q.z());
 
         final PartialModel top = AeroPartialModels.BEARING_PLATE_METAL;
-        final SuperByteBuffer superBuffer = CachedBuffers.partial(top, be.getBlockState());
+        final SuperByteBuffer superBuffer = CachedBufferer.partial(top, be.getBlockState());
 
         superBuffer.translate(normal.scale(4 / 16f));
         superBuffer.rotateCentered(tiltQuat);
@@ -63,8 +63,8 @@ public class GyroscopicPropellerBearingRenderer extends KineticBlockEntityRender
 
         for (int i = 0; i < 4; i++) {
 
-            final SuperByteBuffer headBuffer = CachedBuffers.partial(AeroPartialModels.GYRO_BEARING_PISTON_HEAD, be.getBlockState());
-            final SuperByteBuffer poleBuffer = CachedBuffers.partial(AeroPartialModels.GYRO_BEARING_PISTON_POLE, be.getBlockState());
+            final SuperByteBuffer headBuffer = CachedBufferer.partial(AeroPartialModels.GYRO_BEARING_PISTON_HEAD, be.getBlockState());
+            final SuperByteBuffer poleBuffer = CachedBufferer.partial(AeroPartialModels.GYRO_BEARING_PISTON_POLE, be.getBlockState());
             final Vec3 originalPos = VecHelper.rotate(new Vec3(5.9 / 16.0, 0, 0), -90 * i, Direction.Axis.Y);
             Vec3 translatedPos = originalPos;
 
@@ -116,7 +116,7 @@ public class GyroscopicPropellerBearingRenderer extends KineticBlockEntityRender
 
     @Override
     protected SuperByteBuffer getRotatedModel(final GyroscopicPropellerBearingBlockEntity be, final BlockState state) {
-        return CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, state
+        return CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, state, state
                 .getValue(BearingBlock.FACING)
                 .getOpposite());
     }

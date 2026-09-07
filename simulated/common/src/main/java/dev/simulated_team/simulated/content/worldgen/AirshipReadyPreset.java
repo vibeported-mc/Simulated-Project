@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.GameRules;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.gamerules.GameRules;
 
 public class AirshipReadyPreset extends SimulatedWorldPreset {
 	public AirshipReadyPreset(final Identifier id, @Nullable final Component description) {

@@ -28,7 +28,7 @@ public class SwivelBearingScenes {
                 s -> s.setValue(SwivelBearingBlock.ASSEMBLED, true), false);
 
         scene.world().modifyBlockEntityNBT(util.select().position(swivelPos), SwivelBearingBlockEntity.class, nbt -> {
-            nbt.getCompound("SwivelCog").putFloat("Speed", rpm);
+            nbt.getCompoundOrEmpty("SwivelCog").putFloat("Speed", rpm);
         });
     }
 

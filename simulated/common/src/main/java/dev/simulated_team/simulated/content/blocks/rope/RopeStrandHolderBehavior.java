@@ -53,6 +53,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import java.util.*;
+import net.minecraft.world.level.gamerules.GameRules;
 
 public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
     public static final BehaviourType<RopeStrandHolderBehavior> TYPE = new BehaviourType<>("rope_strand_holder");
@@ -207,19 +208,19 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
         final BlockEntity blockEntity = level.getBlockEntity(blockAttachment);
 
         if (blockEntity == null) {
-            this.destroyRope(null, blockAttachment.getCenter(), tileDrops);
+            this.destroyRope(null, Vec3.atCenterOf(blockAttachment), tileDrops);
             return;
         }
 
         if (!(blockEntity instanceof final SmartBlockEntity smartBlockEntity)) {
-            this.destroyRope(null, blockAttachment.getCenter(), tileDrops);
+            this.destroyRope(null, Vec3.atCenterOf(blockAttachment), tileDrops);
             return;
         }
 
         final RopeStrandHolderBehavior holderBehavior = smartBlockEntity.getBehaviour(RopeStrandHolderBehavior.TYPE);
 
         if (holderBehavior == null) {
-            this.destroyRope(null, blockAttachment.getCenter(), tileDrops);
+            this.destroyRope(null, Vec3.atCenterOf(blockAttachment), tileDrops);
         }
     }
 

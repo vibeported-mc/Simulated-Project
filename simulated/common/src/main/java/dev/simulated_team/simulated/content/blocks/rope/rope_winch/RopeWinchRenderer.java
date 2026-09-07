@@ -13,7 +13,7 @@ import dev.simulated_team.simulated.content.blocks.rope.strand.client.RopeStrand
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.index.SimSpriteShifts;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SpriteShiftEntry;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.Minecraft;
@@ -70,8 +70,8 @@ public class RopeWinchRenderer extends SafeBlockEntityRenderer<RopeWinchBlockEnt
         final VertexConsumer vb = buffer.getBuffer(RenderType.solid());
 
         final BlockState state = be.getBlockState();
-        final SuperByteBuffer shaft = CachedBuffers.partial(SimPartialModels.ROPE_WINCH_SHAFT, state);
-        final SuperByteBuffer ropeCoil = CachedBuffers.partial(SimPartialModels.ROPE_WINCH_ROPE_COIL, state);
+        final SuperByteBuffer shaft = CachedBufferer.partial(SimPartialModels.ROPE_WINCH_SHAFT, state);
+        final SuperByteBuffer ropeCoil = CachedBufferer.partial(SimPartialModels.ROPE_WINCH_ROPE_COIL, state);
 
         final Direction.Axis axis = KineticBlockEntityRenderer.getRotationAxisOf(be);
         final float angle = KineticBlockEntityRenderer.getAngleForBe(be, be.getBlockPos(), axis);

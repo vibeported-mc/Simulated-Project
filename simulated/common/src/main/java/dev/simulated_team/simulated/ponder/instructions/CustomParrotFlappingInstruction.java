@@ -10,6 +10,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.animal.Parrot;
 
 import java.util.Objects;
+import net.minecraft.world.entity.animal.parrot.Parrot;
 
 public class CustomParrotFlappingInstruction extends TickingInstruction {
 

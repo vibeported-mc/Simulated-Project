@@ -7,7 +7,7 @@ import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -31,7 +31,7 @@ public class TorsionSpringRenderer extends KineticBlockEntityRenderer<TorsionSpr
 
         final Direction facing = be.getBlockState().getValue(TorsionSpringBlock.FACING);
 
-        final SuperByteBuffer spring = CachedBuffers.partial(SimPartialModels.TORSION_SPRING, be.getBlockState());
+        final SuperByteBuffer spring = CachedBufferer.partial(SimPartialModels.TORSION_SPRING, be.getBlockState());
         final float angle = be.interpolatedSpring(partialTicks);
         kineticRotationTransform(spring, be, facing.getAxis(), Mth.DEG_TO_RAD * angle, light);
         if (facing.getAxis().isHorizontal()) {
@@ -40,14 +40,14 @@ public class TorsionSpringRenderer extends KineticBlockEntityRenderer<TorsionSpr
         spring.rotateCentered(AngleHelper.rad(-90 - AngleHelper.verticalAngle(facing)), Direction.EAST);
         spring.renderInto(ms, buffer.getBuffer(RenderType.solid()));
 
-        final SuperByteBuffer shaftOut = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, be.getBlockState(), facing);
+        final SuperByteBuffer shaftOut = CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, be.getBlockState(), facing);
         kineticRotationTransform(shaftOut, be, facing.getAxis(), getAngleForBe(be.getExtraKinetics(), be.getBlockPos(), facing.getAxis()), light);
         shaftOut.renderInto(ms, buffer.getBuffer(RenderType.solid()));
     }
 
     @Override
     protected SuperByteBuffer getRotatedModel(final TorsionSpringBlockEntity be, final BlockState state) {
-        return CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, state
+        return CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, state, state
                 .getValue(BearingBlock.FACING)
                 .getOpposite());
     }

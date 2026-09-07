@@ -8,7 +8,7 @@ import dev.simulated_team.simulated.content.blocks.rope.RopeStrandHolderBehavior
 import dev.simulated_team.simulated.content.blocks.rope.strand.client.RopeStrandRenderer;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -42,7 +42,7 @@ public class RopeConnectorRenderer extends SafeBlockEntityRenderer<RopeConnector
         if ((!holder.isAttached()) && (!be.isVirtual() || !be.getRopeHolder().renderAttached)) {
             return;
         }
-        final SuperByteBuffer knot = CachedBuffers.partialFacing(SimPartialModels.ROPE_CONNECTOR_KNOT, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
+        final SuperByteBuffer knot = CachedBufferer.partialFacing(SimPartialModels.ROPE_CONNECTOR_KNOT, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
 
         final BlockPos blockPos = be.getBlockPos();
         final BlockState state = be.getBlockState();
@@ -58,7 +58,7 @@ public class RopeConnectorRenderer extends SafeBlockEntityRenderer<RopeConnector
         final float yRot = AngleHelper.horizontalAngle(facing) + (axisAlongFirstCoordinate || facing.getAxis() != Direction.Axis.Y ? 0.0f : 90.0f);
         final float zRot = facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0;
 
-        knotBuffer.translate(attachmentPoint.subtract(blockPos.getCenter()));
+        knotBuffer.translate(attachmentPoint.subtract(Vec3.atCenterOf(blockPos)));
         knotBuffer.rotateCentered((float) ((zRot) / 180 * Math.PI), Direction.SOUTH);
         knotBuffer.rotateCentered((float) ((yRot) / 180 * Math.PI), Direction.UP);
         knotBuffer.rotateCentered((float) ((zRotLast) / 180 * Math.PI), Direction.SOUTH);

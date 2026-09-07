@@ -11,7 +11,7 @@ import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.util.SimColors;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.createmod.ponder.api.client.level.PonderLevel;
 import net.minecraft.client.Minecraft;
@@ -34,7 +34,7 @@ public class HotAirBurnerRenderer extends SmartBlockEntityRenderer<HotAirBurnerB
     @Override
     protected void renderSafe(final HotAirBurnerBlockEntity be, final float partialTicks, final PoseStack ms, final MultiBufferSource buffer, final int light, final int overlay) {
         final float signalStrength = Math.max(0, be.getSignalStrength() / 15F);
-        final SuperByteBuffer indicator = CachedBuffers.partial(AeroPartialModels.HOT_AIR_BURNER_INDICATOR, be.getBlockState());
+        final SuperByteBuffer indicator = CachedBufferer.partial(AeroPartialModels.HOT_AIR_BURNER_INDICATOR, be.getBlockState());
         final VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
         indicator.light(light)
                 .color(SimColors.redstone(signalStrength))

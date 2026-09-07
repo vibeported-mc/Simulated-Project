@@ -10,7 +10,7 @@ import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.index.SimTags;
 import dev.simulated_team.simulated.util.SimColors;
 import dev.simulated_team.simulated.util.SimDirectionUtil;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -52,7 +52,7 @@ public class NavTableRenderer extends SmartBlockEntityRenderer<NavTableBlockEnti
                 final Direction logicalDirection = Direction.getNearest(logicalDirectionF.x, logicalDirectionF.y, logicalDirectionF.z);
 
                 ms.pushPose();
-                final SuperByteBuffer indicator = CachedBuffers.partial(SimPartialModels.NAV_TABLE_INDICATOR, navState);
+                final SuperByteBuffer indicator = CachedBufferer.partial(SimPartialModels.NAV_TABLE_INDICATOR, navState);
 
                 indicator.rotateToFace(direction);
                 indicator.translate(0, 0, 0.5);
@@ -69,7 +69,7 @@ public class NavTableRenderer extends SmartBlockEntityRenderer<NavTableBlockEnti
             // Render Pointer
             ms.pushPose();
             ms.translate(0, 0.3, 0);
-            final SuperByteBuffer pointer = CachedBuffers.partial(SimPartialModels.NAV_TABLE_POINTER, navState);
+            final SuperByteBuffer pointer = CachedBufferer.partial(SimPartialModels.NAV_TABLE_POINTER, navState);
 
             pointer.rotateY(arrowAngle);
             pointer.light(light).renderInto(ms, buffer.getBuffer(RenderType.cutout()));

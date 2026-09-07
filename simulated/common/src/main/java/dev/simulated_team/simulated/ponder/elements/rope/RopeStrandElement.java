@@ -10,7 +10,7 @@ import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.ponder.instructions.ModifyRopeInstruction;
 import dev.simulated_team.simulated.util.SimMathUtils;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.createmod.ponder.api.client.element.AnimatedSceneElement;
 import net.createmod.ponder.api.client.level.PonderLevel;
@@ -76,8 +76,8 @@ public class RopeStrandElement extends AnimatedSceneElementBase implements Anima
 
     @Override
     protected void renderLast(final PonderLevel world, final MultiBufferSource buffer, final GuiGraphicsExtractor graphics, final float fade, final float pt) {
-        final SuperByteBuffer middle = CachedBuffers.partialFacing(SimPartialModels.ROPE, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
-        final SuperByteBuffer knot = CachedBuffers.partialFacing(SimPartialModels.ROPE_KNOT, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
+        final SuperByteBuffer middle = CachedBufferer.partialFacing(SimPartialModels.ROPE, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
+        final SuperByteBuffer knot = CachedBufferer.partialFacing(SimPartialModels.ROPE_KNOT, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
         final VertexConsumer vb = buffer.getBuffer(RenderType.solid());
         final PoseStack ps = graphics.pose();
 

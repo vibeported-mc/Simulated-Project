@@ -77,7 +77,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity implements SimMa
         //todo: do this in the behaviour or using common method or something
         if (this.latestSubLevel != null) {
             final MagnetMap<RedstoneMagnetBlockEntity> map = RedstoneMagnetBlockEntity.GLOBAL_REDSTONE_MAGNET_MAP;
-            final SimMovementContext context = SimMovementContext.getMovementContext(this.getLevel(), this.getBlockPos().getCenter());
+            final SimMovementContext context = SimMovementContext.getMovementContext(this.getLevel(), Vec3.atCenterOf(this.getBlockPos()));
             final List<SimMovementContext> contexts = map.findNearby(context);
             for (final SimMovementContext movementContext : contexts) {
                 if (movementContext.subLevel() != this.latestSubLevel) {

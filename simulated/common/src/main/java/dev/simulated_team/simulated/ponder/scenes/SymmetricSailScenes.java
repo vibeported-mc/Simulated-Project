@@ -547,7 +547,7 @@ public class SymmetricSailScenes {
     public static void setSymSailKinetics(final CreateSceneBuilder scene, final SceneBuildingUtil util, final float rpm) {
         for (int i = 0; i < 2; i++) {
             scene.world().modifyBlockEntityNBT(util.select().position(93, 2, 3 + (2 * i)), AnalogTransmissionBlockEntity.class, nbt -> {
-                nbt.getCompound("ExtraCogwheel").putFloat("Speed", rpm);
+                nbt.getCompoundOrEmpty("ExtraCogwheel").putFloat("Speed", rpm);
             });
         }
 

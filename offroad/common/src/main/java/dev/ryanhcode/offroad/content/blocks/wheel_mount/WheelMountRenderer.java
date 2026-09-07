@@ -13,7 +13,7 @@ import dev.ryanhcode.offroad.index.OffroadDataComponents;
 import dev.ryanhcode.offroad.index.OffroadPartialModels;
 import dev.simulated_team.simulated.util.SimColors;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -48,14 +48,14 @@ public class WheelMountRenderer extends KineticBlockEntityRenderer<WheelMountBlo
                 .getOpposite();
         final BlockState blockState = be.getBlockState();
 
-        final SuperByteBuffer diodeLeft = CachedBuffers.partial(OffroadPartialModels.DIODE_LEFT, blockState);
-        final SuperByteBuffer diodeRight = CachedBuffers.partial(OffroadPartialModels.DIODE_RIGHT, blockState);
-        final SuperByteBuffer teleOuter = CachedBuffers.partial(OffroadPartialModels.TELE_OUTER, blockState);
-        final SuperByteBuffer teleInner = CachedBuffers.partial(OffroadPartialModels.TELE_INNER, blockState);
-        final SuperByteBuffer teleMount = CachedBuffers.partial(OffroadPartialModels.TELE_MOUNT, blockState);
-        final SuperByteBuffer springTop = CachedBuffers.partial(OffroadPartialModels.SPRING_UPPER, blockState);
-        final SuperByteBuffer springBottom = CachedBuffers.partial(OffroadPartialModels.SPRING_LOWER, blockState);
-        final SuperByteBuffer springMiddle = CachedBuffers.partial(OffroadPartialModels.SPRING_MIDDLE, blockState);
+        final SuperByteBuffer diodeLeft = CachedBufferer.partial(OffroadPartialModels.DIODE_LEFT, blockState);
+        final SuperByteBuffer diodeRight = CachedBufferer.partial(OffroadPartialModels.DIODE_RIGHT, blockState);
+        final SuperByteBuffer teleOuter = CachedBufferer.partial(OffroadPartialModels.TELE_OUTER, blockState);
+        final SuperByteBuffer teleInner = CachedBufferer.partial(OffroadPartialModels.TELE_INNER, blockState);
+        final SuperByteBuffer teleMount = CachedBufferer.partial(OffroadPartialModels.TELE_MOUNT, blockState);
+        final SuperByteBuffer springTop = CachedBufferer.partial(OffroadPartialModels.SPRING_UPPER, blockState);
+        final SuperByteBuffer springBottom = CachedBufferer.partial(OffroadPartialModels.SPRING_LOWER, blockState);
+        final SuperByteBuffer springMiddle = CachedBufferer.partial(OffroadPartialModels.SPRING_MIDDLE, blockState);
 
         final double wheelPivotOffsetHor = 10.0 / 16.0;
         final double springWheelPivotOffsetHor = 12.0 / 16.0;
@@ -124,7 +124,7 @@ public class WheelMountRenderer extends KineticBlockEntityRenderer<WheelMountBlo
             if (tireLike.model().isPresent()) {
                 final Identifier model = tireLike.model().get();
                 ms.translate(tireLike.offset().x, tireLike.offset().y, tireLike.offset().z);
-                final SuperByteBuffer wheel = CachedBuffers.partial(PartialModel.of(model), state);
+                final SuperByteBuffer wheel = CachedBufferer.partial(PartialModel.of(model), state);
                 wheel.light(light)
                         .translate(-0.5f, 0.0f, -0.5f)
                         .renderInto(ms, vb);
@@ -185,7 +185,7 @@ public class WheelMountRenderer extends KineticBlockEntityRenderer<WheelMountBlo
 
     @Override
     protected SuperByteBuffer getRotatedModel(final WheelMountBlockEntity te, final BlockState state) {
-        return CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, te.getBlockState(), te.getBlockState()
+        return CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, te.getBlockState(), te.getBlockState()
                 .getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite());
     }
 }

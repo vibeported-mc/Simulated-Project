@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.Supplier;
+import net.minecraft.advancements.triggers.CriterionTrigger;
+import com.mojang.blaze3d.audio.Listener;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

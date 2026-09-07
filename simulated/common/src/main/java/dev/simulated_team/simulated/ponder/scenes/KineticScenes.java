@@ -325,7 +325,7 @@ public class KineticScenes {
         });
 
         world.modifyBlockEntityNBT(select.position(transmissionPos), AnalogTransmissionBlockEntity.class, nbt -> {
-            nbt.getCompound("ExtraCogwheel").putFloat("Speed", 20f);
+            nbt.getCompoundOrEmpty("ExtraCogwheel").putFloat("Speed", 20f);
         });
         world.setKineticSpeed(select.fromTo(0, 2, 2, 2, 2, 2), -20f);
         scene.idle(10);
@@ -356,7 +356,7 @@ public class KineticScenes {
         });
 
         world.modifyBlockEntityNBT(select.position(transmissionPos), AnalogTransmissionBlockEntity.class, nbt -> {
-            nbt.getCompound("ExtraCogwheel").putFloat("Speed", 8f);
+            nbt.getCompoundOrEmpty("ExtraCogwheel").putFloat("Speed", 8f);
         });
         world.setKineticSpeed(select.fromTo(0, 2, 2, 2, 2, 2), -8f);
         scene.idle(10);
@@ -387,7 +387,7 @@ public class KineticScenes {
         });
 
         world.modifyBlockEntityNBT(select.position(transmissionPos), AnalogTransmissionBlockEntity.class, nbt -> {
-            nbt.getCompound("ExtraCogwheel").putFloat("Speed", 0f);
+            nbt.getCompoundOrEmpty("ExtraCogwheel").putFloat("Speed", 0f);
         });
         world.setKineticSpeed(select.fromTo(0, 1, 2, 2, 2, 2), 0f);
 
@@ -480,7 +480,7 @@ public class KineticScenes {
         world.setKineticSpeed(select.fromTo(0, 1, 2, 2, 1, 2), 32);
         world.setKineticSpeed(select.fromTo(0, 2, 2, 2, 2, 2), -32);
         world.modifyBlockEntityNBT(select.position(transmissionPos), AnalogTransmissionBlockEntity.class, nbt -> {
-            nbt.getCompound("ExtraCogwheel").putFloat("Speed", 32f);
+            nbt.getCompoundOrEmpty("ExtraCogwheel").putFloat("Speed", 32f);
         });
         scene.idle(10);
         world.hideIndependentSection(analogLeverSection, Direction.UP);
@@ -491,7 +491,7 @@ public class KineticScenes {
         effects.indicateRedstone(analogLeverPos);
         world.toggleRedstonePower(select.fromTo(1, 1, 0, 2, 1, 2));
         world.modifyBlockEntityNBT(select.position(transmissionPos), AnalogTransmissionBlockEntity.class, nbt -> {
-            nbt.getCompound("ExtraCogwheel").putFloat("Speed", 0f);
+            nbt.getCompoundOrEmpty("ExtraCogwheel").putFloat("Speed", 0f);
         });
         world.setKineticSpeed(select.fromTo(0, 2, 2, 2, 2, 2), 0);
         scene.idle(20);
@@ -508,7 +508,7 @@ public class KineticScenes {
         world.modifyKineticSpeed(sideInput, x -> x * -2);
         scene.idle(8);
         world.modifyBlockEntityNBT(select.position(transmissionPos), AnalogTransmissionBlockEntity.class, nbt -> {
-            nbt.getCompound("ExtraCogwheel").putFloat("Speed", -64f);
+            nbt.getCompoundOrEmpty("ExtraCogwheel").putFloat("Speed", -64f);
         });
         world.setKineticSpeed(select.fromTo(0, 2, 2, 2, 2, 2), 64);
         scene.idle(20);
@@ -761,7 +761,7 @@ public class KineticScenes {
         overlay.showText(80)
                 .text("Redstone Comparators can be used to read the current angle of the Steering Wheel")
                 .placeNearTarget()
-                .pointAt(steeringWheelPos.getCenter())
+                .pointAt(Vec3.atCenterOf(steeringWheelPos))
                 .attachKeyFrame();
 
         scene.idle(60);
@@ -850,7 +850,7 @@ public class KineticScenes {
         overlay.showText(100)
                 .text("Redstone Comparators placed on the back of the Steering Wheel will read if it is in use")
                 .placeNearTarget()
-                .pointAt(redstoneLamp.getCenter());
+                .pointAt(Vec3.atCenterOf(redstoneLamp));
 
         scene.idle(40);
 
@@ -906,7 +906,7 @@ public class KineticScenes {
         world.setKineticSpeed(springSelection, 16);
         world.setKineticSpeed(outputKinetics, 16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 16);
         });
         world.setKineticSpeed(inputKinetics1, 16);
         world.setKineticSpeed(inputKinetics2, -8);
@@ -916,12 +916,12 @@ public class KineticScenes {
         scene.idle(30);
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         scene.idle(20);
         world.setKineticSpeed(outputKinetics, -16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", -16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", -16);
         });
         world.setKineticSpeed(inputKinetics1, -16);
         world.setKineticSpeed(inputKinetics2, 8);
@@ -931,7 +931,7 @@ public class KineticScenes {
         scene.idle(60);
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         scene.idle(10);
         overlay.showText(60)
@@ -944,7 +944,7 @@ public class KineticScenes {
         world.setKineticSpeed(inputKinetics2, 0);
         world.setKineticSpeed(outputKinetics, 16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 16);
         });
         world.rotateSection(contraption, 90, 0, 0, 30);
         world.rotateBearing(bearingPos, 90, 30);
@@ -952,7 +952,7 @@ public class KineticScenes {
         scene.idle(30);
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         scene.idle(10);
         final Vec3 blockSurface = vector.centerOf(springPos)
@@ -975,7 +975,7 @@ public class KineticScenes {
 
         world.setKineticSpeed(outputKinetics, 16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 16);
         });
         world.setKineticSpeed(inputKinetics1, 16);
         world.setKineticSpeed(inputKinetics2, -8);
@@ -985,7 +985,7 @@ public class KineticScenes {
         scene.idle(10);
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         scene.idle(20);
 
@@ -1008,7 +1008,7 @@ public class KineticScenes {
         world.setKineticSpeed(inputKinetics2, 0);
         world.setKineticSpeed(outputKinetics, -16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", -16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", -16);
         });
         world.rotateSection(contraption, -30, 0, 0, 10);
         world.rotateBearing(bearingPos, -30, 10);
@@ -1016,14 +1016,14 @@ public class KineticScenes {
         scene.idle(10);
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         scene.idle(20);
         overlay.showControls(blockSurface, Pointing.DOWN, 10).rightClick();
         scene.idle(20);
         world.setKineticSpeed(outputKinetics, 16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 16);
         });
         world.setKineticSpeed(inputKinetics1, 16);
         world.setKineticSpeed(inputKinetics2, -8);
@@ -1033,7 +1033,7 @@ public class KineticScenes {
         scene.idle(40);
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         scene.idle(20);
 
@@ -1041,7 +1041,7 @@ public class KineticScenes {
         world.setKineticSpeed(inputKinetics2, 0);
         world.setKineticSpeed(outputKinetics, -16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", -16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", -16);
         });
         world.rotateSection(contraption, -90, 0, 0, 30);
         world.rotateBearing(bearingPos, -90, 30);
@@ -1054,7 +1054,7 @@ public class KineticScenes {
         effects.indicateRedstone(leverPos);
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         scene.idle(20);
         overlay.showText(60)
@@ -1066,7 +1066,7 @@ public class KineticScenes {
 
         world.setKineticSpeed(outputKinetics, -16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", -16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", -16);
         });
         world.setKineticSpeed(inputKinetics1, -16);
         world.setKineticSpeed(inputKinetics2, 8);
@@ -1076,7 +1076,7 @@ public class KineticScenes {
         scene.idle(30);
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         world.setKineticSpeed(inputKinetics1, 0);
         world.setKineticSpeed(inputKinetics2, 0);
@@ -1085,7 +1085,7 @@ public class KineticScenes {
         effects.indicateRedstone(leverPos);
         world.setKineticSpeed(outputKinetics, 16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 16);
         });
         world.rotateSection(contraption, 60, 0, 0, 20);
         world.rotateBearing(bearingPos, 60, 20);
@@ -1093,7 +1093,7 @@ public class KineticScenes {
         scene.idle(20);
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         scene.idle(10);
         world.hideIndependentSection(lever, Direction.UP);
@@ -1104,7 +1104,7 @@ public class KineticScenes {
 
         world.setKineticSpeed(outputKinetics, 16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 16);
         });
         world.setKineticSpeed(inputKinetics1, 16);
         world.setKineticSpeed(inputKinetics2, -8);
@@ -1120,7 +1120,7 @@ public class KineticScenes {
 
         world.setKineticSpeed(outputKinetics, -16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", -16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", -16);
         });
         world.setKineticSpeed(inputKinetics1, -16);
         world.setKineticSpeed(inputKinetics2, 8);
@@ -1151,14 +1151,14 @@ public class KineticScenes {
 
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
         scene.idle(20);
         world.setKineticSpeed(inputKinetics1, 0);
         world.setKineticSpeed(inputKinetics2, 0);
         world.setKineticSpeed(outputKinetics, 16);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 16);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 16);
         });
 
         world.rotateSection(contraption, 120, 0, 0, 45);
@@ -1171,7 +1171,7 @@ public class KineticScenes {
         }
         world.setKineticSpeed(outputKinetics, 0);
         world.modifyBlockEntityNBT(springSelection, TorsionSpringBlockEntity.class, nbt -> {
-            nbt.getCompound("TorsionSpringOutput").putFloat("Speed", 0);
+            nbt.getCompoundOrEmpty("TorsionSpringOutput").putFloat("Speed", 0);
         });
     }
 

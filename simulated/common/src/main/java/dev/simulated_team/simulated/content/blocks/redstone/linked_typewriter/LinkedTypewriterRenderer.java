@@ -9,7 +9,7 @@ import dev.simulated_team.simulated.index.SimPartialModels;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.createmod.catnip.api.animation.LerpedFloat;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -134,9 +134,9 @@ public class LinkedTypewriterRenderer extends SmartBlockEntityRenderer<LinkedTyp
         ms.translate(0.0F, depression, 0.0F);
 
         if (!isSpacebar) {
-            CachedBuffers.partial(SimPartialModels.LINKED_TYPEWRITER_KEY, blockState).light(light).renderInto(ms, vb);
+            CachedBufferer.partial(SimPartialModels.LINKED_TYPEWRITER_KEY, blockState).light(light).renderInto(ms, vb);
         } else {
-            CachedBuffers.partial(SimPartialModels.LINKED_TYPEWRITER_KEY_SPACEBAR, blockState).light(light).renderInto(ms, vb);
+            CachedBufferer.partial(SimPartialModels.LINKED_TYPEWRITER_KEY_SPACEBAR, blockState).light(light).renderInto(ms, vb);
         }
 
         ms.popPose();

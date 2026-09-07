@@ -16,6 +16,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class SteeringWheelHandler extends BlockHoldInteraction {
     private static SteeringWheelBlockEntity blockEntity = null;
@@ -175,7 +176,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
         }
 
         this.setTargetAngle(effectiveAngle);
-        return !BlockHoldInteraction.inInteractionRange(player, this.getInteractionPos().getCenter());
+        return !BlockHoldInteraction.inInteractionRange(player, Vec3.atCenterOf(this.getInteractionPos()));
     }
 
     @Override

@@ -9,7 +9,7 @@ import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.createmod.catnip.api.registry.RegisteredObjectsHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperBufferFactory;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.createmod.catnip.api.client.render.SuperByteBufferCache;
@@ -53,7 +53,7 @@ public class SteeringWheelRenderer extends KineticBlockEntityRenderer<SteeringWh
         if (be.shouldRenderShaft()) {
             final BlockState state = this.getRenderedBlockState(be);
             final RenderType type = this.getRenderType(be, state);
-            renderRotatingBuffer(be, CachedBuffers.partialFacing(
+            renderRotatingBuffer(be, CachedBufferer.partialFacing(
                     AllPartialModels.SHAFT_HALF,
                     be.getBlockState(),
                     floor ? Direction.DOWN : Direction.UP

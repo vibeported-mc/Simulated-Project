@@ -1017,7 +1017,7 @@ public class SensorScenes {
         world.setKineticSpeed(allKinetics, 8);
         world.setKineticSpeed(inverseKinetics, -8);
         world.modifyBlockEntityNBT(util.select().position(swivelBearing), SwivelBearingBlockEntity.class, nbt -> {
-            nbt.getCompound("SwivelCog").putFloat("Speed", 8f);
+            nbt.getCompoundOrEmpty("SwivelCog").putFloat("Speed", 8f);
         });
 
         world.rotateSection(platformLink, 0, 360, 0, 160);
@@ -1061,7 +1061,7 @@ public class SensorScenes {
         world.setKineticSpeed(allKinetics, 0);
         world.setKineticSpeed(inverseKinetics, 0);
         world.modifyBlockEntityNBT(util.select().position(swivelBearing), SwivelBearingBlockEntity.class, nbt -> {
-            nbt.getCompound("SwivelCog").putFloat("Speed", 0f);
+            nbt.getCompoundOrEmpty("SwivelCog").putFloat("Speed", 0f);
         });
 
         scene.idle(20);
@@ -1079,7 +1079,7 @@ public class SensorScenes {
         world.setKineticSpeed(allKinetics, -8);
         world.setKineticSpeed(inverseKinetics, 8);
         world.modifyBlockEntityNBT(util.select().position(swivelBearing), SwivelBearingBlockEntity.class, nbt -> {
-            nbt.getCompound("SwivelCog").putFloat("Speed", -8f);
+            nbt.getCompoundOrEmpty("SwivelCog").putFloat("Speed", -8f);
         });
 
         for (int i = 0; i < 20; i++) {
@@ -1101,7 +1101,7 @@ public class SensorScenes {
         world.setKineticSpeed(allKinetics, 0);
         world.setKineticSpeed(inverseKinetics, 0);
         world.modifyBlockEntityNBT(util.select().position(swivelBearing), SwivelBearingBlockEntity.class, nbt -> {
-            nbt.getCompound("SwivelCog").putFloat("Speed", 0f);
+            nbt.getCompoundOrEmpty("SwivelCog").putFloat("Speed", 0f);
         });
 
         scene.overlay().showText(90)

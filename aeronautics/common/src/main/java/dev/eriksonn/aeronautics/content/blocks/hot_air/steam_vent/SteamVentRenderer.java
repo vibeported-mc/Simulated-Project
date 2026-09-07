@@ -6,7 +6,7 @@ import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRende
 import dev.simulated_team.simulated.util.SimColors;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.GasEmitterRenderHandler;
 import dev.eriksonn.aeronautics.index.AeroPartialModels;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -41,8 +41,8 @@ public class SteamVentRenderer extends SmartBlockEntityRenderer<SteamVentBlockEn
 
             final float position = renderHandler.getPosition(partialTicks);
             final VertexConsumer translucentConsumer = buffer.getBuffer(RenderType.translucent());
-            final SuperByteBuffer base = CachedBuffers.partial(AeroPartialModels.STEAM_VENT_BASE, state);
-            final SuperByteBuffer jet = CachedBuffers.partial(AeroPartialModels.STEAM_VENT_JET, state);
+            final SuperByteBuffer base = CachedBufferer.partial(AeroPartialModels.STEAM_VENT_BASE, state);
+            final SuperByteBuffer jet = CachedBufferer.partial(AeroPartialModels.STEAM_VENT_JET, state);
 
             ms.pushPose();
 

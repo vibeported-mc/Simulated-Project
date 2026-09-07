@@ -6,7 +6,7 @@ import com.simibubi.create.content.redstone.analogLever.AnalogLeverBlock;
 import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -27,7 +27,7 @@ public class PhysicsAssemblerRenderer extends SmartBlockEntityRenderer<PhysicsAs
         final VertexConsumer vb = buffer.getBuffer(RenderType.solid());
 
         // Render handle
-        final SuperByteBuffer handle = CachedBuffers.partial(SimPartialModels.ASSEMBLER_LEVER, blockState);
+        final SuperByteBuffer handle = CachedBufferer.partial(SimPartialModels.ASSEMBLER_LEVER, blockState);
         final float angle = getRenderAngle(be, partialTicks);
         this.transform(handle, blockState).translate(1 / 2f, 7 / 16f, 1 / 2f)
                 .rotate(angle, Direction.EAST)

@@ -6,7 +6,7 @@ import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.simulated_team.simulated.index.SimPartialModels;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -32,7 +32,7 @@ public class SwivelBearingRenderer extends KineticBlockEntityRenderer<SwivelBear
         final Direction.Axis axis = ((IRotate) state.getBlock()).getRotationAxis(state);
 
         final SuperByteBuffer cogwheel = kineticRotationTransform(
-                CachedBuffers.partialFacingVertical(SimPartialModels.SWIVEL_BEARING_COG, state, state.getValue(SwivelBearingBlock.FACING).getOpposite()),
+                CachedBufferer.partialFacingVertical(SimPartialModels.SWIVEL_BEARING_COG, state, state.getValue(SwivelBearingBlock.FACING).getOpposite()),
                 be.getExtraKinetics(),
                 axis,
                 getAngleForBe(be.getExtraKinetics(), be.getBlockPos(), axis),
@@ -41,12 +41,12 @@ public class SwivelBearingRenderer extends KineticBlockEntityRenderer<SwivelBear
         final VertexConsumer vb = buffer.getBuffer(RenderType.solid());
         cogwheel.renderInto(ms, vb);
         if (!be.isAssembled()) {
-            renderRotatingBuffer(be, CachedBuffers.partialFacing(SimPartialModels.SHAFT_SIXTEENTH, state, state.getValue(SwivelBearingBlock.FACING)), ms, vb, light);
+            renderRotatingBuffer(be, CachedBufferer.partialFacing(SimPartialModels.SHAFT_SIXTEENTH, state, state.getValue(SwivelBearingBlock.FACING)), ms, vb, light);
         }
     }
 
     @Override
     protected SuperByteBuffer getRotatedModel(final SwivelBearingBlockEntity be, final BlockState state) {
-        return CachedBuffers.partialFacing(SimPartialModels.SHAFT_SIXTEENTH, state, state.getValue(SwivelBearingBlock.FACING).getOpposite());
+        return CachedBufferer.partialFacing(SimPartialModels.SHAFT_SIXTEENTH, state, state.getValue(SwivelBearingBlock.FACING).getOpposite());
     }
 }

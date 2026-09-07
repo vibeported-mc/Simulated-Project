@@ -6,7 +6,7 @@ import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRender
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -32,11 +32,11 @@ public class DockingConnectorRenderer extends SafeBlockEntityRenderer<DockingCon
         final float extension = be.getExtensionDistance(partialTicks);
         final float rotation = be.getFeetRotation(partialTicks) * 90;
 
-        final SuperByteBuffer piston1 = CachedBuffers.partial(SimPartialModels.DOCKING_CONNECTOR_MAIN_PISTON_BOTTOM, blockState);
-        final SuperByteBuffer piston2 = CachedBuffers.partial(SimPartialModels.DOCKING_CONNECTOR_MAIN_PISTON_TOP, blockState);
-        final SuperByteBuffer sidePiston1 = CachedBuffers.partial(SimPartialModels.DOCKING_CONNECTOR_SIDE_PISTON_BOTTOM, blockState);
-        final SuperByteBuffer sidePiston2 = CachedBuffers.partial(SimPartialModels.DOCKING_CONNECTOR_SIDE_PISTON_TOP, blockState);
-        final SuperByteBuffer foot = CachedBuffers.partial(SimPartialModels.DOCKING_CONNECTOR_FOOT, blockState);
+        final SuperByteBuffer piston1 = CachedBufferer.partial(SimPartialModels.DOCKING_CONNECTOR_MAIN_PISTON_BOTTOM, blockState);
+        final SuperByteBuffer piston2 = CachedBufferer.partial(SimPartialModels.DOCKING_CONNECTOR_MAIN_PISTON_TOP, blockState);
+        final SuperByteBuffer sidePiston1 = CachedBufferer.partial(SimPartialModels.DOCKING_CONNECTOR_SIDE_PISTON_BOTTOM, blockState);
+        final SuperByteBuffer sidePiston2 = CachedBufferer.partial(SimPartialModels.DOCKING_CONNECTOR_SIDE_PISTON_TOP, blockState);
+        final SuperByteBuffer foot = CachedBufferer.partial(SimPartialModels.DOCKING_CONNECTOR_FOOT, blockState);
         ms.pushPose();
         rotateToFaceCentered(ms, direction);
         piston1.translate(0, extension * 0.5, 0);

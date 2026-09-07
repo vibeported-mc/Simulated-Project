@@ -8,7 +8,7 @@ import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.createmod.catnip.api.data.Iterate;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -35,7 +35,7 @@ public class BoreheadBearingRenderer extends KineticBlockEntityRenderer<Borehead
         final Direction.Axis rotationAxis = getRotationAxisOf(be);
 
         for (final Direction direction : Iterate.directionsInAxis(rotationAxis)) {
-            final SuperByteBuffer dirShaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, direction);
+            final SuperByteBuffer dirShaft = CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, state, direction);
             final float offset = getRotationOffsetForPosition(be, be.getBlockPos(), rotationAxis);
 
             float angle = 0;
@@ -51,7 +51,7 @@ public class BoreheadBearingRenderer extends KineticBlockEntityRenderer<Borehead
         }
 
         final Direction facing = state.getValue(BlockStateProperties.FACING);
-        final SuperByteBuffer bearingTop = CachedBuffers.partial(AllPartialModels.BEARING_TOP, state);
+        final SuperByteBuffer bearingTop = CachedBufferer.partial(AllPartialModels.BEARING_TOP, state);
 
         final float interpolatedAngle = be.getInterpolatedAngle(partialTicks - 1);
         kineticRotationTransform(bearingTop, be, facing.getAxis(), (float) (interpolatedAngle / 180 * Math.PI), light);

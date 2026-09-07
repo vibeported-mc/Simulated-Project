@@ -8,7 +8,7 @@ import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import dev.eriksonn.aeronautics.index.AeroPartialModels;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -35,7 +35,7 @@ public class PropellerBearingRenderer extends KineticBlockEntityRenderer<Propell
         final Direction facing = be.getBlockState()
                 .getValue(BlockStateProperties.FACING);
         PartialModel top = AeroPartialModels.BEARING_PLATE;
-        SuperByteBuffer superBuffer = CachedBuffers.partial(top, be.getBlockState());
+        SuperByteBuffer superBuffer = CachedBufferer.partial(top, be.getBlockState());
 
         float interpolatedAngle = be.getInterpolatedAngle(partialTicks - 1);
         kineticRotationTransform(superBuffer, be, facing.getAxis(), (float) (interpolatedAngle / 180 * Math.PI), light);
@@ -50,7 +50,7 @@ public class PropellerBearingRenderer extends KineticBlockEntityRenderer<Propell
 
     @Override
     protected SuperByteBuffer getRotatedModel(PropellerBearingBlockEntity te, BlockState state) {
-        return CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, state
+        return CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, state, state
                 .getValue(BearingBlock.FACING)
                 .getOpposite());
     }

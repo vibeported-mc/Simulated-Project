@@ -6,7 +6,7 @@ import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.simulated_team.simulated.index.SimPartialModels;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -32,7 +32,7 @@ public class AnalogTransmissionRenderer extends KineticBlockEntityRenderer<Analo
         final Direction.Axis axis = ((IRotate) state.getBlock()).getRotationAxis(state);
 
         final SuperByteBuffer cogwheel = kineticRotationTransform(
-                CachedBuffers.partialFacingVertical(SimPartialModels.ANALOG_TRANSMISSION_COG, state, Direction.fromAxisAndDirection(state.getValue(AnalogTransmissionBlock.AXIS), Direction.AxisDirection.POSITIVE)),
+                CachedBufferer.partialFacingVertical(SimPartialModels.ANALOG_TRANSMISSION_COG, state, Direction.fromAxisAndDirection(state.getValue(AnalogTransmissionBlock.AXIS), Direction.AxisDirection.POSITIVE)),
                 be.getExtraKinetics(),
                 axis,
                 getAngleForBe(be.getExtraKinetics(), be.getBlockPos(), axis),

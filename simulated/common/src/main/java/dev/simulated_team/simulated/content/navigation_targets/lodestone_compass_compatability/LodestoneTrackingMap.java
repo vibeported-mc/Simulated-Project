@@ -34,6 +34,7 @@ import org.joml.Vector3dc;
 
 import java.lang.ref.WeakReference;
 import java.util.UUID;
+import com.sun.jna.platform.win32.COM.util.Factory;
 
 public class LodestoneTrackingMap extends SavedData {
 

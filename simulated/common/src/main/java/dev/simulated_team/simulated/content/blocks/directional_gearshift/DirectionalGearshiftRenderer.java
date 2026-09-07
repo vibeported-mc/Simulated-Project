@@ -8,7 +8,7 @@ import com.simibubi.create.content.kinetics.transmission.SplitShaftRenderer;
 import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -52,9 +52,9 @@ public class DirectionalGearshiftRenderer extends SplitShaftRenderer {
         final boolean vertical = axis.isVertical() || (direction.getAxis().isVertical() && !blockState.getValue(DirectionalGearshiftBlock.AXIS_ALONG_FIRST_COORDINATE));
 
         final VertexConsumer consumer = bufferSource.getBuffer(RenderType.solid());
-        final SuperByteBuffer barrel = CachedBuffers.partial(SimPartialModels.DIRECTIONAL_GEARSHIFT_CENTER, blockState);
+        final SuperByteBuffer barrel = CachedBufferer.partial(SimPartialModels.DIRECTIONAL_GEARSHIFT_CENTER, blockState);
 
-        final SuperByteBuffer barrelShaftA = CachedBuffers.partial(SimPartialModels.DIRECTIONAL_GEARSHIFT_BARREL_SHAFT, blockState);
+        final SuperByteBuffer barrelShaftA = CachedBufferer.partial(SimPartialModels.DIRECTIONAL_GEARSHIFT_BARREL_SHAFT, blockState);
         kineticRotationTransform(barrelShaftA, be, axis, angle, light);
         barrelShaftA.center().rotateToFace(direction).uncenter();
         if(vertical) {
@@ -64,7 +64,7 @@ public class DirectionalGearshiftRenderer extends SplitShaftRenderer {
         barrelShaftA.rotateYCentered(shaftAngle);
         barrelShaftA.light(light).renderInto(ms, consumer);
 
-        final SuperByteBuffer barrelShaftB = CachedBuffers.partial(SimPartialModels.DIRECTIONAL_GEARSHIFT_BARREL_SHAFT, blockState);
+        final SuperByteBuffer barrelShaftB = CachedBufferer.partial(SimPartialModels.DIRECTIONAL_GEARSHIFT_BARREL_SHAFT, blockState);
         kineticRotationTransform(barrelShaftB, be, axis, angle, light);
         barrelShaftB.center().rotateToFace(direction).uncenter();
         if(vertical) {

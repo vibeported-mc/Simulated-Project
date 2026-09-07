@@ -9,7 +9,7 @@ import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.util.SimColors;
 import dev.simulated_team.simulated.util.SimDirectionUtil;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -38,7 +38,7 @@ public class GimbalSensorRenderer extends SafeBlockEntityRenderer<GimbalSensorBl
         ms.translate(0.5, 0, 0.5);
         for (final Direction direction : SimDirectionUtil.Y_AXIS_PLANE) {
             ms.pushPose();
-            final SuperByteBuffer indicator = CachedBuffers.partial(SimPartialModels.GIMBAL_SENSOR_INDICATOR, be.getBlockState());
+            final SuperByteBuffer indicator = CachedBufferer.partial(SimPartialModels.GIMBAL_SENSOR_INDICATOR, be.getBlockState());
 
             indicator.rotateToFace(direction);
             indicator.translate(0, 0, -0.5);
@@ -62,7 +62,7 @@ public class GimbalSensorRenderer extends SafeBlockEntityRenderer<GimbalSensorBl
     }
 
     private void apply(final PartialModel model, final GimbalSensorBlockEntity te, final Quaternionf Q, final int light, final PoseStack ms, final VertexConsumer vb) {
-        final SuperByteBuffer buf = CachedBuffers.partial(model, te.getBlockState());
+        final SuperByteBuffer buf = CachedBufferer.partial(model, te.getBlockState());
         buf.rotateCentered(Q);
         buf.translate(0.5, 0.5, 0.5);
         buf.light(light).renderInto(ms, vb);

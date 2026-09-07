@@ -6,7 +6,7 @@ import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.util.SimColors;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -41,6 +41,6 @@ public class RedstoneInductorRenderer extends ColoredOverlayBlockEntityRenderer<
 
     @Override
     protected SuperByteBuffer getOverlayBuffer(final RedstoneInductorBlockEntity te) {
-        return CachedBuffers.partial(SimPartialModels.REDSTONE_INDUCTOR_INDICATOR, te.getBlockState());
+        return CachedBufferer.partial(SimPartialModels.REDSTONE_INDUCTOR_INDICATOR, te.getBlockState());
     }
 }

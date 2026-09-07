@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
+import net.minecraft.world.phys.Vec3;
 
 public class ThrottleLeverBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
     protected int state = 0;
@@ -100,7 +101,7 @@ public class ThrottleLeverBlockEntity extends SmartBlockEntity implements IHaveG
 
     @Override
     public AABB getRenderBoundingBox() {
-        return AABB.ofSize(this.getBlockPos().getCenter(), 1.5, 1.5, 1.5);
+        return AABB.ofSize(Vec3.atCenterOf(this.getBlockPos()), 1.5, 1.5, 1.5);
     }
 
     public int getState() {

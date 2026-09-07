@@ -324,7 +324,7 @@ public class PortableEngineBlockEntity extends GeneratingKineticBlockEntity impl
         boolean openHatch = false;
 
         final BlockPos pos = this.getBlockPos();
-        final Vec3 center = pos.getCenter();
+        final Vec3 center = Vec3.atCenterOf(pos);
         final List<Player> players = this.level.getEntitiesOfClass(Player.class, new AABB(pos).inflate(7.0));
 
         for (final Player player : players) {

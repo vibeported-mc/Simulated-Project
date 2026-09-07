@@ -37,6 +37,8 @@ import org.joml.*;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
 public class SimpleSubLevelGroupRenderer {
     private static final LevelPerspectiveCamera CAMERA = new LevelPerspectiveCamera();

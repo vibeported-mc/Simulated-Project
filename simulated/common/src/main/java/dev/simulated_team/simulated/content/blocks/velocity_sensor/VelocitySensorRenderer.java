@@ -6,7 +6,7 @@ import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRender
 import dev.simulated_team.simulated.content.blocks.util.AbstractDirectionalAxisBlock;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.util.SimColors;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -23,8 +23,8 @@ public class VelocitySensorRenderer extends SafeBlockEntityRenderer<VelocitySens
         final VertexConsumer vb = buffer.getBuffer(RenderType.cutoutMipped());
 
         final BlockState state  = be.getBlockState();
-        final SuperByteBuffer diode = CachedBuffers.partial(SimPartialModels.VELOCITY_SENSOR_DIODE, state);
-        final SuperByteBuffer fan = CachedBuffers.partial(SimPartialModels.VELOCITY_SENSOR_FAN, state);
+        final SuperByteBuffer diode = CachedBufferer.partial(SimPartialModels.VELOCITY_SENSOR_DIODE, state);
+        final SuperByteBuffer fan = CachedBufferer.partial(SimPartialModels.VELOCITY_SENSOR_FAN, state);
 
         boolean front = (state.getValue(VelocitySensorBlock.POWERED) == 1);
         // north + east always opposite

@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import net.minecraft.world.phys.Vec3;
 
 public interface RopeHolderBlock <T extends SmartBlockEntity> extends BlockSubLevelAssemblyListener, IBE<T> {
     static <T extends SmartBlockEntity> InteractionResult shearRope(final RopeHolderBlock<T> block, final Level level, final BlockPos pos, final ServerPlayer player) {
@@ -42,7 +43,7 @@ public interface RopeHolderBlock <T extends SmartBlockEntity> extends BlockSubLe
             final RopeStrandHolderBehavior otherHolder = smartBlockEntity.getBehaviour(RopeStrandHolderBehavior.TYPE);
             if (otherHolder == null) return InteractionResult.FAIL;
 
-            otherHolder.destroyRope(player, pos.getCenter(), !player.hasInfiniteMaterials());
+            otherHolder.destroyRope(player, Vec3.atCenterOf(pos), !player.hasInfiniteMaterials());
             return InteractionResult.SUCCESS;
         });
     }

@@ -15,6 +15,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class ThrottleLeverHandler extends BlockHoldInteraction {
     protected boolean inverted = false;
@@ -39,7 +40,7 @@ public class ThrottleLeverHandler extends BlockHoldInteraction {
     @Override
     public boolean activeTick(final Level level, final LocalPlayer player) {
         if (level.getBlockEntity(this.getInteractionPos()) instanceof ThrottleLeverBlockEntity &&
-                BlockHoldInteraction.inInteractionRange(player, this.getInteractionPos().getCenter(), 0)) {
+                BlockHoldInteraction.inInteractionRange(player, Vec3.atCenterOf(this.getInteractionPos()), 0)) {
             final float speed = 0.85f;
             this.lastAnimatedValue = this.animatedValue;
             this.animatedValue = this.animatedValue * (1 - speed) + this.signal / 15f * speed;

@@ -34,6 +34,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import java.util.*;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * A strand of rope on the server with physics, made up of a list of points
@@ -248,8 +249,8 @@ public class ServerRopeStrand extends RopePhysicsObject {
         final PhysicsPipeline pipeline = physicsSystem.getPipeline();
 
         final FreeConstraintConfiguration config = new FreeConstraintConfiguration(
-                JOMLConversion.toJOML(start.blockAttachment().getCenter()),
-                JOMLConversion.toJOML(end.blockAttachment().getCenter()),
+                JOMLConversion.toJOML(Vec3.atCenterOf(start.blockAttachment())),
+                JOMLConversion.toJOML(Vec3.atCenterOf(end.blockAttachment())),
                 new Quaterniond()
         );
 

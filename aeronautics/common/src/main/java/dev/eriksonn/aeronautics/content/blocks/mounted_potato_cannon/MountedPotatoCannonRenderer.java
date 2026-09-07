@@ -12,7 +12,7 @@ import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.eriksonn.aeronautics.index.AeroPartialModels;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -53,13 +53,13 @@ public class MountedPotatoCannonRenderer extends SafeBlockEntityRenderer<Mounted
 		final float barrelOffset = !be.isBlocked() ? be.getBarrelDistance(partialTicks) : (float) -(be.getBlockedLength() / 2);
 		final float bellowOffset = -be.getBellowDistance(partialTicks);
 
-		final SuperByteBuffer barrel = CachedBuffers.partial(AeroPartialModels.CANNON_BARREL, blockState);
+		final SuperByteBuffer barrel = CachedBufferer.partial(AeroPartialModels.CANNON_BARREL, blockState);
 		transform(barrel, blockState, true)
 				.translate(0, 0, barrelOffset)
 				.light(light)
 				.renderInto(ms, vb);
 
-		final SuperByteBuffer bellow = CachedBuffers.partial(AeroPartialModels.CANNON_BELLOW, blockState);
+		final SuperByteBuffer bellow = CachedBufferer.partial(AeroPartialModels.CANNON_BELLOW, blockState);
 		transform(bellow, blockState, true)
 				.translate(0, bellowOffset, 0)
 				.light(light)
@@ -71,7 +71,7 @@ public class MountedPotatoCannonRenderer extends SafeBlockEntityRenderer<Mounted
 				.translate(0, bellowOffset, 0).renderInto(ms, vb);
 
 		if (drawParts) {
-			final SuperByteBuffer cogwheel = CachedBuffers.partial(AeroPartialModels.CANNON_COG, blockState);
+			final SuperByteBuffer cogwheel = CachedBufferer.partial(AeroPartialModels.CANNON_COG, blockState);
 			final float angle = be.getCogwheelAngle(partialTicks);
 			transform(cogwheel, blockState, true)
 					.rotateCentered(Mth.DEG_TO_RAD * (angle % 360), Direction.SOUTH)

@@ -77,7 +77,7 @@ public class AbsorberBlock extends HorizontalDirectionalBlock implements IBE<Abs
             level.playLocalSound(pos, SimSoundEvents.ABSORBER_EATS.event(), SoundSource.BLOCKS, 0.33f, 0.8f + 0.2f * level.random.nextFloat(), false);
 
             if (level instanceof final ServerLevel serverLevel) {
-                final Vec3 mouthPos = pos.getCenter().add(Vec3.atLowerCornerOf(state.getValue(FACING).getUnitVec3i()).scale(0.5));
+                final Vec3 mouthPos = Vec3.atCenterOf(pos).add(Vec3.atLowerCornerOf(state.getValue(FACING).getUnitVec3i()).scale(0.5));
                 serverLevel.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, stack), mouthPos.x, mouthPos.y, mouthPos.z, 5, 0, 0.1, 0, 0.01);
             }
 

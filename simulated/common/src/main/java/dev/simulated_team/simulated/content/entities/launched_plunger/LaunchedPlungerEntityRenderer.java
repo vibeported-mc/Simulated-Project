@@ -17,7 +17,7 @@ import dev.simulated_team.simulated.index.SimRenderTypes;
 import dev.simulated_team.simulated.util.CatmulRomSpline;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -245,9 +245,9 @@ public class LaunchedPlungerEntityRenderer extends EntityRenderer<LaunchedPlunge
         stack.translate(0, 0, 2.5f / 16f);
 
         final VertexConsumer vb = multiBufferSource.getBuffer(RenderType.solid());
-        final SuperByteBuffer body = CachedBuffers.partial(SimPartialModels.LAUNCHED_PLUNGER_BODY, Blocks.AIR.defaultBlockState());
-        final SuperByteBuffer spool = CachedBuffers.partial(SimPartialModels.LAUNCHED_PLUNGER_SPOOL, Blocks.AIR.defaultBlockState());
-        final SuperByteBuffer joint = CachedBuffers.partial(SimPartialModels.LAUNCHED_PLUNGER_JOINT, Blocks.AIR.defaultBlockState());
+        final SuperByteBuffer body = CachedBufferer.partial(SimPartialModels.LAUNCHED_PLUNGER_BODY, Blocks.AIR.defaultBlockState());
+        final SuperByteBuffer spool = CachedBufferer.partial(SimPartialModels.LAUNCHED_PLUNGER_SPOOL, Blocks.AIR.defaultBlockState());
+        final SuperByteBuffer joint = CachedBufferer.partial(SimPartialModels.LAUNCHED_PLUNGER_JOINT, Blocks.AIR.defaultBlockState());
 
         stack.rotateZDegrees(90f);
         body.light(light).renderInto(poseStack, vb);

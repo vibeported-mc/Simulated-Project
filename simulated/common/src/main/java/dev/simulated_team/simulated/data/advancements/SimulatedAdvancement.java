@@ -25,6 +25,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import net.minecraft.advancements.triggers.Criterion;
 
 // i pretty much yoinked everything from Create's advancement/trigger stuff
 // the only notable difference is it's not hardcoded to simulated, and addons *should* be able to use it

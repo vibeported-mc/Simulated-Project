@@ -8,7 +8,7 @@ import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import net.createmod.catnip.api.math.AngleHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -36,7 +36,7 @@ public abstract class SimplePropellerRenderer<T extends BasePropellerBlockEntity
 
         final VertexConsumer vb = buffer.getBuffer(RenderType.solid());
 
-        final SuperByteBuffer propeller = CachedBuffers.partialFacing(this.getCurrentModel(be), state);
+        final SuperByteBuffer propeller = CachedBufferer.partialFacing(this.getCurrentModel(be), state);
 
         final float angle = this.getAngle(partialTicks, dir, be);
         kineticRotationTransform(propeller, be, dir.getAxis(), angle, light);
@@ -67,7 +67,7 @@ public abstract class SimplePropellerRenderer<T extends BasePropellerBlockEntity
 
     @Override
     protected SuperByteBuffer getRotatedModel(final T be, final BlockState state) {
-        return CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state, state
+        return CachedBufferer.partialFacing(AllPartialModels.SHAFT_HALF, state, state
                 .getValue(BearingBlock.FACING)
                 .getOpposite());
     }

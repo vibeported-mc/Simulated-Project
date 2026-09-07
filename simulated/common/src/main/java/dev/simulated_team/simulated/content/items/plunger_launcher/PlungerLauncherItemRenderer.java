@@ -14,7 +14,7 @@ import dev.simulated_team.simulated.index.SimItems;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.mixin_interface.PlayerLaunchedPlungerExtension;
 import net.createmod.catnip.api.math.VecHelper;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -73,9 +73,9 @@ public class PlungerLauncherItemRenderer extends CustomRenderedItemModelRenderer
 
     private void renderPlunger(final PoseStack ms, final MultiBufferSource buffer, final int light, final boolean first) {
         ms.pushPose();
-        final SuperByteBuffer body = CachedBuffers.partial(SimPartialModels.LAUNCHED_PLUNGER_BODY, Blocks.AIR.defaultBlockState());
-        final SuperByteBuffer spool = CachedBuffers.partial(SimPartialModels.LAUNCHED_PLUNGER_SPOOL, Blocks.AIR.defaultBlockState());
-        final SuperByteBuffer joint = CachedBuffers.partial(SimPartialModels.LAUNCHED_PLUNGER_JOINT, Blocks.AIR.defaultBlockState());
+        final SuperByteBuffer body = CachedBufferer.partial(SimPartialModels.LAUNCHED_PLUNGER_BODY, Blocks.AIR.defaultBlockState());
+        final SuperByteBuffer spool = CachedBufferer.partial(SimPartialModels.LAUNCHED_PLUNGER_SPOOL, Blocks.AIR.defaultBlockState());
+        final SuperByteBuffer joint = CachedBufferer.partial(SimPartialModels.LAUNCHED_PLUNGER_JOINT, Blocks.AIR.defaultBlockState());
 
         ms.translate(2 / 16f * (first ? -1 : 1), -1 / 16f, -5 / 16f);
 

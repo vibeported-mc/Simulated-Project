@@ -12,6 +12,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 
 public record ThrottleLeverSignalPacket(BlockPos pos, int signal) implements CustomPacketPayload {
     public static final Type<ThrottleLeverSignalPacket> TYPE = new Type<>(Simulated.path("throttle_lever_signal"));
@@ -33,7 +34,7 @@ public record ThrottleLeverSignalPacket(BlockPos pos, int signal) implements Cus
         final BlockEntity blockEntity = level.getBlockEntity(this.pos);
 
         if (blockEntity instanceof final ThrottleLeverBlockEntity throttleLever) {
-            if (!BlockHoldInteraction.inInteractionRange(player, this.pos.getCenter(), 1)) return;
+            if (!BlockHoldInteraction.inInteractionRange(player, Vec3.atCenterOf(this.pos), 1)) return;
 
             throttleLever.setSignal(this.signal);
         }

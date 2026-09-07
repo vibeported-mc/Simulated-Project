@@ -8,7 +8,7 @@ import dev.ryanhcode.sable.util.SableDistUtil;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.util.SimColors;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
-import net.createmod.catnip.api.client.render.CachedBuffers;
+import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -36,7 +36,7 @@ public class AltitudeSensorRenderer extends SmartBlockEntityRenderer<AltitudeSen
                               final PoseStack poseStack, final PoseStack contraptionPose, final Matrix4f worldLight, final MultiBufferSource bufferSource, final int light) {
         final Level level = SableDistUtil.getClientLevel();
         final VertexConsumer vb = bufferSource.getBuffer(RenderType.cutout());
-        final SuperByteBuffer indicator = CachedBuffers.partial(SimPartialModels.ALTITUDE_SENSOR_INDICATOR, blockState);
+        final SuperByteBuffer indicator = CachedBufferer.partial(SimPartialModels.ALTITUDE_SENSOR_INDICATOR, blockState);
 
         PartialModel box = SimPartialModels.ALTITUDE_SENSOR_LINEAR_CASE;
         PartialModel dial = SimPartialModels.ALTITUDE_SENSOR_LINEAR_HAND;
@@ -47,8 +47,8 @@ public class AltitudeSensorRenderer extends SmartBlockEntityRenderer<AltitudeSen
             dial = SimPartialModels.ALTITUDE_SENSOR_RADIAL_HAND;
         }
 
-        final SuperByteBuffer face = CachedBuffers.partial(box, blockState);
-        final SuperByteBuffer dialBuffer = CachedBuffers.partial(dial, blockState);
+        final SuperByteBuffer face = CachedBufferer.partial(box, blockState);
+        final SuperByteBuffer dialBuffer = CachedBufferer.partial(dial, blockState);
 
         final Direction direction = blockState.getValue(HORIZONTAL_FACING);
 
