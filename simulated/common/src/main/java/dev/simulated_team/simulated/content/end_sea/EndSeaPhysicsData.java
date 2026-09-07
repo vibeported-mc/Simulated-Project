@@ -1,12 +1,9 @@
 package dev.simulated_team.simulated.content.end_sea;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.network.packets.end_sea.ClientboundEndSeaPacket;
 import foundry.veil.api.network.VeilPacketManager;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -60,37 +57,31 @@ public class EndSeaPhysicsData {
         }
     }
 
-    public static class ReloadListener extends SimpleJsonResourceReloadListener {
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code SimpleJsonResourceReloadListener} is generic and decodes for you -- it takes the
+     * codec and a {@code FileToIdConverter} naming the directory, and hands {@code apply} the
+     * decoded values. The per-entry parse and its error reporting go with that: a file that fails
+     * to decode is dropped by the loader, which reports it itself.
+     */
+    public static class ReloadListener extends SimpleJsonResourceReloadListener<EndSeaPhysics> {
 
-        private static final Gson GSON = new Gson();
         public static final ReloadListener INSTANCE = new ReloadListener();
 
         public static final String NAME = "end_sea";
         public static final Identifier ID = Simulated.path(NAME);
 
         public ReloadListener() {
-            super(GSON, NAME);
+            super(EndSeaPhysics.CODEC, FileToIdConverter.json(NAME));
         }
 
         @Override
-        protected void apply(final Map<Identifier, JsonElement> map, final ResourceManager resourceManager, final ProfilerFiller profiler) {
+        protected void apply(final Map<Identifier, EndSeaPhysics> map, final ResourceManager resourceManager, final ProfilerFiller profiler) {
             END_SEA_PHYSICS_DATA.clear();
 
-            for (final Map.Entry<Identifier, JsonElement> entry : map.entrySet()) {
-                try {
-                    final DataResult<EndSeaPhysics> dataResult = EndSeaPhysics.CODEC.parse(JsonOps.INSTANCE, entry.getValue());
-
-                    if (dataResult.isError()) {
-                        Simulated.LOGGER.error(String.valueOf(dataResult.error().get()));
-                    }
-
-                    final EndSeaPhysics physics = dataResult.getOrThrow();
-                    final ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, physics.dimension());
-
-                    EndSeaPhysicsData.addKeyWithPriority(dimension, physics);
-                } catch (final Exception e) {
-                    Simulated.LOGGER.error("Error while parsing EndSeaPhysics \"{}\" : {}", entry.getKey(), e.getMessage());
-                }
+            for (final EndSeaPhysics physics : map.values()) {
+                final ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, physics.dimension());
+                EndSeaPhysicsData.addKeyWithPriority(dimension, physics);
             }
         }
 

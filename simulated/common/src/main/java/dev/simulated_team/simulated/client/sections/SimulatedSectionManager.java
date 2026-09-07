@@ -1,9 +1,6 @@
 package dev.simulated_team.simulated.client.sections;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -31,25 +28,27 @@ public class SimulatedSectionManager {
 		return sortedSections;
 	}
 
-	public static class ReloadListener extends SimpleJsonResourceReloadListener {
+	/**
+	 * <h2>26.2 note</h2>
+	 * <p>{@code SimpleJsonResourceReloadListener} is generic and decodes for you: it takes the codec
+	 * and a {@code FileToIdConverter} naming the directory, and hands {@code apply} the decoded
+	 * values. The {@code Gson}, the {@code JsonElement} map and the per-entry
+	 * {@code CODEC.parse(JsonOps...)} all go with that -- a file that fails to decode is dropped by
+	 * the loader with its own error, rather than here.
+	 */
+	public static class ReloadListener extends SimpleJsonResourceReloadListener<SimulatedSection> {
 
-		private static final Gson GSON = new Gson();
 		public ReloadListener() {
-			super(GSON, "simulated_sections");
+			super(SimulatedSection.CODEC, FileToIdConverter.json("simulated_sections"));
 		}
 
 		@Override
-		protected void apply(final Map<Identifier, JsonElement> map, final ResourceManager resourceManager, final ProfilerFiller profilerFiller) {
+		protected void apply(final Map<Identifier, SimulatedSection> map, final ResourceManager resourceManager, final ProfilerFiller profilerFiller) {
 			SECTIONS.clear();
 			BY_SECTION.clear();
-			for (final Map.Entry<Identifier, JsonElement> entry : map.entrySet()) {
-				final DataResult<SimulatedSection> result = SimulatedSection.CODEC.parse(JsonOps.INSTANCE, entry.getValue());
-
-				if(result.isSuccess()) {
-					final SimulatedSection tab = result.getOrThrow();
-					SECTIONS.put(entry.getKey(), tab);
-					BY_SECTION.put(tab, entry.getKey());
-				}
+			for (final Map.Entry<Identifier, SimulatedSection> entry : map.entrySet()) {
+				SECTIONS.put(entry.getKey(), entry.getValue());
+				BY_SECTION.put(entry.getValue(), entry.getKey());
 			}
 
 			sortedSections = SECTIONS.values().stream().sorted().toList();
