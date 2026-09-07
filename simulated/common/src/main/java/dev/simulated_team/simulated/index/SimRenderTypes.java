@@ -129,6 +129,28 @@ public final class SimRenderTypes {
                             .affectsCrumbling()
                             .create(true)));
 
+    /**
+     * The End Sea's stacked layers.
+     *
+     * <h2>26.2 note</h2>
+     * <p>This was not a render type at all -- {@code EndSeaRenderer} bound Veil's program itself and
+     * set the GL state around an immediate-mode draw: {@code disableCull}, {@code depthMask(false)},
+     * and a {@code blendFuncSeparate} making it additive. All of that is pipeline state now, so it
+     * becomes a render type like the rest, and the draw goes through it.
+     *
+     * <p>The format is Position + Color + UV0 + UV2, which vanilla already has a name for.
+     */
+    private static final RenderType END_SEA = RenderType.create(
+            Simulated.MOD_ID + ":end_sea",
+            VeilRenderBridge.createRenderType(Simulated.MOD_ID + ":end_sea", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP)
+                    .vertexShader(Simulated.path("end_sea"))
+                    .fragmentShader(Simulated.path("end_sea"))
+                    .snippet(VeilRenderPipelines.additiveBlend())
+                    .snippet(VeilRenderPipelines.lequalDepthTest())
+                    .snippet(VeilRenderPipelines.noDepthWrite())
+                    .snippet(VeilRenderPipelines.noCull())
+                    .create(false));
+
     private SimRenderTypes() {
     }
 
@@ -164,6 +186,10 @@ public final class SimRenderTypes {
 
     public static RenderType itemGlowingTranslucent(boolean shadersActive) {
         return shadersActive ? Sheets.translucentBlockItemSheet() : RenderTypes.itemGlowingTranslucent();
+    }
+
+    public static RenderType endSea() {
+        return END_SEA;
     }
 
     public static RenderType spring(final Identifier texture) {

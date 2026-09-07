@@ -1,14 +1,18 @@
 package dev.simulated_team.simulated.content.end_sea;
 
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.PrimitiveTopology;
 import dev.simulated_team.simulated.Simulated;
 import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.ext.VeilMultiBind;
-import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
 import foundry.veil.api.client.render.shader.uniform.ShaderUniform;
+import foundry.veil.api.client.render.vertex.VertexArray;
+import dev.simulated_team.simulated.index.SimRenderTypes;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -18,7 +22,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3dc;
-import org.lwjgl.opengl.GL30;
 
 // todo good rendering for negative physics depthGradient?
 /**
@@ -29,12 +32,11 @@ public class EndSeaRenderer {
     private static final Identifier SHADER = Simulated.path("end_sea");
 
     private static final int LAYER_COUNT = 48;
-    private static final VertexFormat FORMAT = VertexFormat.builder()
-            .add("Position", VertexFormatElement.POSITION)
-            .add("Color", VertexFormatElement.COLOR)
-            .add("UV0", VertexFormatElement.UV0)
-            .add("UV2", VertexFormatElement.UV2)
-            .build();
+    // 26.2: Position + Color + UV0 + UV2 is DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP.
+    private static final VertexFormat FORMAT = DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP;
+
+    /** Rebuilt every frame; the sea's layers move. */
+    private static VertexArray vertexArray;
 
     private static final Vec3[] LAYER_COLORS = new Vec3[]{
             new Vec3(0.022087, 0.098399, 0.110818),
@@ -76,29 +78,37 @@ public class EndSeaRenderer {
 //        debug.popDebugGroup();
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>The GL state around this draw -- no culling, no depth write, additive blending -- is
+     * pipeline state now and lives on {@link SimRenderTypes#endSea()}. What is left here is the
+     * geometry, which is uploaded into a Veil vertex array and drawn through that type;
+     * {@code BufferUploader.drawWithShader} and {@code Tesselator} are both gone.
+     *
+     * <p>The two shadow samplers the old code bound by hand are not bound: the shadow map that
+     * filled them is parked, so they would sample an empty buffer either way. Restoring the shadow
+     * map means declaring them in the shader's Veil JSON as framebuffer textures, which is how a
+     * render type names its samplers. See {@code SIMULATED-26.2-OPEN-QUESTIONS.md} §1.
+     */
     private static void renderLayers(final EndSeaPhysics physics, final Camera camera) {
         final Minecraft minecraft = Minecraft.getInstance();
 
-        final ShaderProgram shader = VeilRenderSystem.setShader(SHADER);
-        shader.bind();
-        shader.setDefaultUniforms(VertexFormat.Mode.QUADS);
-        final AdvancedFbo shadowBuffer = EndSeaShadowRenderer.getShadowsFramebuffer();
-
-        shader.setTexture("ShadowDepthSampler", GL30.GL_TEXTURE_2D, shadowBuffer.getDepthTextureAttachment().getId());
-        shader.setTexture("ShadowStrengthSampler", GL30.GL_TEXTURE_2D, shadowBuffer.getColorTextureAttachment(0).getId());
-
-        final BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, FORMAT);
+        final ShaderProgram shader = VeilRenderSystem.renderer().getShaderManager().getShader(SHADER);
+        if (shader == null) {
+            return;
+        }
 
         for (int i = 0; i < LAYER_COLORS.length; i++) {
             LAYER_COLORS[i] = LAYER_COLORS[i].lerp(LAYER_COLORS[i].normalize(), 1.0);
         }
 
         final Vector3dc renderOrigin = EndSeaShadowRenderer.getLastRenderOrigin();
+        final Vec3 cameraPosition = camera.position();
 
         final PoseStack poseStack = new PoseStack();
-        poseStack.translate(renderOrigin.x() - camera.getPosition().x, 0.0, renderOrigin.z() - camera.getPosition().z);
+        poseStack.translate(renderOrigin.x() - cameraPosition.x, 0.0, renderOrigin.z() - cameraPosition.z);
         poseStack.scale(EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS, 1.0f, EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS);
-        poseStack.translate(0.0, physics.startY() - camera.getPosition().y, 0.0);
+        poseStack.translate(0.0, physics.startY() - cameraPosition.y, 0.0);
 
         final ShaderUniform volumeSize = shader.getUniform("ShadowVolumeSize");
         if (volumeSize != null) {
@@ -106,7 +116,6 @@ public class EndSeaRenderer {
         }
 
         final ShaderUniform startY = shader.getUniform("StartY");
-
         if (startY != null) {
             startY.setFloat((float) physics.startY());
         }
@@ -114,53 +123,49 @@ public class EndSeaRenderer {
         final LocalPlayer player = minecraft.player;
         final float renderTime = player.tickCount + minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
 
-        for (int i = 0; i < LAYER_COUNT; i++) {
-            final Vec3 layer = LAYER_COLORS[i % LAYER_COLORS.length];
-            final float yCoord = -i / 2f;
-            final float uvScale = EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS * 2.0f / 25.0f;
-            final float uvShift = (float) Mth.frac(renderTime / 2000.0) + (float) (renderOrigin.z() / EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS * uvScale / 2f);
-            final float parallelUVShift = (float) ((float) (layer.x + layer.y) + (renderOrigin.x() / EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS * uvScale / 2f));
-            final float alpha = 1.0f;
+        try (ByteBufferBuilder byteBuffer = ByteBufferBuilder.exactlySized(LAYER_COUNT * 4 * FORMAT.getVertexSize())) {
+            final BufferBuilder builder = new BufferBuilder(byteBuffer, PrimitiveTopology.QUADS, FORMAT);
 
-            final Matrix4f pose = poseStack.last().pose();
+            for (int i = 0; i < LAYER_COUNT; i++) {
+                final Vec3 layer = LAYER_COLORS[i % LAYER_COLORS.length];
+                final float yCoord = -i / 2f;
+                final float uvScale = EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS * 2.0f / 25.0f;
+                final float uvShift = (float) Mth.frac(renderTime / 2000.0) + (float) (renderOrigin.z() / EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS * uvScale / 2f);
+                final float parallelUVShift = (float) ((float) (layer.x + layer.y) + (renderOrigin.x() / EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS * uvScale / 2f));
+                final float alpha = 1.0f;
 
-            builder.addVertex(pose, -1.0f, yCoord, -1.0f)
-                    .setColor((float) layer.x, (float) layer.y, (float) layer.z, alpha)
-                    .setUv(0.0f + parallelUVShift, 0.0f + uvShift)
-                    .setUv2(0, 0);
+                final Matrix4f pose = poseStack.last().pose();
 
-            builder.addVertex(pose, 1.0f, yCoord, -1.0f)
-                    .setColor((float) layer.x, (float) layer.y, (float) layer.z, alpha)
-                    .setUv(uvScale + parallelUVShift, 0.0f + uvShift)
-                    .setUv2(1, 0);
+                builder.addVertex(pose, -1.0f, yCoord, -1.0f)
+                        .setColor((float) layer.x, (float) layer.y, (float) layer.z, alpha)
+                        .setUv(0.0f + parallelUVShift, 0.0f + uvShift)
+                        .setUv2(0, 0);
 
-            builder.addVertex(pose, 1.0f, yCoord, 1.0f)
-                    .setColor((float) layer.x, (float) layer.y, (float) layer.z, alpha)
-                    .setUv(uvScale + parallelUVShift, uvScale + uvShift)
-                    .setUv2(1, 1);
+                builder.addVertex(pose, 1.0f, yCoord, -1.0f)
+                        .setColor((float) layer.x, (float) layer.y, (float) layer.z, alpha)
+                        .setUv(uvScale + parallelUVShift, 0.0f + uvShift)
+                        .setUv2(1, 0);
 
-            builder.addVertex(pose, -1.0f, yCoord, 1.0f)
-                    .setColor((float) layer.x, (float) layer.y, (float) layer.z, alpha)
-                    .setUv(0.0f + parallelUVShift, uvScale + uvShift)
-                    .setUv2(0, 1);
+                builder.addVertex(pose, 1.0f, yCoord, 1.0f)
+                        .setColor((float) layer.x, (float) layer.y, (float) layer.z, alpha)
+                        .setUv(uvScale + parallelUVShift, uvScale + uvShift)
+                        .setUv2(1, 1);
+
+                builder.addVertex(pose, -1.0f, yCoord, 1.0f)
+                        .setColor((float) layer.x, (float) layer.y, (float) layer.z, alpha)
+                        .setUv(0.0f + parallelUVShift, uvScale + uvShift)
+                        .setUv2(0, 1);
+            }
+
+            try (MeshData mesh = builder.buildOrThrow()) {
+                if (vertexArray == null) {
+                    vertexArray = VertexArray.create();
+                }
+
+                vertexArray.bind();
+                vertexArray.upload(mesh, VertexArray.DrawUsage.DYNAMIC);
+                vertexArray.drawWithRenderType(SimRenderTypes.endSea());
+            }
         }
-
-        RenderSystem.disableCull();
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(false);
-
-        // additive
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-
-        BufferUploader.drawWithShader(builder.buildOrThrow());
-        ShaderProgram.unbind();
-
-        RenderSystem.disableBlend();
-        RenderSystem.defaultBlendFunc();
-
-        RenderSystem.disableDepthTest();
-        RenderSystem.enableCull();
-        RenderSystem.depthMask(true);
     }
 }
