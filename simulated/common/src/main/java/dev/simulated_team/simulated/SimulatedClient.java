@@ -1,6 +1,9 @@
 package dev.simulated_team.simulated;
 
+import com.simibubi.create.content.contraptions.render.ActorClients;
 import dev.simulated_team.simulated.client.BlockPropertiesTooltip;
+import dev.simulated_team.simulated.content.blocks.altitude_sensor.AltitudeSensorActorClient;
+import dev.simulated_team.simulated.content.blocks.altitude_sensor.AltitudeSensorMovementBehaviour;
 import dev.simulated_team.simulated.content.blocks.steering_wheel.SteeringWheelRenderer;
 import dev.simulated_team.simulated.content.end_sea.EndSeaFadeTransformer;
 import dev.simulated_team.simulated.content.end_sea.EndSeaShadowRenderer;
@@ -25,6 +28,10 @@ public class SimulatedClient {
 
     public static void init() {
         SimPartialModels.init();
+
+        // 26.2: how an actor draws itself is registered here rather than implemented on the
+        // behaviour, which a dedicated server also instantiates. See ActorClients.
+        ActorClients.register(AltitudeSensorMovementBehaviour.class, new AltitudeSensorActorClient());
         BlockPropertiesTooltip.init();
         SimResourceManagers.init();
 

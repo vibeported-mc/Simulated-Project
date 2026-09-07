@@ -19,7 +19,7 @@ public class SimLevelUtil {
             if (level.isClientSide()) {
                 final int minY = center.getY() - range;
                 final int maxY = center.getY() + range;
-                if (maxY < level.getMinBuildHeight() || minY >= level.getMaxBuildHeight()) {
+                if (maxY < level.getMinY() || minY >= level.getMaxY()) {
                     return false;
                 }
 

@@ -197,8 +197,8 @@ public class PhysicsAssemblerBlockEntity extends SmartBlockEntity implements IDi
 
     private void throwDisassemblyExceptions(final ServerSubLevel subLevel) throws AssemblyException {
         final BoundingBox3dc bounds = subLevel.boundingBox();
-        if (bounds.maxY() > this.level.getMaxBuildHeight()
-                || bounds.minY() < this.level.getMinBuildHeight()) {
+        if (bounds.maxY() > this.level.getMaxY()
+                || bounds.minY() < this.level.getMinY()) {
             throw SimAssemblyException.outOfWorld();
         }
 

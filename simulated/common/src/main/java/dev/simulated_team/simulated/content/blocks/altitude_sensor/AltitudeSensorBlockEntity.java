@@ -63,11 +63,11 @@ public class AltitudeSensorBlockEntity extends SmartBlockEntity implements IHave
 	}
 
 	public float toWorldHeight(final float normalHeight) {
-		return Mth.map(normalHeight, 0.0f, 1.0f, this.getLevel().getMinBuildHeight(), this.getLevel().getMaxBuildHeight());
+		return Mth.map(normalHeight, 0.0f, 1.0f, this.getLevel().getMinY(), this.getLevel().getMaxY());
 	}
 
 	public float toNormalHeight(final float worldHeight) {
-		return Mth.map(worldHeight, this.getLevel().getMinBuildHeight(), this.getLevel().getMaxBuildHeight(), 0.0f, 1.0f);
+		return Mth.map(worldHeight, this.getLevel().getMinY(), this.getLevel().getMaxY(), 0.0f, 1.0f);
 	}
 
 	public double getAirPressure() {

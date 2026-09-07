@@ -2,16 +2,11 @@ package dev.ryanhcode.offroad.content.blocks.rock_cutting_wheel;
 
 import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
-import com.simibubi.create.content.contraptions.render.ActorVisual;
-import com.simibubi.create.content.contraptions.render.ContraptionMatrices;
-import com.simibubi.create.foundation.virtualWorld.VirtualRenderWorld;
-import dev.engine_room.flywheel.api.visualization.VisualizationContext;
 import dev.ryanhcode.offroad.content.blocks.borehead_bearing.BoreheadBearingBlockEntity;
 import dev.ryanhcode.offroad.content.entities.BoreheadContraptionEntity;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.SubLevelHelper;
 import net.createmod.catnip.api.animation.LerpedFloat;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -157,27 +152,9 @@ public class RockCuttingWheelActor implements MovementBehaviour {
         return true;
     }
 
-    @Override
-    public void renderInContraption(final MovementContext context, final VirtualRenderWorld renderWorld, final ContraptionMatrices matrices, final MultiBufferSource buffer) {
-        if (renderWorld.supportsVisualization()) {
-            return;
-        }
-
-        if (context.temporaryData == null) {
-            context.temporaryData = LerpedFloat.angular();
-        }
-
-        RockCuttingWheelRenderer.renderInContraption(context, renderWorld, matrices, buffer);
-    }
-
-    @Override
-    public @Nullable ActorVisual createVisual(final VisualizationContext visualizationContext, final VirtualRenderWorld simulationWorld, final MovementContext context) {
-        if (context.temporaryData == null) {
-            context.temporaryData = LerpedFloat.angular();
-        }
-
-        return new RockCuttingWheelActorVisual(visualizationContext, simulationWorld, context);
-    }
+    // 26.2: renderInContraption and createVisual moved to RockCuttingWheelActorClient. Both name
+    // client-only types, and a behaviour is instantiated during registration on a dedicated server,
+    // where declaring them fails to link. See ActorClients.
 
     @Override
     public boolean isActive(final MovementContext context) {

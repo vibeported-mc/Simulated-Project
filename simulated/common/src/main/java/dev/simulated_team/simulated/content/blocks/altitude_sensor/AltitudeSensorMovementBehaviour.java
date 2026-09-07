@@ -2,21 +2,17 @@ package dev.simulated_team.simulated.content.blocks.altitude_sensor;
 
 import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
 import com.simibubi.create.content.contraptions.behaviour.MovementContext;
-import com.simibubi.create.content.contraptions.render.ContraptionMatrices;
-import com.simibubi.create.foundation.virtualWorld.VirtualRenderWorld;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
-import net.createmod.catnip.api.client.animation.AnimationTickHolder;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.Mth;
 import net.createmod.catnip.api.data.Pair;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
 
+/**
+ * <h2>26.2 note</h2>
+ * <p>{@code renderInContraption} moved out to {@link AltitudeSensorActorClient}. A behaviour is
+ * instantiated during registration, including on a dedicated server, and the rendering hook names
+ * client-only types -- so it may not live here, nor may this class implement the interface that
+ * declares it. See {@code ActorClients}.
+ */
 public class AltitudeSensorMovementBehaviour implements MovementBehaviour {
 
     @Override
@@ -35,25 +31,5 @@ public class AltitudeSensorMovementBehaviour implements MovementBehaviour {
         } else {
             context.temporaryData = Pair.of(yPos, yPos);
         }
-    }
-
-    @Override
-    public void renderInContraption(final MovementContext context, final VirtualRenderWorld renderWorld, final ContraptionMatrices matrices, final MultiBufferSource buffer) {
-        final float lowSignal = context.blockEntityData.getFloatOr("low_signal", 0.0f);
-        final float highSignal = context.blockEntityData.getFloatOr("high_signal", 0.0f);
-
-        final float visualHeight;
-        if (context.temporaryData instanceof final Pair<?, ?> heights) {
-            visualHeight = ((float) heights.getFirst()) * (1 - AnimationTickHolder.getPartialTicks()) + (float) heights.getSecond() * AnimationTickHolder.getPartialTicks();
-        } else {
-            final Vector3d pos = context.position != null ? JOMLConversion.toJOML(context.position) : new Vector3d();
-            visualHeight = (float) Sable.HELPER.projectOutOfSubLevel(context.world, pos).y;
-        }
-
-        final Level level = context.contraption.entity.level();
-        final float y = (float) Mth.map(context.position.y, level.getMinBuildHeight(), level.getMaxBuildHeight(), 0.0f, 1.0f);
-        final float value = Mth.clampedMap(y, 0.0f, 1.0f, lowSignal, highSignal);
-
-        AltitudeSensorRenderer.render(context.state, 1000, value, visualHeight, matrices.getViewProjection(), matrices.getModel(), matrices.getWorld(), buffer, LevelRenderer.getLightColor(renderWorld, context.localPos));
     }
 }
