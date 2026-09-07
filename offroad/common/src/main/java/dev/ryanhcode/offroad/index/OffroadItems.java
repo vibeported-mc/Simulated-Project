@@ -5,7 +5,6 @@ import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
-import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import dev.ryanhcode.offroad.Offroad;
 import dev.ryanhcode.offroad.content.components.TireLike;
 import dev.ryanhcode.offroad.content.items.tire.TireItem;

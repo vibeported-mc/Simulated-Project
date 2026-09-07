@@ -1,6 +1,8 @@
 package dev.simulated_team.simulated.index;
 
 import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.data.models.model.TextureSlot;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllTags;
@@ -18,7 +20,6 @@ import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
-import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.config.server.blocks.SimStress;
@@ -125,8 +126,7 @@ public class SimBlocks {
                     .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::netheriteMetal)
                     .properties((properties -> properties.destroyTime(5f)))
-                    .blockstate(() -> (ctx, prov) -> prov.directionalBlock(ctx.getEntry(),
-                            blockState -> BlockModelGenerators.plainVariant(
+                    .blockstate(() -> (ctx, prov) -> BlockStateGen.directionalBlock(ctx, prov, blockState -> BlockModelGenerators.plainVariant(
                                     prov.modLoc("block/swivel_bearing/block" + (blockState.getValue(SwivelBearingBlock.ASSEMBLED) ? "_assembled" : "")))))
                     .transform(SimStress.setImpact(4.0))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
@@ -215,7 +215,7 @@ public class SimBlocks {
                     .requires(SimTags.Items.HANDLE_VARIANTS)
                     .group("simulated:handle_variants")
                     .unlockedBy("has_ingredient", p.has(SimTags.Items.HANDLE_VARIANTS))
-                    .save(p, Simulated.path("handle_undye"));
+                    .save(p, Simulated.path("handle_undye").toString());
             })
             .register();
 
@@ -265,8 +265,7 @@ public class SimBlocks {
             REGISTRATE.block("torsion_spring", TorsionSpringBlock::new)
                     .initialProperties(SharedProperties::stone)
                     .properties(BlockBehaviour.Properties::noOcclusion)
-                    .blockstate(() -> (c, p) -> p.directionalBlock(c.get(),
-                            blockState -> BlockModelGenerators.plainVariant(p.modLoc("block/torsion_spring/block"))))
+                    .blockstate(() -> (c, p) -> BlockStateGen.directionalBlock(c, p, blockState -> BlockModelGenerators.plainVariant(p.modLoc("block/torsion_spring/block"))))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .transform(SimStress.setImpact(16.0))
@@ -300,7 +299,7 @@ public class SimBlocks {
                                 .requires(SimBlocks.AUGER_COG)
                                 .group("simulated:auger_swap")
                                 .unlockedBy("has_ingredient", p.has(CommonMetal.IRON.plates))
-                                .save(p, Simulated.path(c.getName() + "_from_auger_cogwheel"));
+                                .save(p, Simulated.path(c.getName() + "_from_auger_cogwheel").toString());
                     })
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
                     .properties(BlockBehaviour.Properties::noOcclusion)
@@ -318,7 +317,7 @@ public class SimBlocks {
                             .requires(SimBlocks.AUGER_SHAFT.get())
                             .group("simulated:auger_swap")
                             .unlockedBy("has_ingredient", p.has(CommonMetal.IRON.plates))
-                            .save(p, Simulated.path(c.getName() + "_from_auger_shaft")))
+                            .save(p, Simulated.path(c.getName() + "_from_auger_shaft").toString()))
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .transform(DisplaySource.displaySource(SimDisplaySources.AUGER_DISPLAY))
@@ -370,11 +369,15 @@ public class SimBlocks {
                 .initialProperties(SharedProperties::stone)
                 .properties(p -> p.sound(SoundType.NETHERITE_BLOCK).lightLevel((state) -> PortableEngineBlock.isLitState(state) ? 6 : 0))
                 .properties(BlockBehaviour.Properties::noOcclusion)
-                .blockstate(() -> (c, p) -> BlockStateGen.horizontalBlock(c, p, blockState -> p.models()
-                        .withExistingParent(colorName + "_portable_engine", p.modLoc("block/portable_engine/block"))
-                                .texture("0", p.modLoc("block/portable_engine/" + colorName))
-                                .texture("particle", p.modLoc("block/portable_engine/" + colorName))
-                        ))
+                // 26.2 port: models().withExistingParent(...).texture(...) is gone. The builder
+                // reached through getBuilder() replaces it: a parent, texture slots keyed by
+                // TextureSlot rather than by string, and build(id) returning the model's identifier.
+                .blockstate(() -> (c, p) -> BlockStateGen.horizontalBlock(c, p, blockState ->
+                        BlockModelGenerators.plainVariant(p.getBuilder()
+                                .parent(p.modLoc("block/portable_engine/block"))
+                                .texture(TextureSlot.create("0"), new Material(p.modLoc("block/portable_engine/" + colorName)))
+                                .texture(TextureSlot.PARTICLE, new Material(p.modLoc("block/portable_engine/" + colorName)))
+                                .build(p.modLoc("block/" + colorName + "_portable_engine")))))
                 .transform(SimStress.setCapacity(64.0))
                 .onRegister(BlockStressValues.setGeneratorSpeed(32))
                 .transform(DisplaySource.displaySource(SimDisplaySources.PORTABLE_ENGINE_DISPLAY))
@@ -790,11 +793,11 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::wooden)
                     .properties(p -> p.sound(SoundType.SCAFFOLDING))
                     .blockstate(() -> (c, p) -> BlockStateGen.axisBlock(c, p, blockState -> p.models()
-                            .withExistingParent(colorName + "_symmetric_sail",
-                                    p.modLoc("block/symmetric_sail/block"))
-                            .texture("0", Create.asResource("block/sail/canvas_" + colorName))
-                            .texture("1", p.modLoc("block/symmetric_sail/side_" + colorName))
-                            .texture("particle", Create.asResource("block/sail/canvas_" + colorName))))
+                            .parent(p.modLoc("block/symmetric_sail/block"))
+                            .texture(TextureSlot.create("0"), new Material(Create.asResource("block/sail/canvas_" + colorName)))
+                            .texture(TextureSlot.create("1"), new Material(p.modLoc("block/symmetric_sail/side_" + colorName)))
+                            .texture(TextureSlot.PARTICLE, new Material(Create.asResource("block/sail/canvas_" + colorName)))
+                            .build(p.modLoc("block/" + colorName + "_symmetric_sail"))))
                     .tag(BlockTags.MINEABLE_WITH_AXE, AllTags.AllBlockTags.WINDMILL_SAILS.tag, SimTags.Blocks.SYMMETRIC_SAILS)
                     .loot((p, b) -> p.dropOther(b, WHITE_SYMMETRIC_SAIL.asItem()))
                     .register();
@@ -810,10 +813,11 @@ public class SimBlocks {
                 .tag(SimTags.Blocks.NAMEPLATE_BLOCKS)
                 .blockstate(() -> (ctx, prov) -> BlockStateGen.horizontalBlock(ctx, prov, state -> {
                     NameplateBlock.Position position = state.getValue(NameplateBlock.POSITION);
-                    return prov.models()
-                            .withExistingParent(colorName + "_nameplate_" + position.getSerializedName(), prov.modLoc("block/nameplate/block_" + position.getSerializedName()))
-                            .texture("0", Simulated.path("block/nameplate/" + colorName + "_nameplate"))
-                            .texture("particle", Simulated.path("block/nameplate/" + colorName + "_nameplate"));
+                    return BlockModelGenerators.plainVariant(prov.getBuilder()
+                            .parent(prov.modLoc("block/nameplate/block_" + position.getSerializedName()))
+                            .texture(TextureSlot.create("0"), new Material(Simulated.path("block/nameplate/" + colorName + "_nameplate")))
+                            .texture(TextureSlot.PARTICLE, new Material(Simulated.path("block/nameplate/" + colorName + "_nameplate")))
+                            .build(prov.modLoc("block/" + colorName + "_nameplate_" + position.getSerializedName())));
                 }))
                 .transform(DisplayTarget.displayTarget(NameplateBlockTarget.NAMEPLATE))
                 .transform(x -> {
@@ -832,7 +836,7 @@ public class SimBlocks {
                                 .requires(SimTags.Items.NAMEPLATE_ITEMS)
                                 .group("simualted:nameplate_dyeing")
                                 .unlockedBy("has_nameplate", p.has(SimTags.Items.NAMEPLATE_ITEMS))
-                                .save(p, Simulated.path("crafting/" + c.getName() + "_from_other_nameplate"));
+                                .save(p, Simulated.path("crafting/" + c.getName() + "_from_other_nameplate").toString());
                     });
                 })
                 .onRegisterAfter(Registries.ITEM, v -> ItemDescription.useKey(v, "block.simulated.nameplate"))
@@ -848,8 +852,7 @@ public class SimBlocks {
                     .transform(pickaxeOnly())
                     .initialProperties(SharedProperties::softMetal)
                     .properties(p -> p.forceSolidOn())
-                    .blockstate(() -> (ctx, prov) -> prov.directionalBlock(ctx.getEntry(),
-                            blockState -> BlockModelGenerators.plainVariant(
+                    .blockstate(() -> (ctx, prov) -> BlockStateGen.directionalBlock(ctx, prov, blockState -> BlockModelGenerators.plainVariant(
                                     prov.modLoc("block/spring/" + (blockState.getValue(SpringBlock.SIZE) == SpringBlock.Size.MEDIUM ? "" : (blockState.getValue(SpringBlock.SIZE).getSerializedName() + "_")) + "block"))))
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, AllTags.AllBlockTags.NON_MOVABLE.tag, SimTags.Blocks.LIGHT)
                     .loot((tables, block) -> {

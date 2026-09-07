@@ -14,7 +14,6 @@ import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import com.simibubi.create.foundation.utility.DyeHelper;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
-import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import dev.eriksonn.aeronautics.Aeronautics;
@@ -309,7 +308,7 @@ public class AeroBlocks {
                                 .requires(AeroBlocks.WOODEN_PROPELLER.get())
                                 .group("aeronautics:propeller_style")
                                 .unlockedBy("has_ingredient", p.has(AllItems.PROPELLER.get()))
-                                .save(p, Aeronautics.path(c.getName() + "_from_andesite"));
+                                .save(p, Aeronautics.path(c.getName() + "_from_andesite").toString());
 
                         p.shaped(RecipeCategory.MISC, c.get(), 1)
                                 .pattern("P")
@@ -335,7 +334,7 @@ public class AeroBlocks {
                                 .requires(AeroBlocks.ANDESITE_PROPELLER)
                                 .group("aeronautics:propeller_style")
                                 .unlockedBy("has_ingredient", p.has(AllItems.PROPELLER))
-                                .save(p, Aeronautics.path(c.getName() + "_from_andesite"));
+                                .save(p, Aeronautics.path(c.getName() + "_from_andesite").toString());
                     })
                     .item()
                     .transform(customItemModel())

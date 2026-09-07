@@ -2,7 +2,6 @@ package dev.eriksonn.aeronautics.index;
 
 import com.simibubi.create.AllItems;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
-import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import dev.eriksonn.aeronautics.Aeronautics;
