@@ -90,7 +90,7 @@ public class SimItems {
     public static final ItemEntry<PhysicsStaffItem> PHYSICS_STAFF =
             REGISTRATE.item("creative_physics_staff", PhysicsStaffItem::new)
                     .properties(p -> p.rarity(Rarity.EPIC).stacksTo(1))
-                    .model(AssetLookup.itemModelWithPartials())
+                    .model(() -> AssetLookup.itemModelWithPartials())
                     .register();
 
     public static final ItemEntry<PlungerLauncherItem> PLUNGER_LAUNCHER =
@@ -101,7 +101,7 @@ public class SimItems {
                     .clientExtension(() -> () -> CustomArmPoseClientExtension.INSTANCE)
                     // 26.2: enchantability is a data component rather than an Item override.
                     .properties(p -> p.stacksTo(1).durability(200).enchantable(1))
-                    .model(AssetLookup.itemModelWithPartials())
+                    .model(() -> AssetLookup.itemModelWithPartials())
                     .tag(Tags.Items.ENCHANTABLES, ItemTags.DURABILITY_ENCHANTABLE)
                     .register();
 

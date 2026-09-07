@@ -46,12 +46,16 @@ public enum SimKeys {
 				consumer.accept(key.description, key.translation);
 	}
 
+	// 26.2: a key mapping's category is a registered KeyMapping.Category rather than a
+	// translation key, so the mod names one of its own.
+	private static final KeyMapping.Category CATEGORY = new KeyMapping.Category(Simulated.path("main"));
+
 	public static void registerTo(final Consumer<KeyMapping> consumer) {
 		for (final SimKeys key : values()) {
 			if (key.conflictSafe) {
-				key.keybind = new ConflictSafeKeyMapping(key.description, key.key, Simulated.MOD_NAME);
+				key.keybind = new ConflictSafeKeyMapping(key.description, key.key, CATEGORY);
 			} else {
-				key.keybind = new KeyMapping(key.description, key.key, Simulated.MOD_NAME);
+				key.keybind = new KeyMapping(key.description, key.key, CATEGORY);
 			}
 			if (!key.modifiable)
 				continue;
