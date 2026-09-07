@@ -30,10 +30,10 @@ public class SimItems {
 
     public static final ItemEntry<DiagramItem> CONTRAPTION_DIAGRAM =
             REGISTRATE.item("contraption_diagram", DiagramItem::new)
-                    .recipe((c, p) -> p.shapeless(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> prov.shapeless(RecipeCategory.MISC, c.get(), 1)
                             .requires(Items.PAPER)
                             .requires(SimBlocks.PHYSICS_ASSEMBLER)
-                            .unlockedBy("has_ingredient", p.has(SimBlocks.PHYSICS_ASSEMBLER))
+                            .unlockedBy("has_ingredient", prov.has(SimBlocks.PHYSICS_ASSEMBLER))
                             .save(p))
                     .register();
 
@@ -41,26 +41,26 @@ public class SimItems {
             REGISTRATE.item("spring", SpringItem::new)
                     .properties(p -> p.component(SimDataComponents.BOUNCINESS, 1f))
                     .recipe((ctx, prov) ->
-                            p.shaped(RecipeCategory.MISC, ctx.get(), 2)
+                            prov.shaped(RecipeCategory.MISC, ctx.get(), 2)
                                     .pattern("S")
                                     .pattern("N")
                                     .pattern("S")
                                     .define('S', CommonMetal.IRON.plates)
                                     .define('N', CommonMetal.IRON.nuggets)
-                                    .unlockedBy("has_ingredient", p.has(CommonMetal.IRON.plates))
+                                    .unlockedBy("has_ingredient", prov.has(CommonMetal.IRON.plates))
                                     .save(prov)
                     )
                     .register();
 
     public static ItemEntry<RopeItem> ROPE_COUPLING = REGISTRATE
             .item("rope_coupling", RopeItem::new)
-            .recipe((ctx, prov) -> p.shaped(RecipeCategory.MISC, ctx.get(), 1)
+            .recipe((ctx, prov) -> prov.shaped(RecipeCategory.MISC, ctx.get(), 1)
                     .pattern(" S ")
                     .pattern("NSN")
                     .pattern(" S ")
                     .define('S', Tags.Items.STRINGS)
                     .define('N', Tags.Items.NUGGETS_IRON)
-                    .unlockedBy("has_ingredient", p.has(Tags.Items.STRINGS))
+                    .unlockedBy("has_ingredient", prov.has(Tags.Items.STRINGS))
                     .save(prov))
             .register();
 

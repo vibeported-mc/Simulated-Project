@@ -32,6 +32,7 @@ import net.createmod.ponder.impl.client.element.ElementLinkImpl;
 import net.createmod.ponder.impl.client.instruction.CreateParrotInstruction;
 import net.createmod.ponder.impl.client.instruction.FadeOutOfSceneInstruction;
 import net.createmod.ponder.impl.client.instruction.RotateSceneInstruction;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -528,7 +529,7 @@ public class SensorScenes {
 
         scene.overlay().showFilterSlotInput(sensorFilterPos, Direction.UP, 45);
 
-        final ItemStack dye = new ItemStack(Items.RED_DYE);
+        final ItemStack dye = new ItemStack(Items.DYE.pick(DyeColor.RED));
 
         scene.overlay().showControls(sensorFilterPos, Pointing.DOWN, 40).withItem(dye);
 
@@ -1440,7 +1441,7 @@ public class SensorScenes {
                     loopingPlatform2, new Vec3(0, 0, -20), 200, SmoothMovementUtils.quadraticRiseOut()));
             for (int i = 0; i < 3; i++) {
                 scene.world().setBlock(new BlockPos(1 + i, 0, 42),
-                        (i == 1 ? Blocks.WHITE_CONCRETE : Blocks.SNOW_BLOCK).defaultBlockState(), false);
+                        (i == 1 ? Blocks.CONCRETE.pick(DyeColor.WHITE) : Blocks.SNOW_BLOCK).defaultBlockState(), false);
             }
 
             final ParrotElement dangerParrot = ExpandedParrotElement.create(new Vec3(2.5, 1, 26.5), ParrotPose.DancePose::new);

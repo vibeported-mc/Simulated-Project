@@ -17,6 +17,7 @@ import net.createmod.ponder.api.client.element.WorldSectionElement;
 import net.createmod.ponder.api.client.scene.*;
 import net.createmod.ponder.impl.client.element.ElementLinkImpl;
 import net.createmod.ponder.impl.client.instruction.CreateParrotInstruction;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Items;
@@ -173,7 +174,7 @@ public class RopeScenes {
         scene.idle(5);
 
         for (int i = 0; i < 8; i++) {
-            scene.addInstruction(new OffsetBreakParticlesInstruction(AABB.ofSize(vector.of(1.6 + ((double) i / 3),1.5 + ((double) i / 3.5),5.5), 0.5, 0.5,0.5), Blocks.BROWN_WOOL.defaultBlockState()));
+            scene.addInstruction(new OffsetBreakParticlesInstruction(AABB.ofSize(vector.of(1.6 + ((double) i / 3),1.5 + ((double) i / 3.5),5.5), 0.5, 0.5,0.5), Blocks.WOOL.pick(DyeColor.BROWN).defaultBlockState()));
         }
         scene.addInstruction(new RemoveRopeStrandInstruction(initialRope, scene));
         scene.world().modifyBlockEntity(winch, RopeWinchBlockEntity.class, be -> be.getRopeHolder().renderAttached = false);
