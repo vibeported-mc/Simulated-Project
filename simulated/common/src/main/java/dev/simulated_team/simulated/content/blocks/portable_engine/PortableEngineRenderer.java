@@ -171,7 +171,7 @@ public class PortableEngineRenderer
         pipeRight
                 .translate(pipeCenterRight)
                 .scale(pipeScale)
-                .translateBack(pipeCenterRight)
+                .translateBack(pipeCenterRight.x, pipeCenterRight.y, pipeCenterRight.z)
                 .light(light)
                 .color(255, 255, 255, alpha);
         renderState.parts.add(new Part(pipeRight.extractRenderState(), type));
@@ -181,10 +181,10 @@ public class PortableEngineRenderer
         outletRight
                 .translate(pipeCenterRight)
                 .scale(outletScale)
-                .translateBack(pipeCenterRight)
+                .translateBack(pipeCenterRight.x, pipeCenterRight.y, pipeCenterRight.z)
                 .translate(outletRotationPointRight)
                 .rotateY(-outletRotation)
-                .translateBack(outletRotationPointRight)
+                .translateBack(outletRotationPointRight.x, outletRotationPointRight.y, outletRotationPointRight.z)
                 .light(light)
                 .color(255, 255, 255, alpha);
         renderState.parts.add(new Part(outletRight.extractRenderState(), type));
@@ -194,7 +194,7 @@ public class PortableEngineRenderer
         pipeLeft
                 .translate(pipeCenterLeft)
                 .scale(pipeScale)
-                .translateBack(pipeCenterLeft)
+                .translateBack(pipeCenterLeft.x, pipeCenterLeft.y, pipeCenterLeft.z)
                 .light(light)
                 .color(255, 255, 255, alpha);
         renderState.parts.add(new Part(pipeLeft.extractRenderState(), type));
@@ -204,10 +204,10 @@ public class PortableEngineRenderer
         outletLeft
                 .translate(pipeCenterLeft)
                 .scale(outletScale)
-                .translateBack(pipeCenterLeft)
+                .translateBack(pipeCenterLeft.x, pipeCenterLeft.y, pipeCenterLeft.z)
                 .translate(outletRotationPointLeft)
                 .rotateY(outletRotation)
-                .translateBack(outletRotationPointLeft)
+                .translateBack(outletRotationPointLeft.x, outletRotationPointLeft.y, outletRotationPointLeft.z)
                 .light(light)
                 .color(255, 255, 255, alpha);
         renderState.parts.add(new Part(outletLeft.extractRenderState(), type));
