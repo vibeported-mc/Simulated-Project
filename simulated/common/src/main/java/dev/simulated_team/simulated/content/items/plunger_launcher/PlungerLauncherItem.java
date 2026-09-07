@@ -23,6 +23,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -64,7 +65,9 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
         if (!level.isClientSide()) {
             if (player.isShiftKeyDown()) {
                 LaunchedPlungerServerHandler.removePlayerPlungers(player);
-                player.displayClientMessage(SimLang.translate("plunger_launcher.clear_plungers").color(0xaaaaaa).component(), true);
+                if (player instanceof final ServerPlayer serverPlayer) {
+                    serverPlayer.displayClientMessage(SimLang.translate("plunger_launcher.clear_plungers").color(0xaaaaaa).component(), true);
+                }
                 return InteractionResult.SUCCESS;
             }
 
@@ -109,7 +112,8 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
 //            VeilPacketManager.tracking(player).sendPacket(new PlungerLauncherShootPacket(interactionHand));
 
             if (!BacktankUtil.canAbsorbDamage(player, maxUses()))
-                heldStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(interactionHand));
+                heldStack.hurtAndBreak(1, player,
+                        interactionHand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
         } else {
             SimulatedClient.PLUNGER_LAUNCHER_RENDER_HANDLER.dontAnimateItem(interactionHand);
         }

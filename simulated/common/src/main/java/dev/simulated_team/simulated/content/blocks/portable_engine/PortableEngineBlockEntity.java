@@ -25,6 +25,7 @@ import net.createmod.catnip.api.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import com.simibubi.create.foundation.item.ItemHelper;
 import dev.simulated_team.simulated.index.SimBlocks;
 import net.minecraft.world.Containers;
 import net.minecraft.core.Direction;
@@ -152,7 +153,7 @@ public class PortableEngineBlockEntity extends GeneratingKineticBlockEntity impl
     }
 
     protected static BlockPos getCameraPos() {
-        final Entity renderViewEntity = Minecraft.getInstance().cameraEntity;
+        final Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
         if (renderViewEntity == null) {
             return BlockPos.ZERO;
         }
@@ -237,8 +238,9 @@ public class PortableEngineBlockEntity extends GeneratingKineticBlockEntity impl
             this.burnTime = SimItemService.INSTANCE.getBurnTime(stack);
             this.superHeated = this.getNextSuperHeated();
             if (this.burnTime > 0) {
-                if (stack.getCount() == 1 && stack.getItem().hasCraftingRemainingItem()) {
-                    slot.setStack(slot.getType().getCraftingRemainingItem().getDefaultInstance());
+                final ItemStack remainder = ItemHelper.getCraftingRemainder(stack);
+                if (stack.getCount() == 1 && !remainder.isEmpty()) {
+                    slot.setStack(remainder);
                 } else {
                     slot.shrink(1);
                 }
@@ -326,7 +328,7 @@ public class PortableEngineBlockEntity extends GeneratingKineticBlockEntity impl
                     }
                 }
                 this.burnTime += 20 * 5;
-                this.level.playSound(null, this.getBlockPos(), SoundEvents.GENERIC_EAT, SoundSource.BLOCKS, 1.0f, 1.0f);
+                this.level.playSound(null, this.getBlockPos(), SoundEvents.GENERIC_EAT.value(), SoundSource.BLOCKS, 1.0f, 1.0f);
             }
         }
     }
