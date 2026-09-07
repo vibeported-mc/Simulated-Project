@@ -26,7 +26,7 @@ public class SimpleResourceManager<T> extends CodecReloadListener<T> {
 
 	public static <T> SimpleResourceManager<T> create(final Codec<T> codec, final Identifier path) {
 		final SimpleResourceManager<T> manager = new SimpleResourceManager<>(codec, path.getNamespace() + "/" + path.getPath());
-		REGISTRY.registerListener(manager);
+		REGISTRY.registerListener(path, manager);
 		return manager;
 	}
 
@@ -72,8 +72,14 @@ public class SimpleResourceManager<T> extends CodecReloadListener<T> {
 		}
 	}
 
+	/**
+	 * <h2>26.2 note</h2>
+	 * <p>A reload listener is registered under an identifier, so that other mods can order themselves
+	 * against it -- {@code AddClientReloadListenersEvent} and its server counterpart both take one.
+	 * The manager already knows its path, so it is passed along rather than invented at the far end.
+	 */
 	public interface Registry {
-		void registerListener(PreparableReloadListener listener);
+		void registerListener(Identifier id, PreparableReloadListener listener);
 	}
 
 }

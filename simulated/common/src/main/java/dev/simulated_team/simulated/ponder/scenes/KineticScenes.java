@@ -77,7 +77,7 @@ public class KineticScenes {
         overlay.showControls(textPos, Pointing.DOWN, 30).withItem(Items.COAL.getDefaultInstance());
         world.cycleBlockProperty(enginePos, AbstractFurnaceBlock.LIT);
         world.modifyBlockEntity(enginePos, PortableEngineBlockEntity.class, be -> {
-            be.setCurrentBurnTime(SimItemService.INSTANCE.getBurnTime(Items.COAL.getDefaultInstance()));
+            be.setCurrentBurnTime(SimItemService.INSTANCE.getBurnTime(be.getLevel(), Items.COAL.getDefaultInstance()));
             be.openHatchOverride = false;
         });
         world.setKineticSpeed(select.fromTo(2, 2, 1, 2, 2, 3), -32);
@@ -143,7 +143,7 @@ public class KineticScenes {
         scene.idle(10);
         overlay.showControls(textPos, Pointing.DOWN, 30).withItem(AllItems.BLAZE_CAKE.asStack());
         world.modifyBlockEntity(enginePos, PortableEngineBlockEntity.class, be -> {
-            be.setCurrentBurnTime(SimItemService.INSTANCE.getBurnTime(AllItems.BLAZE_CAKE.asStack()));
+            be.setCurrentBurnTime(SimItemService.INSTANCE.getBurnTime(be.getLevel(), AllItems.BLAZE_CAKE.asStack()));
             be.setSuperHeated(true);
             be.openHatchOverride = false;
         });

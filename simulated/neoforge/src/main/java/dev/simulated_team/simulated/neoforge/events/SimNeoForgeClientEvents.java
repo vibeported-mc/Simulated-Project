@@ -74,7 +74,9 @@ public class SimNeoForgeClientEvents {
 		SimulatedCommonClientEvents.appendTooltip(event.getItemStack(), event.getFlags(), event.getEntity(), event.getToolTip());
 	}
 
-	@EventBusSubscriber(modid = Simulated.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+	// 26.2: EventBusSubscriber.Bus is gone -- an event goes to the mod bus if it implements
+	// IModBusEvent, so there is nothing left to name.
+	@EventBusSubscriber(modid = Simulated.MOD_ID, value = Dist.CLIENT)
 	public static class ModBusEvents {
 
 		@SubscribeEvent
@@ -88,10 +90,8 @@ public class SimNeoForgeClientEvents {
 		}
 
 		@SubscribeEvent
-		public static void addReloadListener(final RegisterClientReloadListenersEvent event) {
-			for (final PreparableReloadListener listener : SimpleResourceManagerRegistryService.LISTENERS) {
-				event.registerReloadListener(listener);
-			}
+		public static void addReloadListener(final AddClientReloadListenersEvent event) {
+			SimpleResourceManagerRegistryService.LISTENERS.forEach(event::addListener);
 		}
 	}
 }

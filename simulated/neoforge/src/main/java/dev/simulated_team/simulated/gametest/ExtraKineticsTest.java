@@ -10,10 +10,16 @@ import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlockEntity;
 import dev.simulated_team.simulated.content.blocks.torsion_spring.TorsionSpringBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.*;
+import com.simibubi.create.infrastructure.gametest.CreateGameTestHelper;
+import com.simibubi.create.infrastructure.gametest.GameTest;
+import com.simibubi.create.infrastructure.gametest.GameTestGroup;
+import net.minecraft.gametest.framework.GameTestAssertException;
+import net.minecraft.gametest.framework.GameTestAssertPosException;
+import net.minecraft.network.chat.Component;
+import net.minecraft.gametest.framework.GameTestSequence;
 import net.minecraft.world.level.block.LeverBlock;
-import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.joml.Vector3d;
 
 import java.util.Objects;
@@ -21,12 +27,23 @@ import java.util.Objects;
 import static dev.simulated_team.simulated.gametest.SimulatedGameTestHelper.assertExtraKineticsSpeed;
 import static dev.simulated_team.simulated.gametest.SimulatedGameTestHelper.assertKineticsSpeed;
 
-@GameTestHolder(Simulated.MOD_ID)
+/**
+ * <h2>26.2 note</h2>
+ * <p>The game no longer finds tests by annotation: a test is a registry object, built in code or
+ * read from data, and {@code @GameTestHolder} went with the old way. Create wrote its own pair of
+ * annotations and a finder over them, so these tests read as they always did -- with two additions
+ * the new shape requires: the structure each runs in has to be named, and the class has to say which
+ * namespace and folder to look for those structures in.
+ *
+ * <p>The structures moved to match: {@code data/simulated/structure/extrakineticstest.<name>.nbt}
+ * became {@code data/simulated/structure/gametest/extra_kinetics/<name>.nbt}.
+ */
+@GameTestGroup(path = "extra_kinetics", namespace = Simulated.MOD_ID)
 public class ExtraKineticsTest {
 
-    @GameTest
-    public static void analogTransmission(final GameTestHelper helper) {
-        final AnalogLeverBlockEntity leverBE = helper.getBlockEntity(new BlockPos(1, 2, 1));
+    @GameTest(template = "analog_transmission")
+    public static void analogTransmission(final CreateGameTestHelper helper) {
+        final AnalogLeverBlockEntity leverBE = helper.getBlockEntity(new BlockPos(1, 2, 1), AnalogLeverBlockEntity.class);
         final GameTestSequence sequence = helper.startSequence();
         for (int i = 0; i < 16; i++) {
             sequence.thenExecuteAfter(1, () -> {
@@ -41,9 +58,9 @@ public class ExtraKineticsTest {
         sequence.thenSucceed();
     }
 
-    @GameTest
-    public static void analogTransmissionReverse(final GameTestHelper helper) {
-        final AnalogLeverBlockEntity leverBE = helper.getBlockEntity(new BlockPos(1, 2, 1));
+    @GameTest(template = "analog_transmission_reverse")
+    public static void analogTransmissionReverse(final CreateGameTestHelper helper) {
+        final AnalogLeverBlockEntity leverBE = helper.getBlockEntity(new BlockPos(1, 2, 1), AnalogLeverBlockEntity.class);
         final GameTestSequence sequence = helper.startSequence();
         for (int i = 0; i < 16; i++) {
             sequence.thenExecuteAfter(1, () -> {
@@ -58,8 +75,8 @@ public class ExtraKineticsTest {
         sequence.thenSucceed();
     }
 
-    @GameTest
-    public static void swivelBearing(final GameTestHelper helper) {
+    @GameTest(template = "swivel_bearing")
+    public static void swivelBearing(final CreateGameTestHelper helper) {
         helper.startSequence()
                 .thenExecuteAfter(1, () -> assertExtraKineticsSpeed(helper, new BlockPos(2, 3, 2), 64, -32))
                 .thenIdle(20)
@@ -72,25 +89,26 @@ public class ExtraKineticsTest {
                     }
 
                     if (count != 1) {
-                        throw new GameTestAssertException("Expected 1 sub-level, found " + count);
+                        // 26.2: the assertion also carries the tick it failed on.
+                        throw new GameTestAssertException(Component.literal("Expected 1 sub-level, found " + count), (int) helper.getTick());
                     }
 
                     final KineticBlockEntity be = (KineticBlockEntity) Objects.requireNonNull(subLevel.getLevel().getBlockEntity(subLevel.getPlot().getCenterBlock()));
                     if (Math.abs(Math.abs(be.getSpeed()) - 64) >= 1e-6) {
                         final Vector3d pos = subLevel.logicalPose().position();
-                        throw new GameTestAssertPosException("Expected %.2f speed, got %.2f".formatted(64F, Math.abs(be.getSpeed())), BlockPos.containing(pos.x, pos.y, pos.z), BlockPos.containing(helper.relativeVec(JOMLConversion.toMojang(pos))), helper.getTick());
+                        throw new GameTestAssertPosException(Component.literal("Expected %.2f speed, got %.2f".formatted(64F, Math.abs(be.getSpeed()))), BlockPos.containing(pos.x, pos.y, pos.z), BlockPos.containing(helper.relativeVec(JOMLConversion.toMojang(pos))), (int) helper.getTick());
                     }
                 })
                 .thenSucceed();
     }
 
-    @GameTest
-    public static void torsionSpring(final GameTestHelper helper) {
+    @GameTest(template = "torsion_spring")
+    public static void torsionSpring(final CreateGameTestHelper helper) {
         helper.startSequence()
                 .thenExecuteAfter(1, () -> assertKineticsSpeed(helper, new BlockPos(2, 2, 3), 32))
-                .thenExecuteAfter(15, () -> helper.<TorsionSpringBlockEntity>assertBlockEntityData(new BlockPos(2, 2, 3), be -> Math.abs(be.getAngle()) == 90, () -> "Expected 90 degrees, got %.0f".formatted(Math.abs(helper.<TorsionSpringBlockEntity>getBlockEntity(new BlockPos(2, 2, 3)).getAngle()))))
+                .thenExecuteAfter(15, () -> helper.assertBlockEntityData(new BlockPos(2, 2, 3), TorsionSpringBlockEntity.class, be -> Math.abs(be.getAngle()) == 90, () -> Component.literal("Expected 90 degrees, got %.0f".formatted(Math.abs(helper.getBlockEntity(new BlockPos(2, 2, 3), TorsionSpringBlockEntity.class).getAngle())))))
                 .thenExecuteAfter(1, () -> helper.setBlock(1, 2, 2, helper.getBlockState(new BlockPos(1, 2, 2)).setValue(LeverBlock.POWERED, true)))
-                .thenExecuteAfter(15, () -> helper.<TorsionSpringBlockEntity>assertBlockEntityData(new BlockPos(2, 2, 3), be -> be.getAngle() == 0, () -> "Expected 0 degrees, got %.0f".formatted(Math.abs(helper.<TorsionSpringBlockEntity>getBlockEntity(new BlockPos(2, 2, 3)).getAngle()))))
+                .thenExecuteAfter(15, () -> helper.assertBlockEntityData(new BlockPos(2, 2, 3), TorsionSpringBlockEntity.class, be -> be.getAngle() == 0, () -> Component.literal("Expected 0 degrees, got %.0f".formatted(Math.abs(helper.getBlockEntity(new BlockPos(2, 2, 3), TorsionSpringBlockEntity.class).getAngle())))))
                 .thenSucceed();
     }
 }

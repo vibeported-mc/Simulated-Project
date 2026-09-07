@@ -5,9 +5,8 @@ import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.sc
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 
 //TODO:figure out where items are rendered and change it
 public class LinkedTypewriterMenuImpl extends LinkedTypewriterMenuCommon {
@@ -20,9 +19,16 @@ public class LinkedTypewriterMenuImpl extends LinkedTypewriterMenuCommon {
         super(type, id, inv, be);
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code ItemStackHandler} is replaced by {@code ItemStacksResourceHandler}, and a slot over
+     * one is a {@code ResourceHandlerSlot} rather than a {@code SlotItemHandler}. A ghost slot is
+     * written directly rather than through a transfer, so the handler's own {@code set} is what the
+     * slot is given to write with -- the same pairing Create's blueprint menu uses.
+     */
     @Override
-    protected ItemStackHandler createGhostInventory() {
-        return new ItemStackHandler(2);
+    protected ItemStacksResourceHandler createGhostInventory() {
+        return new ItemStacksResourceHandler(2);
     }
 
     @Override
@@ -34,10 +40,10 @@ public class LinkedTypewriterMenuImpl extends LinkedTypewriterMenuCommon {
         }
     }
 
-    private class GhostSlotHandler extends SlotItemHandler {
+    private class GhostSlotHandler extends ResourceHandlerSlot {
 
-        public GhostSlotHandler(final IItemHandler itemHandler, final int index, final int xPosition, final int yPosition) {
-            super(itemHandler, index, xPosition, yPosition);
+        public GhostSlotHandler(final ItemStacksResourceHandler itemHandler, final int index, final int xPosition, final int yPosition) {
+            super(itemHandler, itemHandler::set, index, xPosition, yPosition);
         }
 
         @Override
