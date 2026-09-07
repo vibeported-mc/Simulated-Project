@@ -1,6 +1,7 @@
 package dev.eriksonn.aeronautics.neoforge.events;
 
 import dev.eriksonn.aeronautics.Aeronautics;
+import dev.eriksonn.aeronautics.data.AeroEquipmentAssets;
 import dev.eriksonn.aeronautics.data.AeroAdvancementTriggers;
 import dev.eriksonn.aeronautics.events.AeronauticsCommonEvents;
 import dev.eriksonn.aeronautics.index.*;
@@ -71,6 +72,9 @@ public class AeroNeoForgeCommonEvents {
 			generator.addProvider(event.includeServer(), new AeroAdvancements(output, lookupProvider));
 			generator.addProvider(event.includeServer(), AeroProcessingRecipeGen.registerAll(output, lookupProvider));
 			event.addProvider(AeroSoundEvents.REGISTRY.getProvider(output));
+			// 26.2: an armour material names an equipment asset, and the layers it draws are written
+			// out as data rather than handed to the item's constructor as a texture.
+			generator.addProvider(event.includeClient(), new AeroEquipmentAssets(output));
 		}
 
 		@SubscribeEvent

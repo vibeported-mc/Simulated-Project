@@ -26,17 +26,14 @@
     "steam_vent.BoilerDataMixin"
   ],
   "client": [
-    "levitite.ChunkRenderTypeSetAccessor",
     "balloon.LevelChunkMixin",
     "custom_situational_music.MinecraftMixin",
     "custom_situational_music.MusicManagerAccessor",
     "levitite.PonderUIMixin",
     "levitite.TerrainParticleMixin",
-    "levitite.VanillaChunkedSubLevelRenderDataMixin",
     "render.iris.WorldRenderingPhaseMixin",
     "render.sodium.DefaultMaterialsMixin",
-    "render.sodium.SodiumWorldRendererMixin",
-    "render.vanilla.LevelRendererMixin"
+    "render.sodium.SodiumWorldRendererMixin"
   ],
   "server": [],
   "injectors": {

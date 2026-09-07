@@ -57,7 +57,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.common.Tags;
 
 import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
@@ -271,13 +270,13 @@ public class AeroBlocks {
                     .initialProperties(SharedProperties::softMetal)
                     .transform(axeOrPickaxe())
                     .transform(AeroStress.setImpact(4.0))
-                    .blockstate(() -> (ctx, prov) -> {
-                        prov.getVariantBuilder(ctx.getEntry()).forAllStates((state) ->
-                                ConfiguredModel.builder().modelFile(AssetLookup.partialBaseModel(ctx, prov))
-                                        .rotationY(state.getValue(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.X ? 90 : 0)
-                                        .rotationX(state.getValue(SmartPropellerBlock.CEILING) ? 180 : 0)
-                                        .build());
-                    })
+                    // 26.2: NeoForge's model generators are gone, and with them ConfiguredModel and
+                    // getVariantBuilder. A state's model is a MultiVariant now, and a rotation is a
+                    // mutator applied to it -- Create keeps both the walk and the turns.
+                    .blockstate(() -> (ctx, prov) -> BlockStateGen.forAllStates(ctx, prov, state -> BlockStateGen.rotateX(
+                            BlockStateGen.rotateY(AssetLookup.partialBaseModel(ctx, prov),
+                                    state.getValue(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.X ? 90 : 0),
+                            state.getValue(SmartPropellerBlock.CEILING) ? 180 : 0)))
                     .item()
                     .transform(customItemModel())
                     .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 2)
