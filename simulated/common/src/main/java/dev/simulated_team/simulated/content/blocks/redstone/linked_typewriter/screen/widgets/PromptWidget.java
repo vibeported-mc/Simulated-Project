@@ -3,7 +3,7 @@ package dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.s
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.screen.EntryModifierScreen;
 import dev.simulated_team.simulated.data.SimLang;
-import net.createmod.catnip.gui.widget.AbstractSimiWidget;
+import net.createmod.catnip.api.client.gui.widget.AbstractSimiWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;

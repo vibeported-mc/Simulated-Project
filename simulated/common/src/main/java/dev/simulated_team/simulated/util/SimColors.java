@@ -12,7 +12,7 @@ public class SimColors {
     public static int REDSTONE_OFF = new Color(86, 1, 1).getRGB();
     public static int REDSTONE_ON = new Color(205, 0, 0).getRGB();
     public static int redstone(final float frac) {
-        return net.createmod.catnip.theme.Color.mixColors(REDSTONE_OFF, REDSTONE_ON, frac);
+        return net.createmod.catnip.api.theme.Color.mixColors(REDSTONE_OFF, REDSTONE_ON, frac);
     }
 
     public static int ADVANCABLE_GOLD = new Color(219, 162, 19).getRGB();

@@ -8,7 +8,7 @@ import com.simibubi.create.foundation.item.KineticStats;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import dev.simulated_team.simulated.api.CustomStressImpactTooltipProvider;
 import dev.simulated_team.simulated.data.SimLang;
-import net.createmod.catnip.lang.LangBuilder;
+import net.createmod.catnip.api.lang.LangBuilder;
 import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

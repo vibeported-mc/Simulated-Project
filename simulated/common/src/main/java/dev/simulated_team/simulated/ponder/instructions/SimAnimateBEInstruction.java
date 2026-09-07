@@ -3,7 +3,7 @@ package dev.simulated_team.simulated.ponder.instructions;
 import com.simibubi.create.foundation.ponder.instruction.AnimateBlockEntityInstruction;
 import dev.simulated_team.simulated.content.blocks.steering_wheel.SteeringWheelBlockEntity;
 import dev.simulated_team.simulated.content.blocks.torsion_spring.TorsionSpringBlockEntity;
-import net.createmod.ponder.api.level.PonderLevel;
+import net.createmod.ponder.api.client.level.PonderLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 

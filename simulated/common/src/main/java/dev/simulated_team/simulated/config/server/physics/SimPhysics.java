@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.config.server.physics;
 
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 
 public class SimPhysics extends ConfigBase {
 

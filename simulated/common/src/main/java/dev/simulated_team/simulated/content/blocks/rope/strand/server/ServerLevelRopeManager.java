@@ -2,7 +2,7 @@ package dev.simulated_team.simulated.content.blocks.rope.strand.server;
 
 import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.createmod.catnip.data.WorldAttached;
+import net.createmod.catnip.api.data.WorldAttached;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;

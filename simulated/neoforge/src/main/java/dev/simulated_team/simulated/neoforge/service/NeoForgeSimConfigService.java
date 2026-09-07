@@ -5,7 +5,7 @@ import com.simibubi.create.infrastructure.config.CStress;
 import dev.simulated_team.simulated.config.client.SimClient;
 import dev.simulated_team.simulated.config.server.SimServer;
 import dev.simulated_team.simulated.service.SimConfigService;
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;

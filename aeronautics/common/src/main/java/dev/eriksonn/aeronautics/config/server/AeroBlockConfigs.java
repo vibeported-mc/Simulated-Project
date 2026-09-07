@@ -1,6 +1,6 @@
 package dev.eriksonn.aeronautics.config.server;
 
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 
 public class AeroBlockConfigs extends ConfigBase {
 	public final ConfigBool breakBlocksOnCrystallize = this.b(true, "break_blocks_on_levitite_crystallize", Comments.levititeBreaksBlocks);

@@ -4,7 +4,10 @@ plugins {
 }
 
 neoForge {
-    neoFormVersion = neo_form_version
+    // 26.2 port: NeoForge is the only loader these mods have, so `common` compiles against
+    // the real NeoForge distribution rather than bare NeoForm -- there is no second loader
+    // for the abstraction to pay for, and NeoForm publishes nothing for 26.2 anyway.
+    version = neoforge_version
 
     // Automatically enable AccessTransformers if the file exists
     def at = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -13,9 +16,11 @@ neoForge {
         accessTransformers.from(at.absolutePath)
     }
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
+    if (parchment_version != "none") {
+        parchment {
+            minecraftVersion = parchment_minecraft == "same" ? minecraft_version : parchment_minecraft
+            mappingsVersion = parchment_version
+        }
     }
 }
 
@@ -35,3 +40,26 @@ artifacts {
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
 }
 
+// Port scaffolding: report every error, not javac's default first 100.
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Xmaxerrs', '100000']
+}
+
+// ModDevGradle 2.0.144 does not know Minecraft 26.2, so its version capability table falls back to
+// requesting Java 21 for the NeoFormRuntime tasks. Gradle 9 cannot auto-provision one either.
+tasks.withType(net.neoforged.nfrtgradle.NeoFormRuntimeTask).configureEach {
+    javaExecutable.set(javaToolchains.launcherFor(java.toolchain).map { it.executablePath.asFile.absolutePath })
+}
+
+// 26.2 port: integrations with mods that have no 26.2 build. Excluded rather than deleted, so each
+// returns by restoring its dependency in buildSrc, its version in gradle.properties, and this line.
+sourceSets.main.java {
+    // ComputerCraft: peripherals, the wired-network element and the peripheral service.
+    exclude 'dev/simulated_team/simulated/compat/computercraft/**'
+    exclude 'dev/simulated_team/simulated/service/compat/SimPeripheralService.java'
+    // JEI.
+    exclude 'dev/simulated_team/simulated/compat/jei/**'
+    // Nature's Compass and Explorer's Compass: navigation targets and their registries.
+    exclude 'dev/simulated_team/simulated/compat/naturescompass/**'
+    exclude 'dev/simulated_team/simulated/compat/explorerscompass/**'
+}

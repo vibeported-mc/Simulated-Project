@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.api;
 
-import net.createmod.catnip.lang.LangBuilder;
+import net.createmod.catnip.api.lang.LangBuilder;
 
 public interface CustomStressImpactTooltipProvider {
 

@@ -2,7 +2,7 @@ package dev.simulated_team.simulated.mixin.ponder;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.simulated_team.simulated.mixin_interface.ponder.PonderSceneExtension;
-import net.createmod.ponder.foundation.PonderScene;
+import net.createmod.ponder.api.client.scene.PonderScene;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;

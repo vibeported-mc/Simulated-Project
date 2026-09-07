@@ -1,11 +1,11 @@
 package dev.simulated_team.simulated.ponder.instructions;
 
 import dev.simulated_team.simulated.mixin.accessor.ParrotElementAccessor;
-import net.createmod.ponder.api.element.ElementLink;
-import net.createmod.ponder.api.element.ParrotElement;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.instruction.TickingInstruction;
-import net.createmod.ponder.foundation.ui.PonderUI;
+import net.createmod.ponder.api.client.element.ElementLink;
+import net.createmod.ponder.api.client.element.ParrotElement;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.impl.client.instruction.TickingInstruction;
+import net.createmod.ponder.impl.client.gui.PonderUI;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.animal.Parrot;
 

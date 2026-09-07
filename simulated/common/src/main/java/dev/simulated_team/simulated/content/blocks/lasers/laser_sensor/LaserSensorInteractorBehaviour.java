@@ -5,7 +5,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.SubLevelHelper;
 import dev.simulated_team.simulated.content.blocks.lasers.LaserBehaviour;
-import net.createmod.catnip.data.Couple;
+import net.createmod.catnip.api.data.Couple;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;

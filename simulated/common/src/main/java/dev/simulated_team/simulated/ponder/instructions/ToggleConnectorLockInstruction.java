@@ -1,9 +1,9 @@
 package dev.simulated_team.simulated.ponder.instructions;
 
 import dev.simulated_team.simulated.content.blocks.docking_connector.DockingConnectorBlockEntity;
-import net.createmod.ponder.api.level.PonderLevel;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.instruction.PonderInstruction;
+import net.createmod.ponder.api.client.level.PonderLevel;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.api.client.instruction.PonderInstruction;
 import net.minecraft.core.BlockPos;
 
 public class ToggleConnectorLockInstruction extends PonderInstruction {

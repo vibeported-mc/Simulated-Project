@@ -106,7 +106,7 @@ public class NewPonderTooltipManager {
 
 	public record RegisterBuilder(Item... items) {
 		/**
-		 * @param scenes set of scene IDs as set by {@link net.createmod.ponder.foundation.PonderSceneBuilder#title(java.lang.String, java.lang.String)}
+		 * @param scenes set of scene IDs as set by {@link net.createmod.ponder.api.client.scene.PonderSceneBuilder#title(java.lang.String, java.lang.String)}
 		 */
 		public RegisterBuilder addScenes(final ResourceLocation... scenes) {
 			final Set<ResourceLocation> sceneSet = new HashSet<>(List.of(scenes));

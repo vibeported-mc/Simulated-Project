@@ -1,6 +1,6 @@
 package dev.eriksonn.aeronautics.config.server;
 
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 
 public class AeroKinetics extends ConfigBase {
 

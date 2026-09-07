@@ -3,11 +3,11 @@ package dev.ryanhcode.offroad.content.ponder;
 import com.simibubi.create.foundation.ponder.CreatePonderPlugin;
 import dev.ryanhcode.offroad.Offroad;
 import dev.ryanhcode.offroad.index.OffroadPonderScenes;
-import net.createmod.ponder.api.level.PonderLevel;
-import net.createmod.ponder.api.registration.IndexExclusionHelper;
-import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
-import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
-import net.createmod.ponder.api.registration.SharedTextRegistrationHelper;
+import net.createmod.ponder.api.client.level.PonderLevel;
+import net.createmod.ponder.api.client.registration.IndexExclusionHelper;
+import net.createmod.ponder.api.client.registration.PonderSceneRegistrationHelper;
+import net.createmod.ponder.api.client.registration.PonderTagRegistrationHelper;
+import net.createmod.ponder.api.client.registration.SharedTextRegistrationHelper;
 import net.minecraft.resources.ResourceLocation;
 
 public class OffroadPonderPlugin extends CreatePonderPlugin {

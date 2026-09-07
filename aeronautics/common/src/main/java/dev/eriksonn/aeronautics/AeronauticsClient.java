@@ -9,7 +9,7 @@ import dev.eriksonn.aeronautics.index.client.AeroRenderTypes;
 import dev.eriksonn.aeronautics.index.client.AeroSituationalMusic;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.platform.VeilEventPlatform;
-import net.createmod.ponder.foundation.PonderIndex;
+import net.createmod.ponder.api.client.PonderIndex;
 
 public class AeronauticsClient {
     public static void init() {

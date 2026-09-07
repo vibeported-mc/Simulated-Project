@@ -8,7 +8,7 @@ import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.propeller_bearing.PropellerBearingBlockEntity;
 import dev.eriksonn.aeronautics.index.AeroEntityTypes;
 import dev.simulated_team.simulated.util.SimMathUtils;
-import net.createmod.catnip.math.VecHelper;
+import net.createmod.catnip.api.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntityType;
@@ -19,7 +19,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Quaternionf;
 
-import static net.createmod.catnip.math.AngleHelper.angleLerp;
+import static net.createmod.catnip.api.math.AngleHelper.angleLerp;
 
 public class PropellerBearingContraptionEntity extends ControlledContraptionEntity {
 

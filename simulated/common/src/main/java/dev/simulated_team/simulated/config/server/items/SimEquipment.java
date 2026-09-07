@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.config.server.items;
 
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 
 public class SimEquipment extends ConfigBase {
     public final ConfigInt maxPlungerLauncherShots = this.i(100, 0, "maxPlungerLauncherShots", Comments.maxPlungerLauncherShots);

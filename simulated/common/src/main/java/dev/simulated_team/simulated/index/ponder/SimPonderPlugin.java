@@ -4,11 +4,11 @@ import com.simibubi.create.foundation.ponder.CreatePonderPlugin;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimPonderScenes;
 import dev.simulated_team.simulated.index.SimPonderTags;
-import net.createmod.ponder.api.level.PonderLevel;
-import net.createmod.ponder.api.registration.IndexExclusionHelper;
-import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
-import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
-import net.createmod.ponder.api.registration.SharedTextRegistrationHelper;
+import net.createmod.ponder.api.client.level.PonderLevel;
+import net.createmod.ponder.api.client.registration.IndexExclusionHelper;
+import net.createmod.ponder.api.client.registration.PonderSceneRegistrationHelper;
+import net.createmod.ponder.api.client.registration.PonderTagRegistrationHelper;
+import net.createmod.ponder.api.client.registration.SharedTextRegistrationHelper;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 

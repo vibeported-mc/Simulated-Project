@@ -1,6 +1,6 @@
 package dev.eriksonn.aeronautics.config.client;
 
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 
 public class AeroClient extends ConfigBase {
 	@Override

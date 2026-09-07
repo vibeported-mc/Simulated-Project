@@ -2,10 +2,10 @@ package dev.eriksonn.aeronautics.content.ponder.instructions;
 
 import dev.eriksonn.aeronautics.mixin.ponder.TickingInstructionAccessor;
 import dev.eriksonn.aeronautics.mixinterface.TickingInstructionExtension;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.instruction.AnimateElementInstruction;
-import net.createmod.ponder.foundation.instruction.PonderInstruction;
-import net.createmod.ponder.foundation.instruction.TickingInstruction;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.impl.client.instruction.AnimateElementInstruction;
+import net.createmod.ponder.api.client.instruction.PonderInstruction;
+import net.createmod.ponder.impl.client.instruction.TickingInstruction;
 
 public class TickingStoppingInstruction extends PonderInstruction {
 

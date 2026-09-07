@@ -3,8 +3,8 @@ package dev.simulated_team.simulated.ponder.instructions;
 import dev.simulated_team.simulated.ponder.outliners.LerpedLineOutline;
 import dev.simulated_team.simulated.ponder.records.PonderLineRecord;
 import it.unimi.dsi.fastutil.floats.FloatUnaryOperator;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.instruction.TickingInstruction;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.impl.client.instruction.TickingInstruction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 

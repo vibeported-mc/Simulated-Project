@@ -10,7 +10,7 @@ import dev.ryanhcode.offroad.content.blocks.borehead_bearing.BoreheadBearingBloc
 import dev.ryanhcode.offroad.content.entities.BoreheadContraptionEntity;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.SubLevelHelper;
-import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.api.animation.LerpedFloat;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

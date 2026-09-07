@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.config.client.block;
 
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 import org.jspecify.annotations.NonNull;
 
 public class SimBlockConfigs extends ConfigBase {

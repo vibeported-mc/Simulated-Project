@@ -2,11 +2,11 @@ package dev.simulated_team.simulated.ponder.instructions;
 
 import dev.simulated_team.simulated.mixin.accessor.WorldSectionElementAccessor;
 import dev.simulated_team.simulated.util.SimMathUtils;
-import net.createmod.ponder.api.element.ElementLink;
-import net.createmod.ponder.api.element.ParrotElement;
-import net.createmod.ponder.api.element.WorldSectionElement;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.instruction.TickingInstruction;
+import net.createmod.ponder.api.client.element.ElementLink;
+import net.createmod.ponder.api.client.element.ParrotElement;
+import net.createmod.ponder.api.client.element.WorldSectionElement;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.impl.client.instruction.TickingInstruction;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 

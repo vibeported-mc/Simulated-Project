@@ -27,7 +27,7 @@ import dev.simulated_team.simulated.multiloader.inventory.InventoryLoaderWrapper
 import dev.simulated_team.simulated.multiloader.inventory.ItemInfoWrapper;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.createmod.catnip.lang.FontHelper;
+import net.createmod.catnip.api.client.lang.FontHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

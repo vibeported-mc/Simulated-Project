@@ -1,8 +1,8 @@
 package dev.eriksonn.aeronautics.content.ponder.instructions;
 
 import dev.eriksonn.aeronautics.content.blocks.propeller.bearing.propeller_bearing.PropellerBearingBlockEntity;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.instruction.PonderInstruction;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.api.client.instruction.PonderInstruction;
 import net.minecraft.core.BlockPos;
 
 public class SetPropellerSailsInstruction extends PonderInstruction {

@@ -5,7 +5,7 @@ import dev.simulated_team.simulated.content.entities.honey_glue.HoneyGlueEntity;
 import dev.simulated_team.simulated.content.entities.honey_glue.HoneyGlueMaxSizing;
 import dev.simulated_team.simulated.index.SimSoundEvents;
 import foundry.veil.api.network.handler.PacketContext;
-import net.createmod.catnip.data.Pair;
+import net.createmod.catnip.api.data.Pair;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

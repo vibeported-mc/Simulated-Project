@@ -8,7 +8,7 @@ import com.tterrag.registrate.util.entry.RegistryEntry;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.api.ConditionalDisplayTarget;
 import dev.simulated_team.simulated.data.SimLang;
-import net.createmod.catnip.theme.Color;
+import net.createmod.catnip.api.theme.Color;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 

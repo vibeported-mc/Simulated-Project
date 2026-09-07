@@ -14,8 +14,8 @@ import dev.simulated_team.simulated.index.SimResourceManagers;
 import dev.simulated_team.simulated.index.ponder.SimPonderPlugin;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.platform.VeilEventPlatform;
-import net.createmod.catnip.render.SuperByteBufferCache;
-import net.createmod.ponder.foundation.PonderIndex;
+import net.createmod.catnip.api.client.render.SuperByteBufferCache;
+import net.createmod.ponder.api.client.PonderIndex;
 
 public class SimulatedClient {
 

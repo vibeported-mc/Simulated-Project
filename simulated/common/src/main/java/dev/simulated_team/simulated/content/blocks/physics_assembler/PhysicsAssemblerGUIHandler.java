@@ -11,7 +11,7 @@ import dev.simulated_team.simulated.index.SimSoundEvents;
 import dev.simulated_team.simulated.network.packets.AssemblePacket;
 import dev.simulated_team.simulated.util.hold_interaction.BlockHoldInteraction;
 import foundry.veil.api.network.VeilPacketManager;
-import net.createmod.catnip.animation.AnimationTickHolder;
+import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;

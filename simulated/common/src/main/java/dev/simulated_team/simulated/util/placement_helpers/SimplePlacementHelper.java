@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.util.placement_helpers;
 
-import net.createmod.catnip.placement.IPlacementHelper;
+import net.createmod.catnip.api.placement.IPlacementHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 

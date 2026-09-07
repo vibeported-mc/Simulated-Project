@@ -13,7 +13,7 @@ import dev.ryanhcode.offroad.events.OffroadCommonEvents;
 import dev.ryanhcode.offroad.index.*;
 import dev.ryanhcode.offroad.network.OffroadPacketManager;
 import dev.ryanhcode.sable.platform.SableEventPlatform;
-import net.createmod.catnip.lang.FontHelper;
+import net.createmod.catnip.api.client.lang.FontHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;

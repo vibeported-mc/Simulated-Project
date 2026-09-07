@@ -2,9 +2,9 @@ package dev.simulated_team.simulated.ponder.instructions;
 
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
 import dev.simulated_team.simulated.ponder.elements.rope.RopeStrandElement;
-import net.createmod.ponder.api.element.ElementLink;
-import net.createmod.ponder.foundation.element.ElementLinkImpl;
-import net.createmod.ponder.foundation.instruction.FadeOutOfSceneInstruction;
+import net.createmod.ponder.api.client.element.ElementLink;
+import net.createmod.ponder.impl.client.element.ElementLinkImpl;
+import net.createmod.ponder.impl.client.instruction.FadeOutOfSceneInstruction;
 import net.minecraft.core.Direction;
 
 public class RemoveRopeStrandInstruction extends FadeOutOfSceneInstruction<RopeStrandElement> {

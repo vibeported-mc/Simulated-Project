@@ -31,39 +31,45 @@ dependencies {
 
     compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${project.minecraft_version}:${project.sable_companion_version}")
 
-    api("top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}")
-    compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
-    localRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
-
-    api("com.simibubi.create:create-${minecraft_version}:${create_version}") { transitive = false }
-    api("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
+    // The Create ecosystem, built from source for 26.2 and served by mavenLocal. Registrate,
+    // Ponder, Catnip and Flywheel all ship nested inside Create's jar, so they must not also be on
+    // the runtime classpath: FML refuses to start when two modules export the same package
+    // ("Modules Registrate and Registrate.MC26._2._86a1c38 export package
+    // com.tterrag.registrate.builders"). Compile against them, let Create supply them at run time.
+    implementation("com.simibubi.create:create-${minecraft_version}:${create_version}") { transitive = false }
+    compileOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}")
+    compileOnly("net.createmod.catnip:catnip-neoforge:${ponder_version}")
     compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}")
-    implementation("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
     compileOnly("com.tterrag.registrate:Registrate:${registrate_version}")
 
+    // Sable nests Veil and the Companion in its own jar, exactly as Create nests the four above, so
+    // both arrive transitively at run time and neither is declared by these mods' mods.toml.
     implementation("foundry.veil:veil-neoforge-${minecraft_version}:${project.veil_version}") {
         exclude group: "maven.modrinth"
+        exclude group: "me.fallenbreath"
+        exclude group: "com.tterrag.registrate"
     }
 
     api ("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:$sable_version") {
         exclude group: "foundry.veil"
         exclude group: "com.tterrag.registrate"
     }
-    // Mod compat
-    compileOnly("cc.tweaked:cc-tweaked-$minecraft_version-core-api:$computercraft_tweaked_version")
-    compileOnly("cc.tweaked:cc-tweaked-$minecraft_version-forge-api:$computercraft_tweaked_version")
-    runtimeOnly("cc.tweaked:cc-tweaked-$minecraft_version-forge:$computercraft_tweaked_version")
 
-    implementation("maven.modrinth:natures-compass:$minecraft_version-$natures_compass_version-neoforge")
-    implementation("maven.modrinth:explorers-compass:$minecraft_version-$explorers_compass_version-neoforge")
-    compileOnly("maven.modrinth:iris:$iris_version")
-    compileOnly("maven.modrinth:sodium:$rootProject.sodium_version")
+    // 26.2 port: Curios, JEI, ComputerCraft, Nature's Compass, Explorer's Compass, Sodium and Iris
+    // are all cut -- none has a 26.2 build. See gradle.properties.
 }
+
+evaluationDependsOn(project.path.contains(':') ? ":${project.parent.name}:common" : ':common')
 
 tasks.named('compileJava', JavaCompile) {
     dependsOn(configurations.commonJava)
     source(configurations.commonJava)
+    // source(FileCollection) is a plain file tree: it does not carry the common source set's own
+    // exclude patterns, so a file parked on the common side is compiled here regardless unless the
+    // same excludes are applied to this task. Sable hit exactly this.
+    def commonProject = project.path.contains(':') ? project(":${project.parent.name}:common") : project(':common')
+    exclude(commonProject.sourceSets.main.java.excludes as List)
 }
 
 processResources {

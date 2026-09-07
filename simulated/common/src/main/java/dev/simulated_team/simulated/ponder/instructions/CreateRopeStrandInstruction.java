@@ -1,7 +1,7 @@
 package dev.simulated_team.simulated.ponder.instructions;
 
 import dev.simulated_team.simulated.ponder.elements.rope.RopeStrandElement;
-import net.createmod.ponder.foundation.instruction.FadeIntoSceneInstruction;
+import net.createmod.ponder.impl.client.instruction.FadeIntoSceneInstruction;
 import net.minecraft.core.Direction;
 
 public class CreateRopeStrandInstruction extends FadeIntoSceneInstruction<RopeStrandElement> {

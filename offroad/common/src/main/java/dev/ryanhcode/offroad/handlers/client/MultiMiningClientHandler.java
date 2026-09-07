@@ -7,7 +7,7 @@ import dev.ryanhcode.offroad.mixin.client.multimining_destruction_progress.Clien
 import dev.ryanhcode.offroad.mixin_interface.level_renderer.MultiMiningDestructionExtension;
 import dev.ryanhcode.sable.util.LevelAccelerator;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.createmod.ponder.api.level.PonderLevel;
+import net.createmod.ponder.api.client.level.PonderLevel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;

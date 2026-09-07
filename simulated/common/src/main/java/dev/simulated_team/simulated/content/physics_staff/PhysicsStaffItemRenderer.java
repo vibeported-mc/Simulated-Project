@@ -14,8 +14,7 @@ import dev.simulated_team.simulated.index.SimRenderTypes;
 import dev.simulated_team.simulated.util.SimDistUtil;
 import dev.simulated_team.simulated.util.SimMathUtils;
 import foundry.veil.Veil;
-import net.createmod.catnip.animation.AnimationTickHolder;
-import net.irisshaders.iris.Iris;
+import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -91,7 +90,11 @@ public class PhysicsStaffItemRenderer extends CustomRenderedItemModelRenderer {
         final float tiltAmount = Mth.lerp(partialTicks, clientHandler.previousTilt, clientHandler.tilt);
         final Quaternionf utilQuat = new Quaternionf();
 
-        boolean shadersActive = Veil.IRIS && Iris.isPackInUseQuick();
+        // 26.2 port: Iris has no build, so Iris.isPackInUseQuick() cannot be called and this asks
+        // only whether Iris is loaded. That is a weaker question -- it would be true with Iris
+        // present but no pack selected -- and it is unobservable while Veil.IRIS is always false.
+        // Restore the pack check with the dependency.
+        boolean shadersActive = Veil.IRIS;
 
         if (context.firstPerson()) {
             if (clientHandler.getDragSession() != null) {

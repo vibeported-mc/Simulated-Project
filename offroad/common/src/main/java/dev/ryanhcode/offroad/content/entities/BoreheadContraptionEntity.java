@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.Vec3;
 
-import static net.createmod.catnip.math.AngleHelper.angleLerp;
+import static net.createmod.catnip.api.math.AngleHelper.angleLerp;
 
 public class BoreheadContraptionEntity extends ControlledContraptionEntity {
 

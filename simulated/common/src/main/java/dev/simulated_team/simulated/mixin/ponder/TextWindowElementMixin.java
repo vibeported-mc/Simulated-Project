@@ -3,7 +3,7 @@ package dev.simulated_team.simulated.mixin.ponder;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import dev.simulated_team.simulated.mixin_interface.ponder.TextWindowElementExtension;
-import net.createmod.ponder.foundation.element.TextWindowElement;
+import net.createmod.ponder.impl.client.element.TextWindowElement;
 import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

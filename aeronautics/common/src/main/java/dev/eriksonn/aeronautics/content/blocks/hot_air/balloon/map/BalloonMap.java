@@ -11,7 +11,7 @@ import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
 import dev.ryanhcode.sable.sublevel.storage.SubLevelRemovalReason;
 import it.unimi.dsi.fastutil.objects.*;
-import net.createmod.catnip.data.WorldAttached;
+import net.createmod.catnip.api.data.WorldAttached;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;

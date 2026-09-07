@@ -2,7 +2,7 @@ package dev.simulated_team.simulated.config.client;
 
 import dev.simulated_team.simulated.config.client.items.SimItemConfigs;
 import dev.simulated_team.simulated.config.client.block.SimBlockConfigs;
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 import org.jspecify.annotations.NonNull;
 
 public class SimClient extends ConfigBase {

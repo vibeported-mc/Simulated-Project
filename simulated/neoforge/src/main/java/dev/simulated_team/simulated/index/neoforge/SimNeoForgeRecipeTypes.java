@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.data.neoforge.PortableEngineDyeingRecipe;
-import net.createmod.catnip.lang.Lang;
+import net.createmod.catnip.api.lang.Lang;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;

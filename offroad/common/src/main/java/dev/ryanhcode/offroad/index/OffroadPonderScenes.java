@@ -3,7 +3,7 @@ package dev.ryanhcode.offroad.index;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import dev.ryanhcode.offroad.Offroad;
 import dev.ryanhcode.offroad.content.ponder.scenes.BoreheadBearingScenes;
-import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
+import net.createmod.ponder.api.client.registration.PonderSceneRegistrationHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

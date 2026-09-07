@@ -9,7 +9,7 @@ import dev.simulated_team.simulated.content.blocks.physics_assembler.PhysicsAsse
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.mixin_interface.assembly_preventer.PrimaryAssemblerExtension;
 import dev.simulated_team.simulated.service.SimConfigService;
-import net.createmod.catnip.lang.LangBuilder;
+import net.createmod.catnip.api.lang.LangBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 

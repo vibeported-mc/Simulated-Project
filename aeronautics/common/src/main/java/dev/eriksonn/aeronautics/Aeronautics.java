@@ -13,7 +13,7 @@ import dev.eriksonn.aeronautics.index.*;
 import dev.eriksonn.aeronautics.network.AeroPacketManager;
 import dev.eriksonn.aeronautics.registry.AeroRegistrate;
 import dev.ryanhcode.sable.platform.SableEventPlatform;
-import net.createmod.catnip.lang.FontHelper;
+import net.createmod.catnip.api.client.lang.FontHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;

@@ -9,7 +9,7 @@ import dev.ryanhcode.offroad.data.OffroadLang;
 import dev.ryanhcode.offroad.index.OffroadBlockEntityTypes;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.createmod.catnip.lang.LangBuilder;
+import net.createmod.catnip.api.lang.LangBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;

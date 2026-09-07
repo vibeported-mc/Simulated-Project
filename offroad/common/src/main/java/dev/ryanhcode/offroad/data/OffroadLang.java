@@ -8,10 +8,10 @@ import dev.ryanhcode.offroad.Offroad;
 import dev.ryanhcode.offroad.content.ponder.OffroadPonderPlugin;
 import dev.ryanhcode.offroad.index.OffroadAdvancements;
 import dev.ryanhcode.offroad.index.OffroadSoundEvents;
-import net.createmod.catnip.lang.Lang;
-import net.createmod.catnip.lang.LangBuilder;
-import net.createmod.catnip.lang.LangNumberFormat;
-import net.createmod.ponder.foundation.PonderIndex;
+import net.createmod.catnip.api.lang.Lang;
+import net.createmod.catnip.api.lang.LangBuilder;
+import net.createmod.catnip.api.client.lang.LangNumberFormat;
+import net.createmod.ponder.api.client.PonderIndex;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 

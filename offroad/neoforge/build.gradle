@@ -16,9 +16,13 @@ neoForge {
         accessTransformers.from(at.absolutePath)
     }
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
+    // 26.2 ships unobfuscated and has no Parchment release; the guard keeps the block for the
+    // day one exists rather than deleting it.
+    if (parchment_version != "none") {
+        parchment {
+            minecraftVersion = parchment_minecraft == "same" ? minecraft_version : parchment_minecraft
+            mappingsVersion = parchment_version
+        }
     }
 
     runs {
@@ -50,4 +54,16 @@ neoForge {
 
 sourceSets.main.resources {
     srcDir generatedResources.absolutePath
+}
+
+// Port scaffolding: report every error, not javac's default first 100.
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Xmaxerrs', '100000']
+}
+
+// ModDevGradle 2.0.144 does not know Minecraft 26.2, so its version capability table falls back to
+// requesting Java 21 for the NeoFormRuntime tasks. Gradle 9 cannot auto-provision one either: the
+// foojay resolver still references JvmVendorSpec.IBM_SEMERU, which Gradle 9 removed.
+tasks.withType(net.neoforged.nfrtgradle.NeoFormRuntimeTask).configureEach {
+    javaExecutable.set(javaToolchains.launcherFor(java.toolchain).map { it.executablePath.asFile.absolutePath })
 }

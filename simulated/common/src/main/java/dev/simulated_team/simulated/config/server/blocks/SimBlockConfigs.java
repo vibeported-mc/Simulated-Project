@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.config.server.blocks;
 
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 
 public class SimBlockConfigs extends ConfigBase {
 

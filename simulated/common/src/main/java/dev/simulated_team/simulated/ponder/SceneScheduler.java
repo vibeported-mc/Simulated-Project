@@ -4,10 +4,10 @@ import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.util.SimDistUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.createmod.ponder.api.scene.SceneBuilder;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.PonderSceneBuilder;
-import net.createmod.ponder.foundation.instruction.PonderInstruction;
+import net.createmod.ponder.api.client.scene.SceneBuilder;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.api.client.scene.PonderSceneBuilder;
+import net.createmod.ponder.api.client.instruction.PonderInstruction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 

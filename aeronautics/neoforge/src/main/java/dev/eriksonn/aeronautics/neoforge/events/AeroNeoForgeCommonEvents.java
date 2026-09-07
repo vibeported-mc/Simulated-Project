@@ -7,7 +7,7 @@ import dev.eriksonn.aeronautics.index.*;
 import dev.eriksonn.aeronautics.neoforge.data.recipe.AeroProcessingRecipeGen;
 import dev.eriksonn.aeronautics.neoforge.index.AeroFluidsNeoForge;
 import dev.eriksonn.aeronautics.neoforge.service.NeoForgeAeroConfigService;
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;

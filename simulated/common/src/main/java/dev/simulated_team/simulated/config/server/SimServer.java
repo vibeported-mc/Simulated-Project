@@ -5,7 +5,7 @@ import dev.simulated_team.simulated.config.server.blocks.SimBlockConfigs;
 import dev.simulated_team.simulated.config.server.blocks.SimKinetics;
 import dev.simulated_team.simulated.config.server.items.SimEquipment;
 import dev.simulated_team.simulated.config.server.physics.SimPhysics;
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 
 public class SimServer extends ConfigBase {
     public final SimKinetics kinetics = this.nested(0, SimKinetics::new, Comments.kinetics);

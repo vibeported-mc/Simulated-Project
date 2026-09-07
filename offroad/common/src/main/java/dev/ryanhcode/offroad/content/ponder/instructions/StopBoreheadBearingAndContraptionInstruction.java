@@ -2,8 +2,8 @@ package dev.ryanhcode.offroad.content.ponder.instructions;
 
 import dev.ryanhcode.offroad.content.blocks.borehead_bearing.BoreheadBearingBlockEntity;
 import dev.ryanhcode.offroad.index.OffroadBlockEntityTypes;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.instruction.PonderInstruction;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.api.client.instruction.PonderInstruction;
 import net.minecraft.core.BlockPos;
 
 import java.util.Optional;

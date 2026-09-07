@@ -2,7 +2,7 @@ package dev.simulated_team.simulated.config.client.items;
 
 import dev.simulated_team.simulated.client.BlockPropertiesTooltip;
 import dev.simulated_team.simulated.config.client.SimClient;
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 
 public class SimItemConfigs extends ConfigBase {
     public final ConfigEnum<BlockPropertiesTooltip.Condition> displayProperties =

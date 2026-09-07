@@ -1,8 +1,8 @@
 package dev.simulated_team.simulated.mixin.new_ponder;
 
 import dev.simulated_team.simulated.ponder.new_ponder_tooltip.NewPonderTooltipManager;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.registration.PonderSceneRegistry;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.impl.client.registration.PonderSceneRegistry;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

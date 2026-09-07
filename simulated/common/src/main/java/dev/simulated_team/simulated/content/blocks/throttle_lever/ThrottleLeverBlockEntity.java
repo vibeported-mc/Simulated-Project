@@ -7,7 +7,7 @@ import com.simibubi.create.foundation.utility.CreateLang;
 import dev.simulated_team.simulated.content.blocks.behaviour.HoldTipBehaviour;
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimClickInteractions;
-import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.api.animation.LerpedFloat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;

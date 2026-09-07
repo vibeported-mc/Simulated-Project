@@ -2,9 +2,9 @@ package dev.simulated_team.simulated.mixin.ponder;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.simulated_team.simulated.mixin_interface.ponder.PonderSceneExtension;
-import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.api.animation.LerpedFloat;
 import net.createmod.catnip.render.SuperRenderTypeBuffer;
-import net.createmod.ponder.foundation.PonderScene;
+import net.createmod.ponder.api.client.scene.PonderScene;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;

@@ -1,7 +1,7 @@
 package dev.simulated_team.simulated.content.entities.honey_glue;
 
 import dev.simulated_team.simulated.service.SimConfigService;
-import net.createmod.catnip.data.Pair;
+import net.createmod.catnip.api.data.Pair;
 import net.minecraft.world.phys.AABB;
 
 public class HoneyGlueMaxSizing {

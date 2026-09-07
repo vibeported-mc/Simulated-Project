@@ -1,7 +1,7 @@
 package dev.simulated_team.simulated.index;
 
 import dev.simulated_team.simulated.Simulated;
-import net.createmod.catnip.render.BindableTexture;
+import net.createmod.catnip.api.client.render.BindableTexture;
 import net.minecraft.resources.ResourceLocation;
 
 public enum SimSpecialTextures implements BindableTexture {

@@ -4,7 +4,10 @@ plugins {
 }
 
 neoForge {
-    neoFormVersion = neo_form_version
+    // 26.2 port: NeoForge is the only loader these mods have, so `common` compiles against
+    // the real NeoForge distribution rather than bare NeoForm -- there is no second loader
+    // for the abstraction to pay for, and NeoForm publishes nothing for 26.2 anyway.
+    version = neoforge_version
 
     // Automatically enable AccessTransformers if the file exists
     def at = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -13,9 +16,11 @@ neoForge {
         accessTransformers.from(at.absolutePath)
     }
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
+    if (parchment_version != "none") {
+        parchment {
+            minecraftVersion = parchment_minecraft == "same" ? minecraft_version : parchment_minecraft
+            mappingsVersion = parchment_version
+        }
     }
 }
 
@@ -43,3 +48,22 @@ artifacts {
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
 }
 
+// Port scaffolding: report every error, not javac's default first 100.
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Xmaxerrs', '100000']
+}
+
+// ModDevGradle 2.0.144 does not know Minecraft 26.2, so its version capability table falls back to
+// requesting Java 21 for the NeoFormRuntime tasks. Gradle 9 cannot auto-provision one either.
+tasks.withType(net.neoforged.nfrtgradle.NeoFormRuntimeTask).configureEach {
+    javaExecutable.set(javaToolchains.launcherFor(java.toolchain).map { it.executablePath.asFile.absolutePath })
+}
+
+// 26.2 port: Sodium has a 26.2 build but Veil's Sodium integration does not, and Aeronautics'
+// Sodium mixin exists only to run before Sable's -- which is on the vanilla path here. Iris has no
+// 26.2 build at all. Both are gated off by AeroMixinPlugin regardless; excluding the sources keeps
+// them from needing to compile against absent classes.
+sourceSets.main.java {
+    exclude 'dev/eriksonn/aeronautics/mixin/render/sodium/**'
+    exclude 'dev/eriksonn/aeronautics/mixin/render/iris/**'
+}

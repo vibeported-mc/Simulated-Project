@@ -22,7 +22,7 @@ import dev.simulated_team.simulated.multiloader.tanks.neoforge.SingleTankWrapper
 import dev.simulated_team.simulated.neoforge.service.NeoForgeSimConfigService;
 import dev.simulated_team.simulated.neoforge.service.NeoForgeSimInventoryService;
 import dev.simulated_team.simulated.util.hold_interaction.HoldInteractionManager;
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;

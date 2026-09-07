@@ -1,12 +1,12 @@
 package dev.eriksonn.aeronautics.mixin.ponder;
 
-import net.createmod.ponder.api.element.AnimatedSceneElement;
-import net.createmod.ponder.api.element.WorldSectionElement;
-import net.createmod.ponder.api.scene.Selection;
-import net.createmod.ponder.foundation.PonderScene;
-import net.createmod.ponder.foundation.element.WorldSectionElementImpl;
-import net.createmod.ponder.foundation.instruction.DisplayWorldSectionInstruction;
-import net.createmod.ponder.foundation.instruction.FadeIntoSceneInstruction;
+import net.createmod.ponder.api.client.element.AnimatedSceneElement;
+import net.createmod.ponder.api.client.element.WorldSectionElement;
+import net.createmod.ponder.api.client.scene.Selection;
+import net.createmod.ponder.api.client.scene.PonderScene;
+import net.createmod.ponder.impl.client.element.WorldSectionElementImpl;
+import net.createmod.ponder.impl.client.instruction.DisplayWorldSectionInstruction;
+import net.createmod.ponder.impl.client.instruction.FadeIntoSceneInstruction;
 import net.minecraft.core.Direction;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

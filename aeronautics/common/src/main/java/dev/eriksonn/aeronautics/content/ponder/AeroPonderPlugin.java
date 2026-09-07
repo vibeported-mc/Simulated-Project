@@ -3,11 +3,11 @@ package dev.eriksonn.aeronautics.content.ponder;
 import com.simibubi.create.foundation.ponder.CreatePonderPlugin;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.index.AeroPonderScenes;
-import net.createmod.ponder.api.level.PonderLevel;
-import net.createmod.ponder.api.registration.IndexExclusionHelper;
-import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
-import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
-import net.createmod.ponder.api.registration.SharedTextRegistrationHelper;
+import net.createmod.ponder.api.client.level.PonderLevel;
+import net.createmod.ponder.api.client.registration.IndexExclusionHelper;
+import net.createmod.ponder.api.client.registration.PonderSceneRegistrationHelper;
+import net.createmod.ponder.api.client.registration.PonderTagRegistrationHelper;
+import net.createmod.ponder.api.client.registration.SharedTextRegistrationHelper;
 import net.minecraft.resources.ResourceLocation;
 
 public class AeroPonderPlugin extends CreatePonderPlugin {

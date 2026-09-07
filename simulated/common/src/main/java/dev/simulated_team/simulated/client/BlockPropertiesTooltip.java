@@ -13,7 +13,7 @@ import dev.simulated_team.simulated.mixin.accessor.BlockBehaviourAccessor;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import dev.simulated_team.simulated.util.SimColors;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.createmod.ponder.foundation.ui.PonderUI;
+import net.createmod.ponder.impl.client.gui.PonderUI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;

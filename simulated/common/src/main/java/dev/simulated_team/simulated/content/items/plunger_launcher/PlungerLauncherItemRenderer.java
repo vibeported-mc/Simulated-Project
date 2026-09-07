@@ -13,9 +13,9 @@ import dev.simulated_team.simulated.content.entities.launched_plunger.LaunchedPl
 import dev.simulated_team.simulated.index.SimItems;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.mixin_interface.PlayerLaunchedPlungerExtension;
-import net.createmod.catnip.math.VecHelper;
-import net.createmod.catnip.render.CachedBuffers;
-import net.createmod.catnip.render.SuperByteBuffer;
+import net.createmod.catnip.api.math.VecHelper;
+import net.createmod.catnip.api.client.render.CachedBuffers;
+import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;

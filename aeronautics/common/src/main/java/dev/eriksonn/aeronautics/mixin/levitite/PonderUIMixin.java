@@ -1,7 +1,7 @@
 package dev.eriksonn.aeronautics.mixin.levitite;
 
 import dev.eriksonn.aeronautics.content.blocks.levitite.LevititeShaderManager;
-import net.createmod.ponder.foundation.ui.PonderUI;
+import net.createmod.ponder.impl.client.gui.PonderUI;
 import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -12,9 +12,9 @@ import dev.simulated_team.simulated.mixin.accessor.RedstoneLinkBlockEntityAccess
 import dev.simulated_team.simulated.network.packets.linked_typewriter.TypewriterSaveKeyToItemPacket;
 import dev.simulated_team.simulated.util.SimColors;
 import foundry.veil.api.network.VeilPacketManager;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.lang.FontHelper;
-import net.createmod.catnip.outliner.Outliner;
+import net.createmod.catnip.api.data.Couple;
+import net.createmod.catnip.api.client.lang.FontHelper;
+import net.createmod.catnip.api.client.outliner.Outliner;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
