@@ -71,7 +71,7 @@ public class AugerShaftScenes {
                 .placeNearTarget()
                 .pointAt(vector.blockSurface(util.grid().at(2,2, 2), Direction.WEST));
         for (int i = 0; i < 3; i++) {
-            final ItemStack stack = new ItemStack(Items.COPPER_BLOCK.pick(WeatheringCopper.WeatherState.UNAFFECTED).asItem());
+            final ItemStack stack = new ItemStack(Items.COPPER_BLOCK.weathering().pick(WeatheringCopper.WeatherState.UNAFFECTED));
             final ElementLink<EntityElement> remove =
                     world.createItemEntity(new Vec3(2.5, 5, 1.5), Vec3.ZERO, stack);
             scene.idle(9);
@@ -138,7 +138,7 @@ public class AugerShaftScenes {
         world.showSection(validFunnel, Direction.DOWN);
         scene.idle(12);
         world.modifyBlock(new BlockPos(2, 2, 4), s -> s.setValue(AugerShaftBlock.WEST, true), false);
-        world.createItemOnBeltLike(new BlockPos(1,1,4), Direction.EAST, new ItemStack(Items.COPPER_BLOCK.pick(WeatheringCopper.WeatherState.UNAFFECTED).asItem()));
+        world.createItemOnBeltLike(new BlockPos(1,1,4), Direction.EAST, new ItemStack(Items.COPPER_BLOCK.weathering().pick(WeatheringCopper.WeatherState.UNAFFECTED)));
     }
 
     public static void augerShaftExtracting(final SceneBuilder builder, final SceneBuildingUtil util) {

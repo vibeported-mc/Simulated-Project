@@ -9,6 +9,7 @@ import com.simibubi.create.content.redstone.displayLink.DisplayLinkContext;
 import com.simibubi.create.content.redstone.displayLink.DisplayLinkScreen;
 import com.simibubi.create.foundation.gui.widget.Label;
 import dev.simulated_team.simulated.api.ConditionalDisplayTarget;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
@@ -26,7 +27,7 @@ public class DisplayLinkScreenMixin {
     private Component simulated$displayConditionalError(final DisplayTarget instance, final int line, final Operation<Component> original, @Local(name = "level") final ClientLevel level) {
         final DisplayLinkContext context = new DisplayLinkContext(level, this.blockEntity);
         if (instance instanceof final ConditionalDisplayTarget cdt && !cdt.allowsWriting(context)) {
-            this.targetLineLabel.colored(ChatFormatting.GRAY.getColor());
+            this.targetLineLabel.colored(TextColor.GRAY.getValue());
             return cdt.getErrorMessage(context);
         }
         return original.call(instance, line);

@@ -61,7 +61,7 @@ public abstract class LightTextureMixin implements LightTextureExtension {
                 final int r = (int) color.x();
                 final int g = (int) color.y();
                 final int b = (int) color.z();
-                this.lightPixels.setPixelRGBA(y, x, -16777216 | b << 16 | g << 8 | r);
+                this.lightPixels.setPixel(y, x, -16777216 | b << 16 | g << 8 | r);
             }
         }
 
