@@ -248,7 +248,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         super.read(tag, registries, clientPacket);
 
         this.typedEntry = tag.getStringOr("typedEntry", "");
-        this.entryMap = LinkedTypewriterEntries.readKeys(registries, tag.getList("Keys", 10), this.getBlockPos());
+        this.entryMap = LinkedTypewriterEntries.readKeys(registries, tag.getListOrEmpty("Keys"), this.getBlockPos());
         if (tag.contains("CurrentUser")) {
             this.currentUser = tag.read("CurrentUser", UUIDUtil.CODEC).orElseThrow();
         } else {
@@ -304,7 +304,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         if (simulate) {
             return true;
         }
-        this.entryMap = LinkedTypewriterEntries.readKeys(registries, tag.getList("Keys", 10), this.getBlockPos());
+        this.entryMap = LinkedTypewriterEntries.readKeys(registries, tag.getListOrEmpty("Keys"), this.getBlockPos());
         return true;
     }
 

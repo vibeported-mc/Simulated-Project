@@ -611,7 +611,7 @@ public class BoreheadBearingBlockEntity extends MechanicalBearingBlockEntity imp
                     this.centerMiningPositions.add(new Vector3d()); //populate the correct number of entries
                 }
 
-                final ListTag originTagList = compound.getList("OriginPositions", CompoundTag.TAG_COMPOUND);
+                final ListTag originTagList = compound.getListOrEmpty("OriginPositions");
                 for (final Tag tag : originTagList) {
                     final CompoundTag originCompoundTag = (CompoundTag) tag;
                     final int indexPos = originCompoundTag.getInt("indexPosition");

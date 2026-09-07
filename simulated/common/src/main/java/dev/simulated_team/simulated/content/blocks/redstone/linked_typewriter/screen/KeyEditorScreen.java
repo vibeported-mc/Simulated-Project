@@ -16,6 +16,7 @@ import net.createmod.catnip.api.client.gui.element.GuiGameElement;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.joml.Matrix3x2fStack;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -223,7 +224,7 @@ public class KeyEditorScreen {
         this.deactivateAllWidgets();
     }
 
-    public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
+    public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final Matrix3x2fStack ps) {
         guiGraphics.enableScissor(0, this.topPos() + 20, this.parentScreen.width, this.topPos() + KEY_MENU.height - 35);
 
         for (final KeyEntryWidget wrapper : this.keyboardEntryWrappers) {
@@ -308,11 +309,11 @@ public class KeyEditorScreen {
                     + (index * (SimGUITextures.LINKED_TYPEWRITER_KEY_ENTRY.height + ENTRY_HEIGHT_PADDING_PIXELS));
         }
 
-        public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
-            ps.pushPose();
+        public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final Matrix3x2fStack ps) {
+            ps.pushMatrix();
             final int x = KeyEditorScreen.this.leftPos() + 12;
             final float y = this.getCurrentHeight(pt);
-            ps.translate(x, y, 0);
+            ps.translate(x, y);
 
             final int editIconOffset = 167;
             final float iconY = (float) KEY_ENTRY.height / 2;
@@ -320,25 +321,25 @@ public class KeyEditorScreen {
 
             this.renderItems(guiGraphics, ps);
 
-            ps.popPose();
+            ps.popMatrix();
         }
 
         public void extractBackground(final GuiGraphicsExtractor guiGraphics, final float pt, final int mouseX, final int mouseY) {
-            final PoseStack ps = guiGraphics.pose();
+            final Matrix3x2fStack ps = guiGraphics.pose();
 
             final int editIconOffset = 167;
             final float iconY = (float) KEY_ENTRY.height / 2;
 
-            ps.pushPose();
+            ps.pushMatrix();
             final int x = KeyEditorScreen.this.leftPos() + 12;
             final float y = this.getCurrentHeight(pt);
-            ps.translate(x, y, 0);
+            ps.translate(x, y);
 
             KEY_ENTRY.render(guiGraphics, 0, 0);
             this.renderText(guiGraphics, ps);
             this.renderWidgets(guiGraphics, mouseX, mouseY, pt, ps, editIconOffset, iconY);
 
-            ps.popPose();
+            ps.popMatrix();
         }
 
         private void updateWidgetPositions(final int x, final int editIconOffset, final float y, final float iconY) {
@@ -348,34 +349,34 @@ public class KeyEditorScreen {
             this.deleteWidget.setY((int) (y + iconY - 9));
         }
 
-        private void renderItems(final GuiGraphicsExtractor guiGraphics, final PoseStack ps) {
+        private void renderItems(final GuiGraphicsExtractor guiGraphics, final Matrix3x2fStack ps) {
             if (!KeyEditorScreen.this.parentScreen.modifier.modifying) {
-                ps.pushPose();
-                ps.translate(0, ((float) KEY_ENTRY.height / 2) - 8, 0);
+                ps.pushMatrix();
+                ps.translate(0, ((float) KEY_ENTRY.height / 2) - 8);
 
-                ps.translate(82, 0, 0);
+                ps.translate(82, 0);
                 GuiGameElement.of(this.entry.getFirstAsItemStack()).submit(guiGraphics);
-                ps.translate(18, 0, 0);
+                ps.translate(18, 0);
                 GuiGameElement.of(this.entry.getSecondAsItemStack()).submit(guiGraphics);
-                ps.popPose();
+                ps.popMatrix();
             }
         }
 
-        private void renderText(final GuiGraphicsExtractor guiGraphics, final PoseStack ps) {
-            ps.pushPose();
-            ps.translate((float) 9, 11, 0);
+        private void renderText(final GuiGraphicsExtractor guiGraphics, final Matrix3x2fStack ps) {
+            ps.pushMatrix();
+            ps.translate((float) 9, 11);
             guiGraphics.text(Minecraft.getInstance().font, InputConstants.Type.KEYSYM.getOrCreate(this.entry.glfwKeyCode).getDisplayName(), 0, 0, 0xFFFFFF, true);
-            ps.popPose();
+            ps.popMatrix();
         }
 
-        private void renderWidgets(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps, final int editIconOffset, final float iconY) {
-            ps.pushPose();
-            ps.translate(editIconOffset, iconY - 9, 0);
+        private void renderWidgets(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final Matrix3x2fStack ps, final int editIconOffset, final float iconY) {
+            ps.pushMatrix();
+            ps.translate(editIconOffset, iconY - 9);
             this.editWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
 
-            ps.translate(23, 0, 0);
+            ps.translate(23, 0);
             this.deleteWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
-            ps.popPose();
+            ps.popMatrix();
         }
     }
 

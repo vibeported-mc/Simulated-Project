@@ -24,6 +24,7 @@ import net.createmod.catnip.api.client.gui.element.GuiGameElement;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.joml.Matrix3x2fStack;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -243,38 +244,36 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
 
     @Override
     public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt) {
-        final PoseStack ps = guiGraphics.pose();
-        ps.pushPose();
-        ps.translate(0, 0, -1);
+        final Matrix3x2fStack ps = guiGraphics.pose();
+        ps.pushMatrix();
 
         super.extractRenderState(guiGraphics, mouseX, mouseY, pt);
 
         if (this.hoveredSlot != null && this.hoveredSlot.isActive() && this.hoveredSlot.hasItem()) {
 //            new ClientTextTooltip(Component.literal("awa").getVisualOrderText()).renderText(this.font, mouseX, mouseY, ps.last().pose(), guiGraphics.bufferSource());
-            guiGraphics.renderTooltip(this.font, this.hoveredSlot.getItem(), mouseX, mouseY);
+            guiGraphics.setTooltipForNextFrame(this.font, this.hoveredSlot.getItem(), mouseX, mouseY);
         }
 
-        ps.pushPose();
+        ps.pushMatrix();
 
         if (this.keyEditorScreen.active) {
-            this.keyEditorScreen.render(guiGraphics, mouseX, mouseY, pt, ps);
+            this.keyEditorScreen.extractRenderState(guiGraphics, mouseX, mouseY, pt, ps);
         }
 
-        ps.popPose();
-        ps.popPose();
+        ps.popMatrix();
+        ps.popMatrix();
     }
 
     @Override
     protected void renderForeground(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
 
-        final PoseStack ps = graphics.pose();
-        ps.pushPose();
+        final Matrix3x2fStack ps = graphics.pose();
+        ps.pushMatrix();
 
         if (this.modifier.modifying) {
-            ps.translate(0, 0, 200);
-            this.modifier.render(graphics, mouseX, mouseY, partialTicks, ps);
+            this.modifier.extractRenderState(graphics, mouseX, mouseY, partialTicks, ps);
         }
-        ps.popPose();
+        ps.popMatrix();
     }
 
     @Override
@@ -298,7 +297,7 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
 
             int i = 0;
             for (final KeyRow keyRow : this.allKeys) {
-                keyRow.render(guiGraphics, rx, ry + i * 14, mx, my, pt, true);
+                keyRow.extractRenderState(guiGraphics, rx, ry + i * 14, mx, my, pt, true);
                 i++;
             }
 
@@ -314,37 +313,26 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
         }
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>Was two draws: the block model through a GUI element, then the block entity through the
+     * dispatcher, with a mirror and two turns between them to line the second up with the first.
+     * A GUI element takes a block entity alongside its state now and draws both under one transform,
+     * so the correction has nothing left to correct.
+     */
     private void renderTypeWriter(final GuiGraphicsExtractor graphics, final int x, final int y) {
-        final PoseStack ps = graphics.pose();
+        final Matrix3x2fStack ps = graphics.pose();
 
-        final TransformStack<PoseTransformStack> msr = TransformStack.of(ps);
-        ps.pushPose();
-        msr.pushPose()
-                .translate(x + this.backgroundMain.width + 4, y + this.backgroundMain.height + 4, 100)
+        ps.pushMatrix();
+        ps.translate(x + this.backgroundMain.width + 4, y + this.backgroundMain.height + 4);
+
+        GuiGameElement.of(this.clientBe.getBlockState().setValue(LinkedTypewriterBlock.HORIZONTAL_FACING, Direction.WEST),
+                        this.clientBe)
+                .viewRotate(-22, 63, 0)
                 .scale(40)
-                .rotateXDegrees(-22)
-                .rotateYDegrees(63);
+                .submit(graphics);
 
-        GuiGameElement.of(this.clientBe.getBlockState().setValue(LinkedTypewriterBlock.HORIZONTAL_FACING, Direction.WEST))
-                .render(graphics);
-
-        msr.scale(-1);
-        msr.translate(-1, 0, -1);
-        msr.rotateCentered((float) -(0.25f * Math.PI * 2.0f), Direction.UP);
-
-        final float yRot = this.clientBe.getBlockState().getValue(LinkedTypewriterBlock.FACING).getOpposite().toYRot();
-        msr.rotateCentered((float) Math.toRadians(yRot), Direction.UP);
-
-        Minecraft.getInstance().getBlockEntityRenderDispatcher().renderItem(
-                this.clientBe,
-                ps,
-                graphics.bufferSource(),
-                255,
-                OverlayTexture.NO_OVERLAY
-        );
-
-        msr.popPose();
-        ps.popPose();
+        ps.popMatrix();
     }
 
     private void switchStates(final boolean newState) {
@@ -509,7 +497,7 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
         public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int x, final int y, final int mouseX, final int mouseY, final float pt, final boolean keyboardActive) {
             int length = 0;
             for (final KeyWidget key : this) {
-                key.render(guiGraphics, x + length, y, mouseX, mouseY, pt, keyboardActive);
+                key.extractRenderState(guiGraphics, x + length, y, mouseX, mouseY, pt, keyboardActive);
 
                 length += key.getWidth();
             }

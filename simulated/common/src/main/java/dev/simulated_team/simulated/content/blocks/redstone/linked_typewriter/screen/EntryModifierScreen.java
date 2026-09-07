@@ -12,6 +12,7 @@ import dev.simulated_team.simulated.index.SimGUITextures;
 import dev.simulated_team.simulated.network.packets.linked_typewriter.TypewriterMenuModifySlots;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.joml.Matrix3x2fStack;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemUtil;
 import net.minecraft.world.item.ItemStack;
@@ -102,28 +103,26 @@ public class EntryModifierScreen {
         return psuedoEntry;
     }
 
-    public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
+    public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final Matrix3x2fStack ps) {
         if (this.modifying) {
-            ps.pushPose();
+            ps.pushMatrix();
 
             this.confirmationWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
             this.promptWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
             this.cancelEntryWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
 
-            ps.popPose();
+            ps.popMatrix();
         }
     }
 
     public void renderBG(final GuiGraphicsExtractor guiGraphics) {
-        final PoseStack ps = guiGraphics.pose();
+        final Matrix3x2fStack ps = guiGraphics.pose();
 
-        ps.pushPose();
+        ps.pushMatrix();
         guiGraphics.fillGradient(0, 0, this.parentScreen.width, this.parentScreen.height, -1072689136, -804253680);
-
-        ps.translate(0, 0, 2);
         MODIFICATION_MENU.render(guiGraphics, this.getCenterWidth(), this.getCenterHeight());
         this.parentScreen.renderPlayerInventory(guiGraphics, this.getCenterWidth() + 19, this.getCenterHeight() + (18 * 4));
-        ps.popPose();
+        ps.popMatrix();
     }
 
     public int getCenterWidth() {
