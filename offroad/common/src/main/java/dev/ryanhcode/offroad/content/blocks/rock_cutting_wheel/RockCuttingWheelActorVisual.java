@@ -38,17 +38,17 @@ public class RockCuttingWheelActorVisual extends ActorVisual {
 
         if ((this.facing.getAxis() == Direction.Axis.Z || this.facing.getAxis() == Direction.Axis.Y) ^ this.axisFirst) {
             this.wheel.rotateCentered(this.facing.getRotation())
-                    .rotateZCenteredDegrees(90)
-                    .rotateXCenteredDegrees(0)
+                    .rotateCenteredDegrees(90, Direction.SOUTH)
+                    .rotateCenteredDegrees(0, Direction.EAST)
                     .translate(0.625, 0.5, 0);
         } else {
             this.wheel.rotateCentered(this.facing.getRotation())
-                    .rotateZCenteredDegrees(0)
-                    .rotateXCenteredDegrees(90)
+                    .rotateCenteredDegrees(0, Direction.SOUTH)
+                    .rotateCenteredDegrees(90, Direction.EAST)
                     .translate(0, 0.5, -0.625);
         }
 
-        this.wheel.rotateYCenteredDegrees(((LerpedFloat) this.context.temporaryData).getValue(AnimationTickHolder.getPartialTicks()));
+        this.wheel.rotateCenteredDegrees(((LerpedFloat) this.context.temporaryData).getValue(AnimationTickHolder.getPartialTicks()), Direction.UP);
         this.wheel.setChanged();
     }
 

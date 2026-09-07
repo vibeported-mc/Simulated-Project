@@ -162,7 +162,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
         final MassData massData = subLevel.getMassTracker();
 
         final Direction facing = this.getBlockState().getValue(WheelMountBlock.HORIZONTAL_FACING);
-        final Vec3 localPos = blockPos.relative(facing).getCenter();
+        final Vec3 localPos = Vec3.atCenterOf(blockPos.relative(facing));
         this.queuedForcePos.set(localPos.x, localPos.y, localPos.z);
         final double normalMass = 1.0 / massData.getInverseNormalMass(this.queuedForcePos, OrientedBoundingBox3d.UP);
 
@@ -176,7 +176,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
         final Pose3d pose = subLevel.logicalPose();
 
         final Direction.Axis axis = facing.getAxis();
-        Vec3i normal = Direction.get(Direction.AxisDirection.POSITIVE, axis).getNormal();
+        Vec3i normal = Direction.get(Direction.AxisDirection.POSITIVE, axis).getUnitVec3i();
         final Vector3dc sideD = this.getRotatedWheelAxis(normal);
         normal = new Vec3i(normal.getZ(), 0, normal.getX());
         final Vector3dc normalD = this.getRotatedWheelAxis(normal);
@@ -201,7 +201,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
 
         final double springForce = ((suspensionRestDistance - springLength) * springStrength + dampingForce) * timeStep;
 
-        final Vec3i rayHitNormal = extensionToTerrain.normal().getNormal();
+        final Vec3i rayHitNormal = extensionToTerrain.normal().getUnitVec3i();
 
         Vec3 localForce = new Vec3(springForce * rayHitNormal.getX(), springForce * rayHitNormal.getY(), springForce * rayHitNormal.getZ());
         if (extensionToTerrain.subLevel() != null) {
@@ -294,7 +294,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
         final Vector3d localVelocity = subLevel.logicalPose().transformNormalInverse(velocity).div(20.0);
         final Direction.Axis axis = facing.getAxis();
 
-        Vec3i normal = Direction.get(Direction.AxisDirection.POSITIVE, axis).getNormal();
+        Vec3i normal = Direction.get(Direction.AxisDirection.POSITIVE, axis).getUnitVec3i();
         normal = new Vec3i(normal.getZ(), 0, normal.getX());
         final Vector3dc normalD = this.getRotatedWheelAxis(normal);
 
@@ -325,7 +325,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
         final Pose3dc pose = subLevel.logicalPose();
 
         final Direction.Axis axis = facing.getAxis();
-        Vec3i normal = Direction.get(Direction.AxisDirection.POSITIVE, axis).getNormal();
+        Vec3i normal = Direction.get(Direction.AxisDirection.POSITIVE, axis).getUnitVec3i();
         normal = new Vec3i(normal.getZ(), 0, normal.getX());
         final Vector3dc rotatedAxis = this.getRotatedWheelAxis(normal);
 
@@ -361,7 +361,7 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
 
     private TerrainCastResult computeMaxExtensionToTerrain(final Vector3dc normalD, final Pose3dc pose) {
         final Direction facing = this.getBlockState().getValue(WheelMountBlock.HORIZONTAL_FACING);
-        final Vec3 wheelPosCenter = this.getBlockPos().relative(facing).getCenter();
+        final Vec3 wheelPosCenter = Vec3.atCenterOf(this.getBlockPos().relative(facing));
         double minExtension = 5.0;
         Direction minNormal = Direction.UP;
         SubLevel minHitSubLevel = null;

@@ -22,7 +22,7 @@ public class OffroadItems {
                     .requires(Items.DRIED_KELP)
                     .unlockedBy("has_ingredient", p.has(AllBlocks.SHAFT.get()))
                     .save(p))
-            .model(AssetLookup.itemModelWithPartials())
+            .model(() -> AssetLookup.itemModelWithPartials())
             .register();
 
     public static final ItemEntry<TireItem> TIRE = REGISTRATE.item("tire", TireItem::new)
@@ -35,7 +35,7 @@ public class OffroadItems {
                     .define('S', AllBlocks.SHAFT.asItem())
                     .unlockedBy("has_ingredient", p.has(AllBlocks.SHAFT.get()))
                     .save(p))
-            .model(AssetLookup.itemModelWithPartials())
+            .model(() -> AssetLookup.itemModelWithPartials())
             .register();
 
     public static final ItemEntry<TireItem> LARGE_TIRE = REGISTRATE.item("large_tire", TireItem::new)
@@ -48,7 +48,7 @@ public class OffroadItems {
                     .define('S', AllBlocks.SHAFT.asItem())
                     .unlockedBy("has_ingredient", p.has(AllBlocks.SHAFT.get()))
                     .save(p))
-            .model(AssetLookup.itemModelWithPartials())
+            .model(() -> AssetLookup.itemModelWithPartials())
             .register();
 
     public static final ItemEntry<TireItem> MONSTROUS_TIRE = REGISTRATE.item("monstrous_tire", TireItem::new)
@@ -61,7 +61,7 @@ public class OffroadItems {
                     .define('S', AllBlocks.SHAFT.asItem())
                     .unlockedBy("has_ingredient", p.has(AllBlocks.SHAFT.get()))
                     .save(p))
-            .model(AssetLookup.itemModelWithPartials())
+            .model(() -> AssetLookup.itemModelWithPartials())
             .register();
 
     public static void init() {

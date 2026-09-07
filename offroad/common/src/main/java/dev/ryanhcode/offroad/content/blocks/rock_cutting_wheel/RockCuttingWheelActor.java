@@ -109,8 +109,8 @@ public class RockCuttingWheelActor implements MovementBehaviour {
                     final BlockPos pos = context.localPos;
                     final BlockState state = context.state;
 
-                    Vec3 centerPos = pos.getCenter();
-                    final Vec3i facingNormal = state.getValue(BlockStateProperties.FACING).getNormal();
+                    Vec3 centerPos = Vec3.atCenterOf(pos);
+                    final Vec3i facingNormal = state.getValue(BlockStateProperties.FACING).getUnitVec3i();
                     centerPos = centerPos.add(facingNormal.getX() * SEARCH_ORIGIN_OFFSET, facingNormal.getY() * SEARCH_ORIGIN_OFFSET, facingNormal.getZ() * SEARCH_ORIGIN_OFFSET);
 
                     final Vec3 contraptionProjectedPos = context.contraption.entity.toGlobalVector(centerPos, 1);

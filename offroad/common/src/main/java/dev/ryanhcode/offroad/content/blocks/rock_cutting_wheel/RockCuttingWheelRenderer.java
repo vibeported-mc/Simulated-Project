@@ -57,13 +57,13 @@ public class RockCuttingWheelRenderer
     private static void transformBuffer(final Direction facing, final boolean alongFirstCoords, final SuperByteBuffer wheel) {
         if ((facing.getAxis() == Direction.Axis.Z || facing.getAxis() == Direction.Axis.Y) ^ alongFirstCoords) {
             wheel.rotateCentered(facing.getRotation())
-                    .rotateZCenteredDegrees(90)
-                    .rotateXCenteredDegrees(0)
+                    .rotateCenteredDegrees(90, Direction.SOUTH)
+                    .rotateCenteredDegrees(0, Direction.EAST)
                     .translate(0.625, 0.5, 0);
         } else {
             wheel.rotateCentered(facing.getRotation())
-                    .rotateZCenteredDegrees(0)
-                    .rotateXCenteredDegrees(90)
+                    .rotateCenteredDegrees(0, Direction.SOUTH)
+                    .rotateCenteredDegrees(90, Direction.EAST)
                     .translate(0, 0.5, -0.625);
         }
     }
@@ -76,7 +76,7 @@ public class RockCuttingWheelRenderer
         wheel.transform(matrices.getModel());
 
         transformBuffer(facing, state.getValue(AbstractDirectionalAxisBlock.AXIS_ALONG_FIRST_COORDINATE), wheel);
-        wheel.rotateYCenteredDegrees(((LerpedFloat) context.temporaryData).getValue(AnimationTickHolder.getPartialTicks(context.world)));
+        wheel.rotateCenteredDegrees(((LerpedFloat) context.temporaryData).getValue(AnimationTickHolder.getPartialTicks(context.world)), Direction.UP);
 
         wheel.light(LightCoordsUtil.getLightCoords(renderWorld, context.localPos))
                 .useLevelLight(RenderLevels.lightSource(context.world, renderWorld), matrices.getWorld());
@@ -90,7 +90,7 @@ public class RockCuttingWheelRenderer
 
         transformBuffer(state.getValue(FACING), state.getValue(AbstractDirectionalAxisBlock.AXIS_ALONG_FIRST_COORDINATE), wheel);
         if (blockEntity.isVirtual()) {
-            wheel.rotateYCenteredDegrees(blockEntity.getAnimatedSpeed(partialTicks));
+            wheel.rotateCenteredDegrees(blockEntity.getAnimatedSpeed(partialTicks), Direction.UP);
         }
 
         renderState.wheel = wheel.light(renderState.lightCoords).extractRenderState();
