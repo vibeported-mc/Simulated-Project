@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.phys.HitResult;
 import org.joml.Vector4f;
 
-public class OpticalSensorRenderer extends AbstractLaserRenderer<OpticalSensorBlockEntity> {
+public class OpticalSensorRenderer extends AbstractLaserRenderer<OpticalSensorBlockEntity, AbstractLaserRenderer.LaserRenderState> {
     public OpticalSensorRenderer(final BlockEntityRendererProvider.Context context) {
         super(context);
     }
