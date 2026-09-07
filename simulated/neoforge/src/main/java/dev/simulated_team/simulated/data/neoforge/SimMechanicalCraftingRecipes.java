@@ -7,14 +7,13 @@ import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimBlocks;
 import dev.simulated_team.simulated.index.SimItems;
+import net.minecraft.tags.BlockItemTags;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
-
-import java.util.concurrent.CompletableFuture;
 
 public class SimMechanicalCraftingRecipes extends MechanicalCraftingRecipeGen {
     private final GeneratedRecipe LINKED_TYPEWRITER = this.create(SimBlocks.LINKED_TYPEWRITER::get)
@@ -23,9 +22,9 @@ public class SimMechanicalCraftingRecipes extends MechanicalCraftingRecipeGen {
                     .patternLine("BBBBT")
                     .patternLine("BBBBB")
                     .patternLine(" GPG ")
-                    .key('B', Ingredient.of(ItemTags.BUTTONS))
+                    .key('B', ingredient(BlockItemTags.BUTTONS.item()))
                     .key('T', AllItems.TRANSMITTER)
-                    .key('G', CommonMetal.GOLD.plates)
+                    .key('G', ingredient(CommonMetal.GOLD.plates))
                     .key('P', AllItems.PRECISION_MECHANISM)
             );
 
@@ -35,11 +34,11 @@ public class SimMechanicalCraftingRecipes extends MechanicalCraftingRecipeGen {
                     .patternLine("   P")
                     .patternLine("AMFR")
                     .patternLine("CC P")
-                    .key('C', CommonMetal.COPPER.ingots)
+                    .key('C', ingredient(CommonMetal.COPPER.ingots))
                     .key('R', SimItems.ROPE_COUPLING)
                     .key('A', AllItems.ANDESITE_ALLOY)
                     .key('M', AllItems.PRECISION_MECHANISM)
-                    .key('P', Tags.Items.SLIME_BALLS)
+                    .key('P', ingredient(Tags.Items.SLIME_BALLS))
                     .key('F', AllBlocks.FLUID_PIPE)
             );
 
@@ -50,19 +49,24 @@ public class SimMechanicalCraftingRecipes extends MechanicalCraftingRecipeGen {
                     .patternLine(" C ")
                     .patternLine("PAP")
                     .patternLine("BEB")
-                    .key('B', CommonMetal.BRASS.plates)
+                    .key('B', ingredient(CommonMetal.BRASS.plates))
                     .key('E', AllItems.ELECTRON_TUBE)
                     .key('P', Blocks.PISTON)
                     .key('A', AllBlocks.BRASS_CASING)
                     .key('C', AllBlocks.CHUTE)
-                    .key('I', CommonMetal.IRON.plates)
+                    .key('I', ingredient(CommonMetal.IRON.plates))
             );
 
-
-    public SimMechanicalCraftingRecipes(final PackOutput output, final CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries, Simulated.MOD_ID);
+    /**
+     * <h2>26.2 note</h2>
+     * <p>A recipe generator is no longer a {@code DataProvider}: 26.2 builds it once the registries
+     * have loaded and hands it the output to write into, so the constructor takes those two rather
+     * than a {@code PackOutput} and a future. {@code BaseRecipeProvider.runner} is what supplies the
+     * {@code DataProvider} half.
+     */
+    public SimMechanicalCraftingRecipes(final HolderLookup.Provider registries, final RecipeOutput output) {
+        super(registries, output, Simulated.MOD_ID);
     }
-
 
     @Override
     public String getName() {

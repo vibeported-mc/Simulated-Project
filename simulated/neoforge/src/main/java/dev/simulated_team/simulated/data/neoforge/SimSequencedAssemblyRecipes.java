@@ -9,12 +9,10 @@ import com.simibubi.create.content.kinetics.saw.CuttingRecipe;
 import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimItems;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-
-import java.util.concurrent.CompletableFuture;
 
 public class SimSequencedAssemblyRecipes extends SequencedAssemblyRecipeGen {
 
@@ -44,8 +42,15 @@ public class SimSequencedAssemblyRecipes extends SequencedAssemblyRecipeGen {
             .addOutput(Items.IRON_HELMET, 1)
     );
 
-    public SimSequencedAssemblyRecipes(final PackOutput output, final CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries, Simulated.MOD_ID);
+    /**
+     * <h2>26.2 note</h2>
+     * <p>A recipe generator is no longer a {@code DataProvider}: 26.2 builds it once the registries
+     * have loaded and hands it the output to write into, so the constructor takes those two rather
+     * than a {@code PackOutput} and a future. {@code BaseRecipeProvider.runner} is what supplies the
+     * {@code DataProvider} half.
+     */
+    public SimSequencedAssemblyRecipes(final HolderLookup.Provider registries, final RecipeOutput output) {
+        super(registries, output, Simulated.MOD_ID);
     }
 
     @Override

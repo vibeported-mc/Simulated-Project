@@ -1,38 +1,49 @@
 package dev.simulated_team.simulated.data.neoforge;
 
-import com.simibubi.create.api.data.recipe.BaseRecipeProvider;
-import dev.simulated_team.simulated.Simulated;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class SimProcessingRecipeGen extends BaseRecipeProvider {
-    protected static final List<BaseRecipeProvider> GENERATORS = new ArrayList<>();
-    public static DataProvider registerAll(final PackOutput output, final CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        GENERATORS.add(new SimFillingRecipes(output, lookupProvider));
-        GENERATORS.add(new SimMechanicalCraftingRecipes(output, lookupProvider));
-        GENERATORS.add(new SimSequencedAssemblyRecipes(output, lookupProvider));
-        GENERATORS.add(new SimStandardRecipeGen(output, lookupProvider));
-        return new DataProvider() {
-            @Override
-            public CompletableFuture<?> run(final CachedOutput arg) {
-                return CompletableFuture.allOf(GENERATORS.stream()
-                        .map(gen -> gen.run(arg))
-                        .toArray(CompletableFuture[]::new));
-            }
+import com.simibubi.create.api.data.recipe.BaseRecipeProvider;
 
-            @Override
-            public String getName() {
-                return "Simulated's Peculiar Processing Recipes";
-            }
-        };
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+
+/**
+ * <h2>26.2 note</h2>
+ * <p>A recipe generator is no longer a {@code DataProvider}, so this can no longer be an anonymous
+ * one that fans {@code run} out across a static list. 26.2 builds the provider once the registries
+ * have loaded and hands it the output to write into -- which is what
+ * {@link BaseRecipeProvider#runner} wraps -- and the generators are built there rather than being
+ * accumulated in a static field that never got cleared between runs.
+ *
+ * <p>This also stopped being a base class: nothing extended it, and the constructor it offered no
+ * longer matches what a generator takes.
+ */
+public class SimProcessingRecipeGen {
+
+    public static DataProvider registerAll(final PackOutput output, final CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        return BaseRecipeProvider.runner(output, lookupProvider, "Simulated's Peculiar Processing Recipes", AllProcessing::new);
     }
-    public SimProcessingRecipeGen(final PackOutput output, final CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries, Simulated.MOD_ID);
+
+    private static class AllProcessing extends RecipeProvider {
+
+        private final List<BaseRecipeProvider> generators;
+
+        private AllProcessing(final HolderLookup.Provider registries, final RecipeOutput output) {
+            super(registries, output);
+            this.generators = List.of(
+                    new SimFillingRecipes(registries, output),
+                    new SimMechanicalCraftingRecipes(registries, output),
+                    new SimSequencedAssemblyRecipes(registries, output),
+                    new SimStandardRecipeGen(registries, output));
+        }
+
+        @Override
+        protected void buildRecipes() {
+            this.generators.forEach(BaseRecipeProvider::buildRecipes);
+        }
     }
 }

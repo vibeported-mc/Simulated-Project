@@ -1,35 +1,47 @@
 package dev.eriksonn.aeronautics.neoforge.data.recipe;
 
-import com.simibubi.create.api.data.recipe.BaseRecipeProvider;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import com.simibubi.create.api.data.recipe.BaseRecipeProvider;
+
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+
+/**
+ * <h2>26.2 note</h2>
+ * <p>A recipe generator is no longer a {@code DataProvider}, so this can no longer be an anonymous
+ * one that fans {@code run} out across a static list. 26.2 builds the provider once the registries
+ * have loaded and hands it the output to write into -- which is what
+ * {@link BaseRecipeProvider#runner} wraps -- and the generators are built there rather than being
+ * accumulated in a static field that never got cleared between runs.
+ */
 public class AeroProcessingRecipeGen {
-	protected static List<BaseRecipeProvider> GENERATORS = new ArrayList<>();
 
-	public static DataProvider registerAll(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-		GENERATORS.add(new AeroMixingRecipes(output, lookupProvider));
-		GENERATORS.add(new AeroCrushingRecipes(output, lookupProvider));
-		GENERATORS.add(new AeroMechanicalCraftingRecipes(output, lookupProvider));
-		GENERATORS.add(new AeroWashingRecipes(output, lookupProvider));
-		GENERATORS.add(new AeroDeployingRecipes(output, lookupProvider));
+	public static DataProvider registerAll(final PackOutput output, final CompletableFuture<HolderLookup.Provider> lookupProvider) {
+		return BaseRecipeProvider.runner(output, lookupProvider, "Aero's Perfect Processing Recipes", AllProcessing::new);
+	}
 
-		return new DataProvider() {
-			@Override
-			public CompletableFuture<?> run(CachedOutput cachedOutput) {
-				return CompletableFuture.allOf(GENERATORS.stream().map(gen -> gen.run(cachedOutput)).toArray(CompletableFuture[]::new));
-			}
+	private static class AllProcessing extends RecipeProvider {
 
-			@Override
-			public String getName() {
-				return "Aero's Perfect Processing Recipes";
-			}
-		};
+		private final List<BaseRecipeProvider> generators;
+
+		private AllProcessing(final HolderLookup.Provider registries, final RecipeOutput output) {
+			super(registries, output);
+			this.generators = List.of(
+					new AeroMixingRecipes(registries, output),
+					new AeroCrushingRecipes(registries, output),
+					new AeroMechanicalCraftingRecipes(registries, output),
+					new AeroWashingRecipes(registries, output),
+					new AeroDeployingRecipes(registries, output));
+		}
+
+		@Override
+		protected void buildRecipes() {
+			this.generators.forEach(BaseRecipeProvider::buildRecipes);
+		}
 	}
 }

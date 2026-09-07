@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 
 public enum SimNeoForgeRecipeTypes implements IRecipeTypeInfo, StringRepresentable {
 
-    PORTABLE_ENGINE_DYEING(() -> new SimpleCraftingRecipeSerializer<>(PortableEngineDyeingRecipe::new), () -> RecipeType.CRAFTING, false);
+    PORTABLE_ENGINE_DYEING(() -> PortableEngineDyeingRecipe.SERIALIZER, () -> RecipeType.CRAFTING, false);
 
     public static final Codec<SimNeoForgeRecipeTypes> CODEC = StringRepresentable.fromEnum(SimNeoForgeRecipeTypes::values);
     public final Identifier id;

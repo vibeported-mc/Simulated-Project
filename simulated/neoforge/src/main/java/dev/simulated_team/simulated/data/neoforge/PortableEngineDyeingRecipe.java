@@ -2,11 +2,10 @@ package dev.simulated_team.simulated.data.neoforge;
 
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineBlock;
 import dev.simulated_team.simulated.index.SimBlocks;
-import dev.simulated_team.simulated.index.neoforge.SimNeoForgeRecipeTypes;
-import net.minecraft.core.HolderLookup;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -16,9 +15,21 @@ import net.neoforged.neoforge.common.Tags;
 
 public class PortableEngineDyeingRecipe extends CustomRecipe {
 
-    public PortableEngineDyeingRecipe(final CraftingBookCategory category) {
-        super(category);
-    }
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code CustomRecipe} has no constructor arguments any more -- the crafting book category is
+     * a method on the recipe rather than state handed in, and {@code CustomRecipe} answers it with
+     * MISC, which is what this recipe was registered with.
+     *
+     * <p>The serializer moved onto the recipe too. {@code SimpleCraftingRecipeSerializer} is gone; a
+     * special recipe is a codec pair over a single instance. {@code StreamCodec.unit} checks the
+     * decoded value against the one it holds, so the recipe read from data and the recipe sent over
+     * the network have to be the same object -- hence the singleton.
+     */
+    private static final PortableEngineDyeingRecipe INSTANCE = new PortableEngineDyeingRecipe();
+
+    public static final RecipeSerializer<PortableEngineDyeingRecipe> SERIALIZER =
+            new RecipeSerializer<>(MapCodec.unit(INSTANCE), StreamCodec.unit(INSTANCE));
 
     @Override
     public boolean matches(final CraftingInput input, final Level level) {
@@ -46,7 +57,7 @@ public class PortableEngineDyeingRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(final CraftingInput input, final HolderLookup.Provider registries) {
+    public ItemStack assemble(final CraftingInput input) {
         ItemStack engine = ItemStack.EMPTY;
         DyeColor color = DyeColor.RED;
 
@@ -73,14 +84,15 @@ public class PortableEngineDyeingRecipe extends CustomRecipe {
         return dyedEngine;
     }
 
+    /**
+     * 26.2: {@code canCraftInDimensions} is gone -- a special recipe reports what it can be placed
+     * into through {@code placementInfo}, and {@code CustomRecipe} already answers NOT_PLACEABLE.
+     * The two-slot minimum this expressed is enforced by {@link #matches} anyway, which needs one
+     * engine and one dye.
+     */
     @Override
-    public boolean canCraftInDimensions(final int width, final int height) {
-        return width * height >= 2;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
-        return SimNeoForgeRecipeTypes.PORTABLE_ENGINE_DYEING.getSerializer();
+    public RecipeSerializer<PortableEngineDyeingRecipe> getSerializer() {
+        return SERIALIZER;
     }
 
 }

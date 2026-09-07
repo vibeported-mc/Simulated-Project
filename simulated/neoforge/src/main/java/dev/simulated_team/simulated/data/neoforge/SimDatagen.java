@@ -1,27 +1,37 @@
 package dev.simulated_team.simulated.data.neoforge;
 
-import dev.simulated_team.simulated.Simulated;
+import java.util.concurrent.CompletableFuture;
+
 import dev.simulated_team.simulated.data.advancements.SimAdvancements;
 import dev.simulated_team.simulated.index.SimTags;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-import java.util.concurrent.CompletableFuture;
-
-// advancements are written to use the traditional datagen entrypoint, and only need to be ran on one side
+/**
+ * Advancements are written to use the traditional datagen entrypoint, and only need to be run on one
+ * side.
+ *
+ * <h2>26.2 note</h2>
+ * <p>26.2 fires a separate {@code GatherDataEvent} per side rather than handing one event a pair of
+ * include flags, and providers are added to the event rather than to the generator. The event is
+ * also raised per mod, so there is no mod set to filter on.
+ *
+ * <p>Nothing calls this class -- {@code SimNeoForgeCommonEvents.ModBusEvents} carries the live
+ * listeners and does the same work. It is ported rather than deleted so the two do not drift, but
+ * whichever of the pair is dead should go.
+ */
 public class SimDatagen {
+
     public static void gatherDataHighPriority(final GatherDataEvent event) {
-        if (event.getMods().contains(Simulated.MOD_ID))
-            SimTags.addGenerators();
+        SimTags.addGenerators();
     }
-    public static void gatherData(final GatherDataEvent event) {
-        final DataGenerator generator = event.getGenerator();
-        final PackOutput output = generator.getPackOutput();
+
+    public static void gatherData(final GatherDataEvent.Server event) {
+        final PackOutput output = event.getGenerator().getPackOutput();
         final CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        generator.addProvider(event.includeServer(), new SimAdvancements(output, lookupProvider));
-        generator.addProvider(event.includeServer(), SimProcessingRecipeGen.registerAll(output, lookupProvider));
+        event.addProvider(new SimAdvancements(output, lookupProvider));
+        event.addProvider(SimProcessingRecipeGen.registerAll(output, lookupProvider));
     }
 }
