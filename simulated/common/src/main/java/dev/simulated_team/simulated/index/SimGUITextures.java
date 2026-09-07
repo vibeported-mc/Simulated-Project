@@ -125,7 +125,7 @@ public enum SimGUITextures implements ScreenElement {
         RenderSystem.setShaderTexture(0, this.location);
     }
 
-    public void render(final GuiGraphicsExtractor graphics, final int x, final int y) {
+    public void extractRenderState(final GuiGraphicsExtractor graphics, final int x, final int y) {
         graphics.blit(this.location, x, y, this.startX, this.startY, this.width, this.height, this.texWidth, this.texHeight);
     }
 
@@ -133,7 +133,7 @@ public enum SimGUITextures implements ScreenElement {
         graphics.blit(this.location, x, y, this.startX, this.startY, width, height, this.texWidth, this.texHeight);
     }
 
-    public void render(final GuiGraphicsExtractor graphics, final int x, final int y, final Color c) {
+    public void extractRenderState(final GuiGraphicsExtractor graphics, final int x, final int y, final Color c) {
         this.bind();
         UIRenderHelper.drawColoredTexture(graphics, c, x, y, 0, this.startX, this.startY, this.width, this.height, this.texWidth, this.texHeight);
     }

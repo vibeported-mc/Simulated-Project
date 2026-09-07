@@ -223,7 +223,7 @@ public class KeyEditorScreen {
         this.deactivateAllWidgets();
     }
 
-    public void render(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
+    public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
         guiGraphics.enableScissor(0, this.topPos() + 20, this.parentScreen.width, this.topPos() + KEY_MENU.height - 35);
 
         for (final KeyEntryWidget wrapper : this.keyboardEntryWrappers) {
@@ -232,9 +232,9 @@ public class KeyEditorScreen {
 
         guiGraphics.disableScissor();
 
-        this.addWidget.render(guiGraphics, mouseX, mouseY, pt);
-        this.confirmWidget.render(guiGraphics, mouseX, mouseY, pt);
-        this.removeAllWidget.render(guiGraphics, mouseX, mouseY, pt);
+        this.addWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
+        this.confirmWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
+        this.removeAllWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
 
         final int fadeOffColor = 0x00000000;
         final int fadeFromColor = 0x77000000;
@@ -266,7 +266,7 @@ public class KeyEditorScreen {
 
         guiGraphics.enableScissor(0, this.topPos() + 20, this.parentScreen.width, this.topPos() + KEY_MENU.height - 35);
         for (final KeyEntryWidget wrapper : this.keyboardEntryWrappers) {
-            wrapper.renderBackground(guiGraphics, v, i, i1);
+            wrapper.extractBackground(guiGraphics, v, i, i1);
         }
         guiGraphics.disableScissor();
     }
@@ -308,7 +308,7 @@ public class KeyEditorScreen {
                     + (index * (SimGUITextures.LINKED_TYPEWRITER_KEY_ENTRY.height + ENTRY_HEIGHT_PADDING_PIXELS));
         }
 
-        public void render(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
+        public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
             ps.pushPose();
             final int x = KeyEditorScreen.this.leftPos() + 12;
             final float y = this.getCurrentHeight(pt);
@@ -323,7 +323,7 @@ public class KeyEditorScreen {
             ps.popPose();
         }
 
-        public void renderBackground(final GuiGraphicsExtractor guiGraphics, final float pt, final int mouseX, final int mouseY) {
+        public void extractBackground(final GuiGraphicsExtractor guiGraphics, final float pt, final int mouseX, final int mouseY) {
             final PoseStack ps = guiGraphics.pose();
 
             final int editIconOffset = 167;
@@ -371,10 +371,10 @@ public class KeyEditorScreen {
         private void renderWidgets(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps, final int editIconOffset, final float iconY) {
             ps.pushPose();
             ps.translate(editIconOffset, iconY - 9, 0);
-            this.editWidget.render(guiGraphics, mouseX, mouseY, pt);
+            this.editWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
 
             ps.translate(23, 0, 0);
-            this.deleteWidget.render(guiGraphics, mouseX, mouseY, pt);
+            this.deleteWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
             ps.popPose();
         }
     }

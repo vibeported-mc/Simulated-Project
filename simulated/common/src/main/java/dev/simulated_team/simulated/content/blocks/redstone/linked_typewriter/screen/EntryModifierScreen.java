@@ -100,13 +100,13 @@ public class EntryModifierScreen {
         return psuedoEntry;
     }
 
-    public void render(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
+    public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
         if (this.modifying) {
             ps.pushPose();
 
-            this.confirmationWidget.render(guiGraphics, mouseX, mouseY, pt);
-            this.promptWidget.render(guiGraphics, mouseX, mouseY, pt);
-            this.cancelEntryWidget.render(guiGraphics, mouseX, mouseY, pt);
+            this.confirmationWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
+            this.promptWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
+            this.cancelEntryWidget.extractRenderState(guiGraphics, mouseX, mouseY, pt);
 
             ps.popPose();
         }

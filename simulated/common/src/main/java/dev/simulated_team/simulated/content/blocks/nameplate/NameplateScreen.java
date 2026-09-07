@@ -87,16 +87,16 @@ public class NameplateScreen extends Screen {
    }
 
    @Override
-   public void render(final GuiGraphicsExtractor gui, final int pMouseX, final int pMouseY, final float pPartialTick) {
+   public void extractRenderState(final GuiGraphicsExtractor gui, final int pMouseX, final int pMouseY, final float pPartialTick) {
       Lighting.setupForFlatItems();
-      this.renderBackground(gui, pMouseX, pMouseY, pPartialTick);
+      this.extractBackground(gui, pMouseX, pMouseY, pPartialTick);
       gui.centeredText(this.font, this.title, this.width / 2, 40, 16777215);
 
       this.renderSign(gui);
       Lighting.setupFor3DItems();
 
       //we have to do this now because we are manually rendering the background, so we can't call super otherwise the background will be rendered twice
-      this.button.render(gui, pMouseX, pMouseY, pPartialTick);
+      this.button.extractRenderState(gui, pMouseX, pMouseY, pPartialTick);
    }
 
    @Override

@@ -241,12 +241,12 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
     }
 
     @Override
-    public void render(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt) {
+    public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt) {
         final PoseStack ps = guiGraphics.pose();
         ps.pushPose();
         ps.translate(0, 0, -1);
 
-        super.render(guiGraphics, mouseX, mouseY, pt);
+        super.extractRenderState(guiGraphics, mouseX, mouseY, pt);
 
         if (this.hoveredSlot != null && this.hoveredSlot.isActive() && this.hoveredSlot.hasItem()) {
 //            new ClientTextTooltip(Component.literal("awa").getVisualOrderText()).renderText(this.font, mouseX, mouseY, ps.last().pose(), guiGraphics.bufferSource());
@@ -301,9 +301,9 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
                 i++;
             }
 
-            this.mainScreenResetAll.render(guiGraphics, mx, my, pt);
-            this.mainScreenConfirm.render(guiGraphics, mx, my, pt);
-            this.mainScreenEditBinding.render(guiGraphics, mx, my, pt);
+            this.mainScreenResetAll.extractRenderState(guiGraphics, mx, my, pt);
+            this.mainScreenConfirm.extractRenderState(guiGraphics, mx, my, pt);
+            this.mainScreenEditBinding.extractRenderState(guiGraphics, mx, my, pt);
         } else {
             this.keyEditorScreen.renderBG(guiGraphics, pt, mx, my);
         }
@@ -503,7 +503,7 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
             this.add(kWid);
         }
 
-        public void render(final GuiGraphicsExtractor guiGraphics, final int x, final int y, final int mouseX, final int mouseY, final float pt, final boolean keyboardActive) {
+        public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int x, final int y, final int mouseX, final int mouseY, final float pt, final boolean keyboardActive) {
             int length = 0;
             for (final KeyWidget key : this) {
                 key.render(guiGraphics, x + length, y, mouseX, mouseY, pt, keyboardActive);

@@ -60,7 +60,7 @@ public class SimIcons extends AllIcons {
     }
 
     @Override
-    public void render(final GuiGraphicsExtractor graphics, final int x, final int y) {
+    public void extractRenderState(final GuiGraphicsExtractor graphics, final int x, final int y) {
         graphics.blit(ICON_ATLAS, x, y, 0, this.iconX, this.iconY, 16, 16, 64, 64);
     }
 

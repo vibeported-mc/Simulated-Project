@@ -38,13 +38,13 @@ public class KeyWidget extends AbstractSimiWidget {
         this.screen = screen;
     }
 
-    public void render(final GuiGraphicsExtractor pGuiGraphics, final int x, final int y, final int pMouseX, final int pMouseY, final float pPartialTick, final boolean keyboardActive) {
+    public void extractRenderState(final GuiGraphicsExtractor pGuiGraphics, final int x, final int y, final int pMouseX, final int pMouseY, final float pPartialTick, final boolean keyboardActive) {
         this.bound = this.screen.getNewEntries().getKeyMap().containsKey(this.keyNum);
 
         this.setX(x);
         this.setY(y);
         this.keyboardActive = keyboardActive;
-        this.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        this.extractRenderState(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class KeyWidget extends AbstractSimiWidget {
             final int arrowX = (this.width / 2) - (arrow.width / 2);
             final int freqX = (this.width / 2) - (freq.width / 2);
 
-            this.renderBackground(pGuiGraphics, this.getX() + bgX, this.getY() - bgHeight - yOffset, bgWidth, bgHeight);
+            this.extractBackground(pGuiGraphics, this.getX() + bgX, this.getY() - bgHeight - yOffset, bgWidth, bgHeight);
             arrow.render(pGuiGraphics, this.getX() + arrowX, this.getY() - yOffset - 2);
 
             freq.render(pGuiGraphics, this.getX() + freqX, this.getY() - yOffset - bgHeight + 4);
@@ -123,7 +123,7 @@ public class KeyWidget extends AbstractSimiWidget {
                 .getDisplayName();
     }
 
-    private void renderBackground(@NotNull final GuiGraphicsExtractor pGuiGraphics, final int x, final int y, final int w, final int h) {
+    private void extractBackground(@NotNull final GuiGraphicsExtractor pGuiGraphics, final int x, final int y, final int w, final int h) {
         final SimGUITextures bg = SimGUITextures.LINKED_TYPEWRITER_TOOLTIP_BACKGROUND;
         pGuiGraphics.blitSprite(bg.location, x, y, 0, w, h);
     }

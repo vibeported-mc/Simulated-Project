@@ -65,7 +65,7 @@ public class AltitudeSensorScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public void renderBackground(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTick) {
+    public void extractBackground(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTick) {
         final int a = ((int) (0x50 * Math.min(1, (this.ticksOpen + AnimationTickHolder.getPartialTicks()) / 20f))) << 24;
         graphics.fillGradient(0, 0, this.width, this.height, 0x101010 | a, 0x101010 | a);
 

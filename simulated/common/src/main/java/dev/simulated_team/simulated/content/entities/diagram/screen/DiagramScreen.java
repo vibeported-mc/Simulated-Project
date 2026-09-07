@@ -615,7 +615,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         ps.popPose();
 
         for (final DiagramForceGroupToggle widget : this.forceToggleWidgets) {
-            widget.render(graphics, mouseX, mouseY, partialTicks);
+            widget.extractRenderState(graphics, mouseX, mouseY, partialTicks);
         }
 
         // Render diagram
@@ -1070,7 +1070,7 @@ public class DiagramScreen extends AbstractSimiScreen {
     public record GreebleRenderable(int x, int y, int width, int height, Identifier texture,
                                     Greeble.TextureSlice slice) implements Renderable {
         @Override
-        public void render(final GuiGraphicsExtractor guiGraphics, final int i, final int i1, final float v) {
+        public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int i, final int i1, final float v) {
             guiGraphics.blit(this.texture, this.x, this.y, this.slice.x(), this.slice.y(), this.slice.width(), this.slice.height(), this.width, this.height);
         }
     }
