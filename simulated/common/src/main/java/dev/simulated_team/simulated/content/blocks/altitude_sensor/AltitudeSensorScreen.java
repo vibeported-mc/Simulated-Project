@@ -1,21 +1,23 @@
 package dev.simulated_team.simulated.content.blocks.altitude_sensor;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimGUITextures;
 import dev.simulated_team.simulated.network.packets.ConfigureAltitudeSensorPacket;
 import dev.simulated_team.simulated.util.SimColors;
+import dev.simulated_team.simulated.util.render.FadedTexturedQuadRenderState;
 import foundry.veil.api.network.VeilPacketManager;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.createmod.catnip.api.animation.LerpedFloat;
 import net.createmod.catnip.api.client.gui.AbstractSimiScreen;
 import net.createmod.catnip.api.client.gui.ScreenOpener;
+import net.createmod.catnip.api.client.gui.UIRenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import org.joml.Matrix3x2f;
 
 public class AltitudeSensorScreen extends AbstractSimiScreen {
     private static final SimGUITextures BACKGROUND = SimGUITextures.ALTITUDE_SENSOR;
@@ -87,40 +89,27 @@ public class AltitudeSensorScreen extends AbstractSimiScreen {
         final int lowMax = (int) (visualLowPT * this.barHeight);
 
         if (this.lowSignal > this.highSignal) {
-            graphics.blit(BAR.location, x, y + BAR.height - highMax, BAR.startX, BAR.height - highMax - BAR.startY, BAR.width, BAR.height - (BAR.height - highMax));
+            graphics.blit(RenderPipelines.GUI_TEXTURED, BAR.location, x, y + BAR.height - highMax, BAR.startX, BAR.height - highMax - BAR.startY, BAR.width, BAR.height - (BAR.height - highMax), BAR.texWidth, BAR.texHeight);
         } else {
-            graphics.blit(BAR.location, x, y, BAR.startX, BAR.startY, BAR.width, BAR.height - highMax);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, BAR.location, x, y, BAR.startX, BAR.startY, BAR.width, BAR.height - highMax, BAR.texWidth, BAR.texHeight);
         }
 
-        final PoseStack ps = graphics.pose();
+        // 26.2 port: the band between the two handles fades out downwards, which no blit overload can
+        // express, so it goes out as its own GUI element render state.
+        final float uvx1 = BAR.startX / (float) BAR.texWidth;
+        final float uvx2 = (BAR.startX + BAR.width) / (float) BAR.texWidth;
+        final float uvy1 = (BAR.startY + highMax) / (float) BAR.texHeight;
+        final float uvy2 = (BAR.startY + lowMax) / (float) BAR.texHeight;
 
-        BAR.bind();
-        RenderSystem.disableCull();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        final Tesselator tesselator = Tesselator.getInstance();
-        final BufferBuilder bufferbuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-
-        final float imageSize = 256f;
-        final float uvx1 = BAR.startX / imageSize;
-        final float uvx2 = (BAR.startX + BAR.width) / imageSize;
-        final float uvy1 = (BAR.startY + highMax) / imageSize;
-        final float uvy2 = (BAR.startY + lowMax) / imageSize;
-
-        final float px1 = (float) x;
-        final float px2 = (float) x + BAR.width;
-        final float py1 = (y - highMax) + BAR.height;
-        final float py2 = (y - lowMax) + BAR.height;
-
-        bufferbuilder.addVertex(ps.last().pose(), px2, py1, 0.0f).setUv(uvx2, uvy1).setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        bufferbuilder.addVertex(ps.last().pose(), px1, py1, 0.0f).setUv(uvx1, uvy1).setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        bufferbuilder.addVertex(ps.last().pose(), px1, py2, 0.0f).setUv(uvx1, uvy2).setColor(1.0f, 1.0f, 1.0f, 0.0f);
-        bufferbuilder.addVertex(ps.last().pose(), px2, py2, 0.0f).setUv(uvx2, uvy2).setColor(1.0f, 1.0f, 1.0f, 0.0f);
-        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
-
-        RenderSystem.enableCull();
-        RenderSystem.disableBlend();
+        graphics.submitGuiElementRenderState(new FadedTexturedQuadRenderState(
+                new Matrix3x2f(graphics.pose()),
+                UIRenderHelper.getScissor(graphics),
+                BAR.bind(),
+                0xFFFFFFFF,
+                0x00FFFFFF,
+                x, x + BAR.width,
+                (y - highMax) + BAR.height, (y - lowMax) + BAR.height,
+                uvx1, uvx2, uvy1, uvy2));
 
         final int invHighMax = (int) (invHighSignal * this.barHeight);
         final int invLowMax = (int) (invLowSignal * this.barHeight);
@@ -165,11 +154,11 @@ public class AltitudeSensorScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-        this.draggingLeft = this.overGrabby(mouseX, mouseY, true);
-        this.draggingRight = this.overGrabby(mouseX, mouseY, false);
+    public boolean mouseClicked(final MouseButtonEvent event, final boolean doubleClick) {
+        this.draggingLeft = this.overGrabby(event.x(), event.y(), true);
+        this.draggingRight = this.overGrabby(event.x(), event.y(), false);
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -222,10 +211,10 @@ public class AltitudeSensorScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean mouseReleased(final double mouseX, final double mouseY, final int button) {
+    public boolean mouseReleased(final MouseButtonEvent event) {
         this.draggingLeft = false;
         this.draggingRight = false;
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
 
     @Override

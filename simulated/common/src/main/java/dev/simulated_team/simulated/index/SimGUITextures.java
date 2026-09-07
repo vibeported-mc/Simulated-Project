@@ -1,15 +1,16 @@
 package dev.simulated_team.simulated.index;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.simulated_team.simulated.Simulated;
+import net.createmod.catnip.api.client.gui.TextureSheetSegment;
 import net.createmod.catnip.api.client.gui.UIRenderHelper;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.createmod.catnip.api.theme.Color;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public enum SimGUITextures implements ScreenElement {
+public enum SimGUITextures implements ScreenElement, TextureSheetSegment {
 
     MODULATINGLINK("modulating_linked_receiver", 182, 99),
     MODULATINGLINK_MARKER("modulating_linked_receiver", 193, 4, 3, 20),
@@ -121,20 +122,41 @@ public enum SimGUITextures implements ScreenElement {
         this.texHeight = texHeight;
     }
 
-    public void bind() {
-        RenderSystem.setShaderTexture(0, this.location);
+    @Override
+    public Identifier getId() {
+        return this.location;
     }
 
-    public void extractRenderState(final GuiGraphicsExtractor graphics, final int x, final int y) {
-        graphics.blit(this.location, x, y, this.startX, this.startY, this.width, this.height, this.texWidth, this.texHeight);
+    @Override
+    public int getStartX() {
+        return this.startX;
     }
 
-    public void render (final GuiGraphicsExtractor graphics, final int x, final int y, final int width, final int height) {
-        graphics.blit(this.location, x, y, this.startX, this.startY, width, height, this.texWidth, this.texHeight);
+    @Override
+    public int getStartY() {
+        return this.startY;
     }
 
-    public void extractRenderState(final GuiGraphicsExtractor graphics, final int x, final int y, final Color c) {
-        this.bind();
-        UIRenderHelper.drawColoredTexture(graphics, c, x, y, 0, this.startX, this.startY, this.width, this.height, this.texWidth, this.texHeight);
+    @Override
+    public int getWidth() {
+        return this.width;
+    }
+
+    @Override
+    public int getHeight() {
+        return this.height;
+    }
+
+    @Override
+    public void render(final GuiGraphicsExtractor graphics, final int x, final int y) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, this.location, x, y, this.startX, this.startY, this.width, this.height, this.texWidth, this.texHeight);
+    }
+
+    public void render(final GuiGraphicsExtractor graphics, final int x, final int y, final int width, final int height) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, this.location, x, y, this.startX, this.startY, width, height, this.texWidth, this.texHeight);
+    }
+
+    public void render(final GuiGraphicsExtractor graphics, final int x, final int y, final Color c) {
+        UIRenderHelper.drawColoredTexture(graphics, this.bind(), c, x, y, this.startX, this.startY, this.width, this.height, this.texWidth, this.texHeight);
     }
 }
