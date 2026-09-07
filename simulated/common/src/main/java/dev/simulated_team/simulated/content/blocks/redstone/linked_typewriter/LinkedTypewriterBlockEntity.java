@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter;
 
+import net.minecraft.core.UUIDUtil;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -238,7 +239,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         tag.put("Keys", this.entryMap.saveKeys(registries));
 
         if (this.currentUser != null) {
-            tag.putUUID("CurrentUser", this.currentUser);
+            tag.store("CurrentUser", UUIDUtil.CODEC, this.currentUser);
         }
     }
 
@@ -249,7 +250,7 @@ public class LinkedTypewriterBlockEntity extends SmartBlockEntity implements Men
         this.typedEntry = tag.getStringOr("typedEntry", "");
         this.entryMap = LinkedTypewriterEntries.readKeys(registries, tag.getList("Keys", 10), this.getBlockPos());
         if (tag.contains("CurrentUser")) {
-            this.currentUser = tag.getUUID("CurrentUser");
+            this.currentUser = tag.read("CurrentUser", UUIDUtil.CODEC).orElseThrow();
         } else {
             this.currentUser = null;
         }

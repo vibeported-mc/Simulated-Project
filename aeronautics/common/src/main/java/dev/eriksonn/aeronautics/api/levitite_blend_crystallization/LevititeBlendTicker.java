@@ -1,5 +1,6 @@
 package dev.eriksonn.aeronautics.api.levitite_blend_crystallization;
 
+import net.minecraft.nbt.NbtOps;
 import dev.eriksonn.aeronautics.index.AeroRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,7 +24,7 @@ public class LevititeBlendTicker {
 	// Constructor used for loading this levitite blend ticker
 	public LevititeBlendTicker(final CompoundTag toDeserialize, final Level level) {
 		this.level = level;
-		this.pos = NbtUtils.readBlockPos(toDeserialize, "pos").get();
+		this.pos = toDeserialize.read("pos", BlockPos.CODEC).get();
 		this.context = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().get(Identifier.parse(toDeserialize.getString("context")));
 
 		this.deserialize(toDeserialize);
@@ -115,7 +116,7 @@ public class LevititeBlendTicker {
 
 		tag.putBoolean("requiresCatalyst", this.requiresCatalyst);
 
-		tag.put("pos", NbtUtils.writeBlockPos(this.getPos()));
+		tag.put("pos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.getPos()));
 		Identifier resourceLocation = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().getKey(this.context);
 		tag.putString("context", resourceLocation.toString());
 

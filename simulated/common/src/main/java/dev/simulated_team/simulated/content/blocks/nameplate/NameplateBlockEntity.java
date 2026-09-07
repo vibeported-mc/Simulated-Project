@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.content.blocks.nameplate;
 
+import net.minecraft.nbt.NbtOps;
 import com.simibubi.create.content.equipment.clipboard.ClipboardCloneable;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -326,7 +327,7 @@ public class NameplateBlockEntity extends SmartBlockEntity implements ClipboardC
         if (this.controller) {
             tag.putInt("Width", this.controllerWidth);
         } else {
-            tag.put("ControllerPos", NbtUtils.writeBlockPos(this.controllerPos));
+            tag.put("ControllerPos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.controllerPos));
         }
     }
 
@@ -343,7 +344,7 @@ public class NameplateBlockEntity extends SmartBlockEntity implements ClipboardC
 
         if (tag.contains("ControllerPos")) {
             this.controller = false;
-            this.controllerPos = NbtUtils.readBlockPos(tag, "ControllerPos").get();
+            this.controllerPos = tag.read("ControllerPos", BlockPos.CODEC).get();
         } else {
             this.controller = true;
             this.controllerPos = this.getBlockPos();

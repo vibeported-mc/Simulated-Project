@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.content.entities.launched_plunger;
 
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import com.simibubi.create.foundation.utility.NbtValueIO;
@@ -28,6 +29,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
@@ -54,7 +58,15 @@ import java.util.UUID;
 
 public class LaunchedPlungerEntity extends ThrowableProjectile {
 
-    public static final EntityDataAccessor<Optional<UUID>> OTHER_PLUNGER = SynchedEntityData.defineId(LaunchedPlungerEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    /**
+     * 26.2 removed EntityDataSerializers.OPTIONAL_UUID: vanilla points at entities through
+     * EntityReference now, and the serializer it keeps is for LivingEntity, which a plunger is not.
+     * A serializer is just a stream codec, so this is the same wire format the removed one had.
+     */
+    private static final EntityDataSerializer<Optional<UUID>> OPTIONAL_UUID =
+            EntityDataSerializer.forValueType(ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC).cast());
+
+    public static final EntityDataAccessor<Optional<UUID>> OTHER_PLUNGER = SynchedEntityData.defineId(LaunchedPlungerEntity.class, OPTIONAL_UUID);
     public static final EntityDataAccessor<Integer> OTHER_PLUNGER_ID = SynchedEntityData.defineId(LaunchedPlungerEntity.class, EntityDataSerializers.INT);
 
     public static final EntityDataAccessor<Direction> PLUNGED_DIRECTION = SynchedEntityData.defineId(LaunchedPlungerEntity.class, EntityDataSerializers.DIRECTION);
@@ -372,9 +384,9 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
     protected void addAdditionalSaveData(final ValueOutput output) {
         final CompoundTag compoundTag = new CompoundTag();
         final Optional<UUID> other = this.getData(OTHER_PLUNGER);
-        other.ifPresent(value -> compoundTag.putUUID("OtherPlunger", value));
+        other.ifPresent(value -> compoundTag.store("OtherPlunger", UUIDUtil.CODEC, value));
 
-        compoundTag.put("PlungedBlockPos", NbtUtils.writeBlockPos(this.getData(PLUNGED_BLOCK_POS)));
+        compoundTag.put("PlungedBlockPos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.getData(PLUNGED_BLOCK_POS)));
         compoundTag.put("TargetPos", VecHelper.writeNBT(this.getData(TARGET_POS)));
         NBTHelper.writeEnum(compoundTag, "PlungedDir", this.getData(PLUNGED_DIRECTION));
         compoundTag.putBoolean("IsPlunged", this.getData(IS_PLUNGED));
@@ -391,13 +403,13 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
         this.setData(IS_PLUNGED, compoundTag.getBoolean("IsPlunged"));
 
         this.setData(PLUNGED_DIRECTION, NBTHelper.readEnum(compoundTag, "PlungedDir", Direction.class));
-        this.setData(PLUNGED_BLOCK_POS, NbtUtils.readBlockPos(compoundTag, "PlungedBlockPos").get());
+        this.setData(PLUNGED_BLOCK_POS, compoundTag.read("PlungedBlockPos", BlockPos.CODEC).get());
         this.setData(TARGET_POS, VecHelper.readNBT((ListTag) compoundTag.get("TargetPos")));
 
         this.setData(IS_FIRST, compoundTag.getBoolean("IsFirst"));
 
         if (compoundTag.contains("OtherPlunger")) {
-            this.setData(OTHER_PLUNGER, Optional.of(compoundTag.getUUID("OtherPlunger")));
+            this.setData(OTHER_PLUNGER, Optional.of(compoundTag.read("OtherPlunger", UUIDUtil.CODEC).orElseThrow()));
         }
 
         super.readAdditionalSaveData(input);

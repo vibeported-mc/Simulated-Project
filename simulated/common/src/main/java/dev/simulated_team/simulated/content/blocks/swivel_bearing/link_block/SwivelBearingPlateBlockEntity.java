@@ -1,5 +1,7 @@
 package dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block;
 
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.core.UUIDUtil;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import dev.ryanhcode.sable.Sable;
@@ -92,11 +94,11 @@ public class SwivelBearingPlateBlockEntity extends KineticBlockEntity implements
         super.write(compound, registries, clientPacket);
 
         if (this.parent != null) {
-            compound.put("ParentPos", NbtUtils.writeBlockPos(this.parent));
+            compound.put("ParentPos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.parent));
         }
 
         if (this.parentSubLevelId != null) {
-            compound.putUUID("ParentSubLevelId", this.parentSubLevelId);
+            compound.store("ParentSubLevelId", UUIDUtil.CODEC, this.parentSubLevelId);
         }
     }
 
@@ -105,16 +107,16 @@ public class SwivelBearingPlateBlockEntity extends KineticBlockEntity implements
         super.read(compound, registries, clientPacket);
 
         if (compound.contains("parent")) {
-            this.parent = NbtUtils.readBlockPos(compound, "parent").get();
+            this.parent = compound.read("parent", BlockPos.CODEC).get();
         }
 
 
         if (compound.contains("ParentPos")) {
-            this.parent = NbtUtils.readBlockPos(compound, "ParentPos").get();
+            this.parent = compound.read("ParentPos", BlockPos.CODEC).get();
         }
 
         if (compound.contains("ParentSubLevelId")) {
-            this.parentSubLevelId = compound.getUUID("ParentSubLevelId");
+            this.parentSubLevelId = compound.read("ParentSubLevelId", UUIDUtil.CODEC).orElseThrow();
         }
     }
 

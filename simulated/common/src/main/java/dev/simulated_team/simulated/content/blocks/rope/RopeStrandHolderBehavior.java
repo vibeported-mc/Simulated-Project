@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.content.blocks.rope;
 
+import net.minecraft.core.UUIDUtil;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.simibubi.create.AllBlocks;
@@ -435,7 +436,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
         nbt.putBoolean("OwnStrand", this.strandOwner);
 
         if (this.attachedRopeID != null) {
-            nbt.putUUID("HasRopeAttached", this.attachedRopeID);
+            nbt.store("HasRopeAttached", UUIDUtil.CODEC, this.attachedRopeID);
         }
 
         final ServerRopeStrand strand = this.getOwnedStrand();
@@ -450,7 +451,7 @@ public class RopeStrandHolderBehavior extends BlockEntityBehaviour {
         this.strandOwner = nbt.getBooleanOr("OwnStrand", false);
 
         if (nbt.contains("HasRopeAttached")) {
-            this.attachedRopeID = nbt.getUUID("HasRopeAttached");
+            this.attachedRopeID = nbt.read("HasRopeAttached", UUIDUtil.CODEC).orElseThrow();
         } else {
             this.attachedRopeID = null;
         }

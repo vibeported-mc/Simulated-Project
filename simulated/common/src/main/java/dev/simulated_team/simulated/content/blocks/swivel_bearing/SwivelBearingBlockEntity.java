@@ -1,5 +1,7 @@
 package dev.simulated_team.simulated.content.blocks.swivel_bearing;
 
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.core.UUIDUtil;
 import com.simibubi.create.content.contraptions.AssemblyException;
 import com.simibubi.create.content.contraptions.IDisplayAssemblyExceptions;
 import com.simibubi.create.content.contraptions.bearing.BearingBlock;
@@ -619,11 +621,11 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         }
 
         if (id != null) {
-            compound.putUUID("SubLevelID", id);
+            compound.store("SubLevelID", UUIDUtil.CODEC, id);
         }
 
         if (platePos != null) {
-            compound.put("SwivelPlate", NbtUtils.writeBlockPos(platePos));
+            compound.put("SwivelPlate", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, platePos));
         }
 
         if (this.sequencedAngleLimit >= 0)
@@ -642,7 +644,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         SubLevelSchematicSerializationContext.SchematicMapping mapping = null;
 
         if (compound.hasUUID("SubLevelID")) {
-            UUID subLevelID = compound.getUUID("SubLevelID");
+            UUID subLevelID = compound.read("SubLevelID", UUIDUtil.CODEC).orElseThrow();
 
             if (schematicContext != null) {
                 mapping = schematicContext.getMapping(subLevelID);
@@ -656,7 +658,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         }
 
         if (compound.contains("SwivelPlate")) {
-            final BlockPos blockPos = NbtUtils.readBlockPos(compound, "SwivelPlate").orElseThrow();
+            final BlockPos blockPos = compound.read("SwivelPlate", BlockPos.CODEC).orElseThrow();
             this.setPlatePos(blockPos);
         }
 

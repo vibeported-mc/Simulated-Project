@@ -1,5 +1,7 @@
 package dev.simulated_team.simulated.content.blocks.docking_connector;
 
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.core.UUIDUtil;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import dev.ryanhcode.sable.Sable;
@@ -443,11 +445,11 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         tag.putFloat("Feet", this.feet.getValue());
 
         if (this.otherConnectorPosition != null) {
-            tag.put("OtherConnector", NbtUtils.writeBlockPos(this.otherConnectorPosition));
+            tag.put("OtherConnector", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, this.otherConnectorPosition));
         }
 
         if (this.otherConnectorSubLevelId != null) {
-            tag.putUUID("OtherConnectorSubLevelId", this.otherConnectorSubLevelId);
+            tag.store("OtherConnectorSubLevelId", UUIDUtil.CODEC, this.otherConnectorSubLevelId);
         }
 
         tag.put("Inventory", this.inventory.write(registries));
@@ -468,13 +470,13 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         this.feet.setValue(this.feet.getValue());
 
         if (tag.contains("OtherConnector")) {
-            this.otherConnectorPosition = NbtUtils.readBlockPos(tag, "OtherConnector").orElse(null);
+            this.otherConnectorPosition = tag.read("OtherConnector", BlockPos.CODEC).orElse(null);
         } else {
             this.otherConnectorPosition = null;
         }
 
         if (tag.contains("OtherConnectorSubLevelId")) {
-            this.otherConnectorSubLevelId = tag.getUUID("OtherConnectorSubLevelId");
+            this.otherConnectorSubLevelId = tag.read("OtherConnectorSubLevelId", UUIDUtil.CODEC).orElseThrow();
         }
 
         this.inventory.read(registries, tag.getCompoundOrEmpty("Inventory"));
