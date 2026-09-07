@@ -108,7 +108,7 @@ public class ClientRopeItemHandler {
                             .disableLineNormals();
                 }
 
-                final DustParticleOptions data = new DustParticleOptions(color.asVectorF(), 1);
+                final DustParticleOptions data = new DustParticleOptions(color.getRGB(), 1);
                 final double totalFlyingTicks = 10;
                 final int segments = (((int) totalFlyingTicks) / 3) + 1;
 

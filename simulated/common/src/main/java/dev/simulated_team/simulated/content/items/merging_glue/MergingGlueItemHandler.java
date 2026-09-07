@@ -175,7 +175,7 @@ public class MergingGlueItemHandler {
                 final Vec3 globalFirstPoint = Sable.HELPER.projectOutOfSubLevel(level, linkAABB.getCenter());
                 final Vec3 globalTarget = Sable.HELPER.projectOutOfSubLevel(level, hitAABB.getCenter());
 
-                final DustParticleOptions data = new DustParticleOptions(new net.createmod.catnip.api.theme.Color(color).asVectorF(), 1);
+                final DustParticleOptions data = new DustParticleOptions(new net.createmod.catnip.api.theme.Color(color).getRGB(), 1);
                 final int segments = 1;
 
                 for (int i = 0; i < segments; i++) {

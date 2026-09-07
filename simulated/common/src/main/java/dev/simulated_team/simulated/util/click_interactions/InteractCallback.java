@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.util.click_interactions;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -96,7 +97,7 @@ public interface InteractCallback {
             if (this.mouse) {
                 return mapping.matchesMouse(this.key);
             } else {
-                return mapping.matches(this.key, this.scanCode);
+                return mapping.matches(InputConstants.Type.KEYSYM.getOrCreate(this.key));
             }
         }
     }

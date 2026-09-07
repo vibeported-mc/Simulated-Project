@@ -92,7 +92,7 @@ public class RedstoneInductorBlock extends AbstractDiodeBlock implements IBE<Red
     }
 
     private static void addParticles(final BlockState state, final LevelAccessor level, final BlockPos pos, final float alpha) {
-        level.addParticle(new DustParticleOptions(new Vector3f(1.0F, 0.0F, 0.0F), alpha), pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, 0.0D, 0.0D,
+        level.addParticle(new DustParticleOptions(0xFF0000, alpha), pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, 0.0D, 0.0D,
                 0.0D);
     }
 

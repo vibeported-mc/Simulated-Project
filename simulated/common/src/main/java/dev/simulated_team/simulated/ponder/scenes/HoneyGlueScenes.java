@@ -84,7 +84,7 @@ public class HoneyGlueScenes {
                 .pointAt(vector.blockSurface(new BlockPos(3, 2, 2), Direction.WEST));
         overlay.showControls(vector.centerOf(3, 1, 1), Pointing.RIGHT, 20).withItem(SimItems.HONEY_GLUE.asStack()).rightClick();
         scene.idle(6);
-        effects.emitParticles(new Vec3(3, 1, 1), effects.particleEmitterWithinBlockSpace(new DustParticleOptions(new Color(255, 232, 142).asVectorF(), 1.0F), Vec3.ZERO), 10.0f, 2);
+        effects.emitParticles(new Vec3(3, 1, 1), effects.particleEmitterWithinBlockSpace(new DustParticleOptions(new Color(255, 232, 142).getRGB(), 1.0F), Vec3.ZERO), 10.0f, 2);
         scene.idle(24);
         overlay.showControls(vector.centerOf(3, 3, 3), Pointing.RIGHT, 20).withItem(SimItems.HONEY_GLUE.asStack()).rightClick();
         scene.idle(6);
@@ -304,7 +304,7 @@ public class HoneyGlueScenes {
                 .pointAt(Vec3.atCenterOf(carFull.getCenter()));
         scene.idle(20);
         overlay.showControls(vector.centerOf(carMinCorner), Pointing.RIGHT, 10).withItem(SimItems.HONEY_GLUE.asStack()).rightClick();
-        effects.emitParticles(vector.centerOf(carMinCorner), effects.particleEmitterWithinBlockSpace(new DustParticleOptions((new Color(255, 232, 142)).asVectorF(), 1.0F), Vec3.ZERO), 10.0f, 2);
+        effects.emitParticles(vector.centerOf(carMinCorner), effects.particleEmitterWithinBlockSpace(new DustParticleOptions((new Color(255, 232, 142)).getRGB(), 1.0F), Vec3.ZERO), 10.0f, 2);
         scene.idle(25);
         overlay.showControls(vector.centerOf(carMaxCorner), Pointing.RIGHT, 10).withItem(SimItems.HONEY_GLUE.asStack()).rightClick();
         overlay.chaseBoundingBoxOutline(PonderPalette.OUTPUT, carGlueCorner, carGlueCorner, 5);

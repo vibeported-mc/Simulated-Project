@@ -178,7 +178,7 @@ public class PhysicsAssemblerScenes {
         scene.idle(100);
 
         overlay.showControls(vector.centerOf(4, 0, 0), Pointing.RIGHT, 10).withItem(SimItems.HONEY_GLUE.asStack()).rightClick();
-        effects.emitParticles(vector.centerOf(4, 0, 0), effects.particleEmitterWithinBlockSpace(new DustParticleOptions((new Color(255, 232, 142)).asVectorF(), 1.0F), Vec3.ZERO), 10.0f, 2);
+        effects.emitParticles(vector.centerOf(4, 0, 0), effects.particleEmitterWithinBlockSpace(new DustParticleOptions((new Color(255, 232, 142)).getRGB(), 1.0F), Vec3.ZERO), 10.0f, 2);
         final AABB funnyGlue = new AABB(new BlockPos(4, 0, 0));
         overlay.chaseBoundingBoxOutline(PonderPalette.OUTPUT, funnyGlue, funnyGlue, 20);
         scene.idle(20);

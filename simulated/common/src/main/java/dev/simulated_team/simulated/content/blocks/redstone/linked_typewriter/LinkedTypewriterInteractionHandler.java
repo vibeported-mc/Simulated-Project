@@ -14,6 +14,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -142,7 +143,7 @@ public class LinkedTypewriterInteractionHandler {
                 }
 
                 for (final KeyMapping control : ControlsUtil.getControls()) {
-                    if (control.matches(key, scanCode)) {
+                    if (control.matches(InputConstants.Type.KEYSYM.getOrCreate(key))) {
                         control.consumeClick();
                         control.setDown(false);
                         break;
@@ -158,7 +159,7 @@ public class LinkedTypewriterInteractionHandler {
 
     public static void preventPress(final int key, final int scanCode) {
         for (final KeyMapping mapping : Minecraft.getInstance().options.keyMappings) {
-            if (mapping.matches(key, scanCode)) {
+            if (mapping.matches(InputConstants.Type.KEYSYM.getOrCreate(key))) {
                 // TODO: there might be a better, more robust way to prevent keystrokes from propagating
                 mapping.consumeClick();
                 mapping.setDown(false);
