@@ -1,13 +1,13 @@
 package dev.simulated_team.simulated.content.blocks.rope.rope_winch;
 
 
+import org.jspecify.annotations.Nullable;
+
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.simibubi.create.AllSpriteShifts;
 import com.simibubi.create.content.contraptions.pulley.AbstractPulleyRenderer;
-import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
+import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringRenderer.FilterRenderState;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import dev.simulated_team.simulated.content.blocks.rope.strand.client.RopeStrandRenderer;
 import dev.simulated_team.simulated.index.SimPartialModels;
@@ -16,11 +16,12 @@ import net.createmod.catnip.api.math.AngleHelper;
 import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SpriteShiftEntry;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.createmod.catnip.api.client.render.SuperByteBufferRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -28,10 +29,36 @@ import net.minecraft.world.phys.Vec3;
 import static com.simibubi.create.content.kinetics.base.DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE;
 import static com.simibubi.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 
-public class RopeWinchRenderer extends SafeBlockEntityRenderer<RopeWinchBlockEntity> {
+/**
+ * <h2>26.2 note</h2>
+ * <p>The shaft, the coil and the rope strand all read the block entity, so all three are baked
+ * during extraction. The rope is the interesting one: it is a chain of segments whose poses are
+ * rebuilt at submit time, so {@link RopeStrandRenderer} splits the same way and its state is carried
+ * here.
+ *
+ * <p>{@code shouldRenderOffScreen} no longer takes the block entity, and
+ * {@code FilteringRenderer.renderOnBlockEntity} is gone -- the filter is extracted into a
+ * {@link FilterRenderState}, which needs an {@link ItemModelResolver} from the context.
+ */
+public class RopeWinchRenderer
+        extends SafeBlockEntityRenderer<RopeWinchBlockEntity, RopeWinchRenderer.RopeWinchRenderState> {
+
+    public static class RopeWinchRenderState extends SafeRenderState {
+        public @Nullable FilterRenderState filter;
+        public @Nullable SuperByteBufferRenderState shaft;
+        public @Nullable SuperByteBufferRenderState ropeCoil;
+        public final RopeStrandRenderer.RopeRenderState rope = new RopeStrandRenderer.RopeRenderState();
+    }
+
+    private final ItemModelResolver itemModelResolver;
 
     public RopeWinchRenderer(final BlockEntityRendererProvider.Context context) {
+        this.itemModelResolver = context.itemModelResolver();
+    }
 
+    @Override
+    public RopeWinchRenderState createRenderState() {
+        return new RopeWinchRenderState();
     }
 
     private static SuperByteBuffer transform(final SuperByteBuffer buffer, final BlockState state, final boolean axisDirectionMatters) {
@@ -51,7 +78,7 @@ public class RopeWinchRenderer extends SafeBlockEntityRenderer<RopeWinchBlockEnt
     }
 
     @Override
-    public boolean shouldRenderOffScreen(final RopeWinchBlockEntity be) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 
@@ -60,26 +87,21 @@ public class RopeWinchRenderer extends SafeBlockEntityRenderer<RopeWinchBlockEnt
         return true;
     }
 
-    protected void renderSafe(final RopeWinchBlockEntity be, final float partialTicks, final PoseStack ms, final MultiBufferSource buffer, final int light, final int overlay) {
-        FilteringRenderer.renderOnBlockEntity(be, partialTicks, ms, buffer, light, overlay);
-        this.renderComponents(be, partialTicks, ms, buffer, light, overlay);
-    }
-
-    protected void renderComponents(final RopeWinchBlockEntity be, final float partialTicks, final PoseStack ms, final MultiBufferSource buffer, final int light, final int overlay) {
-        ms.pushPose();
-        final VertexConsumer vb = buffer.getBuffer(RenderType.solid());
+    @Override
+    protected void extractSafe(final RopeWinchBlockEntity be, final RopeWinchRenderState renderState, final float partialTicks, final Vec3 cameraPosition) {
+        renderState.filter = FilteringRenderer.getFilterRenderState(be, this.itemModelResolver, cameraPosition);
 
         final BlockState state = be.getBlockState();
         final SuperByteBuffer shaft = CachedBufferer.partial(SimPartialModels.ROPE_WINCH_SHAFT, state);
-        final SuperByteBuffer ropeCoil = CachedBufferer.partial(SimPartialModels.ROPE_WINCH_ROPE_COIL, state);
 
         final Direction.Axis axis = KineticBlockEntityRenderer.getRotationAxisOf(be);
         final float angle = KineticBlockEntityRenderer.getAngleForBe(be, be.getBlockPos(), axis);
-        KineticBlockEntityRenderer.kineticRotationTransform(shaft, be, axis, angle, light);
-        transform(shaft, state, true).renderInto(ms, vb);
+        KineticBlockEntityRenderer.kineticRotationTransform(shaft, be, axis, angle, renderState.lightCoords);
+        renderState.shaft = transform(shaft, state, true).extractRenderState();
 
         if (be.getRopeHolder().isAttached() || (be.isVirtual() && be.getRopeHolder().renderAttached)) {
-            ropeCoil.light(light);
+            final SuperByteBuffer ropeCoil = CachedBufferer.partial(SimPartialModels.ROPE_WINCH_ROPE_COIL, state);
+            ropeCoil.light(renderState.lightCoords);
 
             final Direction facing = state.getValue(FACING);
             final float speed;
@@ -92,10 +114,28 @@ public class RopeWinchRenderer extends SafeBlockEntityRenderer<RopeWinchBlockEnt
 
             AbstractPulleyRenderer.scrollCoil(ropeCoil, this.getCoilShift(), be.clientAngle.getValue(partialTicks), speed);
 
-            transform(ropeCoil, state, true).renderInto(ms, vb);
+            renderState.ropeCoil = transform(ropeCoil, state, true).extractRenderState();
+        } else {
+            // Reused between frames, so an absent coil has to be cleared rather than left standing.
+            renderState.ropeCoil = null;
         }
+
+        RopeStrandRenderer.extract(be, be.getRopeHolder(), partialTicks, renderState.rope);
+    }
+
+    @Override
+    protected void submitSafe(final RopeWinchRenderState renderState, final PoseStack ms, final SubmitNodeCollector queue, final CameraRenderState camera) {
+        if (renderState.filter != null)
+            renderState.filter.submit(renderState.blockState, queue, ms, renderState.lightCoords);
+
+        ms.pushPose();
+        if (renderState.shaft != null)
+            renderState.shaft.submit(ms, RenderTypes.solidMovingBlock(), queue);
+        if (renderState.ropeCoil != null)
+            renderState.ropeCoil.submit(ms, RenderTypes.solidMovingBlock(), queue);
         ms.popPose();
-        RopeStrandRenderer.render(be, be.getRopeHolder(), partialTicks, ms, buffer);
+
+        RopeStrandRenderer.submit(renderState.rope, ms, queue);
     }
 
     protected SpriteShiftEntry getCoilShift() {

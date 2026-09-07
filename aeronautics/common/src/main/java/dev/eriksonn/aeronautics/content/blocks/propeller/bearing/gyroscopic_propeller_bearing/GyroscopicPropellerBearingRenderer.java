@@ -1,5 +1,8 @@
 package dev.eriksonn.aeronautics.content.blocks.propeller.bearing.gyroscopic_propeller_bearing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.contraptions.bearing.BearingBlock;
@@ -11,8 +14,10 @@ import net.createmod.catnip.api.math.AngleHelper;
 import net.createmod.catnip.api.math.VecHelper;
 import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.createmod.catnip.api.client.render.SuperByteBufferRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,17 +25,37 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
-public class GyroscopicPropellerBearingRenderer extends KineticBlockEntityRenderer<GyroscopicPropellerBearingBlockEntity> {
+/**
+ * <h2>26.2 note</h2>
+ * <p>Every transform here goes onto the buffer rather than the pose, so the whole body moves into
+ * extraction unchanged and the submit is a flat replay. The tilt quaternion is interpolated from the
+ * block entity, which is why it cannot wait.
+ */
+public class GyroscopicPropellerBearingRenderer
+        extends KineticBlockEntityRenderer<GyroscopicPropellerBearingBlockEntity, GyroscopicPropellerBearingRenderer.GyroscopicPropellerBearingRenderState> {
+
+    public static class GyroscopicPropellerBearingRenderState extends KineticRenderState {
+        public final List<SuperByteBufferRenderState> parts = new ArrayList<>();
+    }
 
     public GyroscopicPropellerBearingRenderer(final BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
     @Override
-    protected void renderSafe(final GyroscopicPropellerBearingBlockEntity be, final float partialTicks, final PoseStack ms, final MultiBufferSource buffer, final int light, final int overlay) {
-        if (VisualizationManager.supportsVisualization(be.getLevel())) return;
+    public GyroscopicPropellerBearingRenderState createRenderState() {
+        return new GyroscopicPropellerBearingRenderState();
+    }
 
-        super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
+    @Override
+    protected void extractSafe(final GyroscopicPropellerBearingBlockEntity be, final GyroscopicPropellerBearingRenderState renderState, final float partialTicks, final Vec3 cameraPosition) {
+        if (VisualizationManager.supportsVisualization(be.getLevel())) {
+            renderState.skip = true;
+            return;
+        }
+
+        super.extractSafe(be, renderState, partialTicks, cameraPosition);
+        renderState.parts.clear();
 
         final Direction facing = be.getBlockState().getValue(BlockStateProperties.FACING);
         final Vec3 normal = new Vec3(facing.getStepX(), facing.getStepY(), facing.getStepZ());
@@ -49,7 +74,7 @@ public class GyroscopicPropellerBearingRenderer extends KineticBlockEntityRender
         superBuffer.translate(normal.scale(-4 / 16f));
 
         final float interpolatedAngle = be.getInterpolatedAngle(partialTicks - 1);
-        kineticRotationTransform(superBuffer, be, facing.getAxis(), (float) (interpolatedAngle / 180 * Math.PI), light);
+        kineticRotationTransform(superBuffer, be, facing.getAxis(), (float) (interpolatedAngle / 180 * Math.PI), renderState.lightCoords);
 
         if (facing.getAxis()
                 .isHorizontal()) {
@@ -58,7 +83,7 @@ public class GyroscopicPropellerBearingRenderer extends KineticBlockEntityRender
         }
 
         superBuffer.rotateCentered(AngleHelper.rad(-90 - AngleHelper.verticalAngle(facing)), Direction.EAST);
-        superBuffer.renderInto(ms, buffer.getBuffer(RenderType.solid()));
+        renderState.parts.add(superBuffer.extractRenderState());
 
 
         for (int i = 0; i < 4; i++) {
@@ -108,10 +133,17 @@ public class GyroscopicPropellerBearingRenderer extends KineticBlockEntityRender
             headBuffer.rotate(AngleHelper.rad(-90 * j), Direction.UP);
             poleBuffer.rotate(AngleHelper.rad(-90 * j), Direction.UP);
 
-            headBuffer.light(light).renderInto(ms, buffer.getBuffer(RenderType.solid()));
-            poleBuffer.light(light).renderInto(ms, buffer.getBuffer(RenderType.solid()));
+            renderState.parts.add(headBuffer.light(renderState.lightCoords).extractRenderState());
+            renderState.parts.add(poleBuffer.light(renderState.lightCoords).extractRenderState());
 
         }
+    }
+
+    @Override
+    protected void submitSafe(final GyroscopicPropellerBearingRenderState renderState, final PoseStack ms, final SubmitNodeCollector queue, final CameraRenderState camera) {
+        super.submitSafe(renderState, ms, queue, camera);
+        for (final SuperByteBufferRenderState part : renderState.parts)
+            part.submit(ms, RenderTypes.solidMovingBlock(), queue);
     }
 
     @Override
@@ -121,4 +153,3 @@ public class GyroscopicPropellerBearingRenderer extends KineticBlockEntityRender
                 .getOpposite());
     }
 }
-

@@ -1,33 +1,67 @@
 package dev.simulated_team.simulated.content.blocks.docking_connector;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jspecify.annotations.Nullable;
+
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import net.createmod.catnip.api.math.AngleHelper;
 import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.createmod.catnip.api.client.render.SuperByteBufferRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
-public class DockingConnectorRenderer extends SafeBlockEntityRenderer<DockingConnectorBlockEntity> {
+/**
+ * <h2>26.2 note</h2>
+ * <p>The extension and foot rotation are read off the block entity, so all the geometry is baked
+ * during extraction. Reusing one buffer per model across the four legs stays correct:
+ * {@code extractRenderState} resets the buffer, exactly as {@code renderInto} did.
+ *
+ * <p>What cannot be baked is the pose. Each leg is drawn under its own quarter turn, and the whole
+ * assembly under the connector's facing, so those stay in the submit phase -- which means the legs
+ * are kept as four separate groups rather than one flat list.
+ */
+public class DockingConnectorRenderer
+        extends SafeBlockEntityRenderer<DockingConnectorBlockEntity, DockingConnectorRenderer.DockingConnectorRenderState> {
+
+    public static class DockingConnectorRenderState extends SafeRenderState {
+        public @Nullable Direction facing;
+        public final List<SuperByteBufferRenderState> mainPistons = new ArrayList<>();
+        /** One group per leg; each is drawn under its own quarter turn. */
+        public final List<List<SuperByteBufferRenderState>> legs = new ArrayList<>();
+    }
+
     public DockingConnectorRenderer(final BlockEntityRendererProvider.Context context) {
 
     }
 
     @Override
-    protected void renderSafe(final DockingConnectorBlockEntity be, final float partialTicks, final PoseStack ms, final MultiBufferSource bufferSource, final int light, final int overlay) {
-        final VertexConsumer vb = bufferSource.getBuffer(RenderType.cutout());
+    public DockingConnectorRenderState createRenderState() {
+        return new DockingConnectorRenderState();
+    }
+
+    @Override
+    protected void extractSafe(final DockingConnectorBlockEntity be, final DockingConnectorRenderState renderState, final float partialTicks, final Vec3 cameraPosition) {
+        renderState.mainPistons.clear();
+        renderState.legs.clear();
+
         final Direction direction = be.getBlockState()
                 .getValue(BlockStateProperties.FACING);
+        renderState.facing = direction;
         final BlockState blockState = be.getBlockState();
         final float extension = be.getExtensionDistance(partialTicks);
         final float rotation = be.getFeetRotation(partialTicks) * 90;
@@ -37,12 +71,11 @@ public class DockingConnectorRenderer extends SafeBlockEntityRenderer<DockingCon
         final SuperByteBuffer sidePiston1 = CachedBufferer.partial(SimPartialModels.DOCKING_CONNECTOR_SIDE_PISTON_BOTTOM, blockState);
         final SuperByteBuffer sidePiston2 = CachedBufferer.partial(SimPartialModels.DOCKING_CONNECTOR_SIDE_PISTON_TOP, blockState);
         final SuperByteBuffer foot = CachedBufferer.partial(SimPartialModels.DOCKING_CONNECTOR_FOOT, blockState);
-        ms.pushPose();
-        rotateToFaceCentered(ms, direction);
+
         piston1.translate(0, extension * 0.5, 0);
         piston2.translate(0, extension, 0);
-        piston1.light(light).renderInto(ms, vb);
-        piston2.light(light).renderInto(ms, vb);
+        renderState.mainPistons.add(piston1.light(renderState.lightCoords).extractRenderState());
+        renderState.mainPistons.add(piston2.light(renderState.lightCoords).extractRenderState());
 
         final Vector2f footAnchor = new Vector2f();
         final Vector2f sidePistonTopAnchor = new Vector2f();
@@ -65,9 +98,7 @@ public class DockingConnectorRenderer extends SafeBlockEntityRenderer<DockingCon
 
 
         for (int i = 0; i < 4; i++) {
-            ms.pushPose();
-            ms.translate(0.5, 0, 0.5);
-            TransformStack.of(ms).rotateYDegrees(i * 90);
+            final List<SuperByteBufferRenderState> leg = new ArrayList<>();
 
             sidePiston1.translate(0, sidePistonBottomAnchor.y, sidePistonBottomAnchor.x);
             sidePiston2.translate(0, sidePistonTopAnchor.y, sidePistonTopAnchor.x);
@@ -77,9 +108,30 @@ public class DockingConnectorRenderer extends SafeBlockEntityRenderer<DockingCon
             sidePiston1.mulPose(rotationMatrix);
             sidePiston2.mulPose(rotationMatrix);
 
-            sidePiston1.light(light).renderInto(ms, vb);
-            sidePiston2.light(light).renderInto(ms, vb);
-            foot.light(light).renderInto(ms, vb);
+            leg.add(sidePiston1.light(renderState.lightCoords).extractRenderState());
+            leg.add(sidePiston2.light(renderState.lightCoords).extractRenderState());
+            leg.add(foot.light(renderState.lightCoords).extractRenderState());
+            renderState.legs.add(leg);
+        }
+    }
+
+    @Override
+    protected void submitSafe(final DockingConnectorRenderState renderState, final PoseStack ms, final SubmitNodeCollector queue, final CameraRenderState camera) {
+        if (renderState.facing == null)
+            return;
+
+        ms.pushPose();
+        rotateToFaceCentered(ms, renderState.facing);
+
+        for (final SuperByteBufferRenderState piston : renderState.mainPistons)
+            piston.submit(ms, RenderTypes.cutoutMovingBlock(), queue);
+
+        for (int i = 0; i < renderState.legs.size(); i++) {
+            ms.pushPose();
+            ms.translate(0.5, 0, 0.5);
+            TransformStack.of(ms).rotateYDegrees(i * 90);
+            for (final SuperByteBufferRenderState part : renderState.legs.get(i))
+                part.submit(ms, RenderTypes.cutoutMovingBlock(), queue);
             ms.popPose();
         }
 
