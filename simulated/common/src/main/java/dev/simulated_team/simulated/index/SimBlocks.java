@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.index;
 
-import com.simibubi.create.AllBlocks;
+import net.minecraft.client.data.models.BlockModelGenerators;com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllTags;
 import com.simibubi.create.Create;
@@ -104,17 +104,17 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::wooden)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
-                    .blockstate((c, p) -> p.horizontalFaceBlock(c.get(), AssetLookup.partialBaseModel(c, p)))
+                    .blockstate(() -> (c, p) -> p.generateHorizontalFaceBlock(c.get(), AssetLookup.partialBaseVariant(c, p)))
                     .item()
                     .transform(customItemModel())
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("   ")
                             .pattern(" N ")
                             .pattern("ARA")
                             .define('A', AllItems.ANDESITE_ALLOY)
                             .define('N', Items.LEVER)
                             .define('R', AllBlocks.ANDESITE_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .register();
 
@@ -124,29 +124,29 @@ public class SimBlocks {
                     .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::netheriteMetal)
                     .properties((properties -> properties.destroyTime(5f)))
-                    .blockstate((ctx, prov) -> prov.directionalBlock(ctx.getEntry(),
-                            blockState -> prov.models().getExistingFile(
+                    .blockstate(() -> (ctx, prov) -> prov.directionalBlock(ctx.getEntry(),
+                            blockState -> BlockModelGenerators.plainVariant(
                                     prov.modLoc("block/swivel_bearing/block" + (blockState.getValue(SwivelBearingBlock.ASSEMBLED) ? "_assembled" : "")))))
                     .transform(SimStress.setImpact(4.0))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .item().transform(customItemModel("swivel_bearing", "item"))
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern(" A ")
                             .pattern(" B ")
                             .pattern(" C ")
                             .define('A', ItemTags.WOODEN_SLABS)
                             .define('B', AllBlocks.INDUSTRIAL_IRON_BLOCK)
                             .define('C', AllBlocks.COGWHEEL)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .register();
 
     public static final BlockEntry<SwivelBearingPlateBlock> SWIVEL_BEARING_LINK_BLOCK =
             REGISTRATE.block("swivel_bearing_link_block", SwivelBearingPlateBlock::new)
                     .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
-                    .blockstate((ctx, prov) ->
-                            prov.directionalBlock(ctx.getEntry(), blockState -> prov.models().getExistingFile(prov.modLoc("block/swivel_bearing/bearing_plate"))))
+                    .blockstate(() -> (ctx, prov) ->
+                            BlockStateGen.directionalBlock(ctx, prov, blockState -> BlockModelGenerators.plainVariant(prov.modLoc("block/swivel_bearing/bearing_plate"))))
                     .initialProperties(SharedProperties::netheriteMetal)
                     .properties(properties -> properties
                             .destroyTime(5f))
@@ -156,8 +156,8 @@ public class SimBlocks {
 
     public static final BlockEntry<MergingGlueBlock> MERGING_GLUE =
             REGISTRATE.block("merging_glue", MergingGlueBlock::new)
-                    .blockstate((ctx, prov) ->
-                            prov.directionalBlock(ctx.getEntry(), blockState -> prov.models().getExistingFile(prov.modLoc("block/merging_glue/block"))))
+                    .blockstate(() -> (ctx, prov) ->
+                            BlockStateGen.directionalBlock(ctx, prov, blockState -> BlockModelGenerators.plainVariant(prov.modLoc("block/merging_glue/block"))))
                     .properties(p -> p.noOcclusion().instabreak().mapColor(MapColor.GRASS).friction(0.8F).sound(SoundType.SLIME_BLOCK))
                     .register();
 
@@ -165,19 +165,19 @@ public class SimBlocks {
             REGISTRATE.block("rope_winch", RopeWinchBlock::new)
                     .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
-                    .blockstate(SimBlockStateGen::directionalKineticAxisBlockstate)
+                    .blockstate(() -> SimBlockStateGen::directionalKineticAxisBlockstate)
                     .properties(Block.Properties::noOcclusion)
                     .transform(SimStress.setImpact(4.0))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("I")
                             .pattern("H")
                             .pattern("S")
                             .define('I', CommonMetal.IRON.plates)
                             .define('H', AllBlocks.SHAFT)
                             .define('S', AllBlocks.INDUSTRIAL_IRON_BLOCK)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimItems.ROPE_COUPLING))
+                            .unlockedBy("has_ingredient", p.has(SimItems.ROPE_COUPLING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -187,15 +187,15 @@ public class SimBlocks {
             REGISTRATE.block("rope_connector", RopeConnectorBlock::new)
                     .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
-                    .blockstate(SimBlockStateGen::directionalAxisBlock)
+                    .blockstate(() -> SimBlockStateGen::directionalAxisBlock)
                     .properties(p -> p.noOcclusion().forceSolidOn())
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE, BlockTags.MINEABLE_WITH_AXE, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.SUPER_LIGHT)
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("I")
                             .pattern("S")
                             .define('I', CommonMetal.IRON.plates)
                             .define('S', AllBlocks.INDUSTRIAL_IRON_BLOCK)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimItems.ROPE_COUPLING))
+                            .unlockedBy("has_ingredient", p.has(SimItems.ROPE_COUPLING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -203,26 +203,26 @@ public class SimBlocks {
 
     public static final BlockEntry<HandleBlock> IRON_HANDLE = createHandle(null, HandleBlock.Variant.IRON)
             .recipe((c, p) -> {
-                ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                p.shaped(RecipeCategory.MISC, c.get(), 1)
                     .pattern("N")
                     .pattern("A")
                     .define('N', CommonMetal.IRON.nuggets)
                     .define('A', AllItems.ANDESITE_ALLOY)
-                    .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.ANDESITE_ALLOY))
+                    .unlockedBy("has_ingredient", p.has(AllItems.ANDESITE_ALLOY))
                     .save(p);
-                ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
+                p.shapeless(RecipeCategory.MISC, c.get(), 1)
                     .requires(SimTags.Items.HANDLE_VARIANTS)
                     .group("simulated:handle_variants")
-                    .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimTags.Items.HANDLE_VARIANTS))
+                    .unlockedBy("has_ingredient", p.has(SimTags.Items.HANDLE_VARIANTS))
                     .save(p, Simulated.path("handle_undye"));
             })
             .register();
 
     public static final BlockEntry<HandleBlock> COPPER_HANDLE = createHandle(null, HandleBlock.Variant.COPPER)
-            .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
+            .recipe((c, p) -> p.shapeless(RecipeCategory.MISC, c.get(), 1)
                     .requires(IRON_HANDLE)
                     .requires(CommonMetal.COPPER.nuggets)
-                    .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(IRON_HANDLE))
+                    .unlockedBy("has_ingredient", p.has(IRON_HANDLE))
                     .group("simulated:handle_variants")
                     .save(p))
             .transform(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.applyBlock())
@@ -230,10 +230,10 @@ public class SimBlocks {
 
     public static final DyedBlockList<HandleBlock> DYED_HANDLES = new DyedBlockList<>(color ->
             createHandle(color, HandleBlock.Variant.DYED)
-                .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
+                .recipe((c, p) -> p.shapeless(RecipeCategory.MISC, c.get(), 1)
                         .requires(IRON_HANDLE)
                         .requires(DyeItem.byColor(color))
-                        .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(IRON_HANDLE))
+                        .unlockedBy("has_ingredient", p.has(IRON_HANDLE))
                         .group("simulated:handle_variants")
                         .save(p))
                 .transform(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.applyBlock())
@@ -248,15 +248,15 @@ public class SimBlocks {
                     .mapColor(MapColor.PODZOL))
             .transform(axeOrPickaxe())
             .recipe((c, p) -> {
-                ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get())
+                p.shapeless(RecipeCategory.MISC, c.get())
                         .requires(AllBlocks.ANDESITE_CASING)
                         .requires(AllBlocks.COGWHEEL)
                         .requires(Items.REDSTONE_TORCH)
                         .requires(AllBlocks.SHAFT)
-                        .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
+                        .unlockedBy("has_ingredient", p.has(AllBlocks.ANDESITE_CASING))
                         .save(p);
             })
-            .blockstate(DirectionalGearshiftGenerator::generate)
+            .blockstate(() -> DirectionalGearshiftGenerator::generate)
             .item()
             .transform(customItemModel())
             .register();
@@ -264,41 +264,41 @@ public class SimBlocks {
             REGISTRATE.block("torsion_spring", TorsionSpringBlock::new)
                     .initialProperties(SharedProperties::stone)
                     .properties(BlockBehaviour.Properties::noOcclusion)
-                    .blockstate((c, p) -> p.directionalBlock(c.get(),
-                            blockState -> p.models().getExistingFile(p.modLoc("block/torsion_spring/block"))))
+                    .blockstate(() -> (c, p) -> p.directionalBlock(c.get(),
+                            blockState -> BlockModelGenerators.plainVariant(p.modLoc("block/torsion_spring/block"))))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .transform(SimStress.setImpact(16.0))
                     .transform(SimStress.setCapacity(8.0))
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("A")
                             .pattern("S")
                             .pattern("C")
                             .define('A', AllBlocks.SHAFT)
                             .define('S', SimItems.SPRING)
                             .define('C', AllBlocks.ANDESITE_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .item().transform(customItemModel())
                     .register();
     public static final BlockEntry<AugerShaftBlock> AUGER_SHAFT =
             REGISTRATE.block("auger_shaft", AugerShaftBlock::new)
                     .initialProperties(SharedProperties::softMetal)
-                    .blockstate(SimBlockStateService.INSTANCE.augerShaftGenerate("auger_shaft", false))
+                    .blockstate(() -> SimBlockStateService.INSTANCE.augerShaftGenerate("auger_shaft", false))
                     .transform(pickaxeOnly())
                     .transform(SimStress.setImpact(0.5))
                     .recipe((c, p) -> {
-                        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 2)
+                        p.shapeless(RecipeCategory.MISC, c.get(), 2)
                                 .requires(AllBlocks.CHUTE)
                                 .requires(AllBlocks.SHAFT)
                                 .requires(CommonMetal.IRON.plates)
-                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.IRON.plates))
+                                .unlockedBy("has_ingredient", p.has(CommonMetal.IRON.plates))
                                 .save(p);
 
-                        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
+                        p.shapeless(RecipeCategory.MISC, c.get(), 1)
                                 .requires(SimBlocks.AUGER_COG)
                                 .group("simulated:auger_swap")
-                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.IRON.plates))
+                                .unlockedBy("has_ingredient", p.has(CommonMetal.IRON.plates))
                                 .save(p, Simulated.path(c.getName() + "_from_auger_cogwheel"));
                     })
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
@@ -309,14 +309,14 @@ public class SimBlocks {
     public static final BlockEntry<AugerCogBlock> AUGER_COG =
             REGISTRATE.block("auger_cog", AugerCogBlock::new)
                     .initialProperties(SharedProperties::softMetal)
-                    .blockstate(SimBlockStateService.INSTANCE.augerShaftGenerate("auger_cog", true))
+                    .blockstate(() -> SimBlockStateService.INSTANCE.augerShaftGenerate("auger_cog", true))
                     .lang("Auger Cogwheel")
                     .transform(pickaxeOnly())
                     .transform(SimStress.setImpact(0.5))
-                    .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shapeless(RecipeCategory.MISC, c.get(), 1)
                             .requires(SimBlocks.AUGER_SHAFT.get())
                             .group("simulated:auger_swap")
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.IRON.plates))
+                            .unlockedBy("has_ingredient", p.has(CommonMetal.IRON.plates))
                             .save(p, Simulated.path(c.getName() + "_from_auger_shaft")))
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
                     .properties(BlockBehaviour.Properties::noOcclusion)
@@ -330,14 +330,14 @@ public class SimBlocks {
 
         if (color == DyeColor.RED) {
             return createPortableEngine(color)
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("G")
                             .pattern("E")
                             .pattern("B")
                             .define('G', CommonMetal.IRON.plates)
                             .define('E', SimItems.ENGINE_ASSEMBLY)
                             .define('B', Blocks.BLAST_FURNACE)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.IRON.plates))
+                            .unlockedBy("has_ingredient", p.has(CommonMetal.IRON.plates))
                             .save(p))
                     .item()
                     .model((c, p) -> p
@@ -369,7 +369,7 @@ public class SimBlocks {
                 .initialProperties(SharedProperties::stone)
                 .properties(p -> p.sound(SoundType.NETHERITE_BLOCK).lightLevel((state) -> PortableEngineBlock.isLitState(state) ? 6 : 0))
                 .properties(BlockBehaviour.Properties::noOcclusion)
-                .blockstate((c, p) -> p.horizontalBlock(c.get(), blockState -> p.models()
+                .blockstate(() -> (c, p) -> BlockStateGen.horizontalBlock(c, p, blockState -> p.models()
                         .withExistingParent(colorName + "_portable_engine", p.modLoc("block/portable_engine/block"))
                                 .texture("0", p.modLoc("block/portable_engine/" + colorName))
                                 .texture("particle", p.modLoc("block/portable_engine/" + colorName))
@@ -384,15 +384,15 @@ public class SimBlocks {
             REGISTRATE.block("laser_pointer", LaserPointerBlock::new)
                     .initialProperties(SharedProperties::softMetal)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-                    .blockstate(SimBlockStateGen::facingPoweredAxisBlockstate)
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .blockstate(() -> SimBlockStateGen::facingPoweredAxisBlockstate)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("A")
                             .pattern("T")
                             .pattern("C")
                             .define('A', SimTags.Items.LASER_POINTER_LENS)
                             .define('T', Items.REDSTONE_TORCH)
                             .define('C', AllBlocks.ANDESITE_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
@@ -404,17 +404,17 @@ public class SimBlocks {
                     .transform(DisplaySource.displaySource(SimDisplaySources.LASER_SENSOR_DISPLAY))
                     .initialProperties(SharedProperties::wooden)
                     .properties(BlockBehaviour.Properties::noOcclusion)
-                    .blockstate((c, p) -> SimBlockStateService.INSTANCE.genericModelBuilder(c, p, SimBlockStateGen::xyLaser, (state) -> AssetLookup.forPowered(c, p).apply(state)))
+                    .blockstate(() -> (c, p) -> SimBlockStateService.INSTANCE.genericModelBuilder(c, p, SimBlockStateGen::xyLaser, (state) -> AssetLookup.forPowered(c, p).apply(state)))
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("G")
                             .pattern("A")
                             .pattern("C")
                             .define('G', Blocks.TINTED_GLASS)
                             .define('A', SimTags.Items.LASER_POINTER_LENS)
                             .define('C', AllBlocks.ANDESITE_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -425,17 +425,17 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::wooden)
                     .transform(axeOrPickaxe())
                     .properties(BlockBehaviour.Properties::noOcclusion)
-                    .blockstate(SimBlockStateGen::directionalAxisBlock)
+                    .blockstate(() -> SimBlockStateGen::directionalAxisBlock)
                     .transform(DisplaySource.displaySource(SimDisplaySources.VELO_DISPLAY))
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("P")
                             .pattern("B")
                             .pattern("A")
                             .define('P', AllItems.PROPELLER)
                             .define('B', Blocks.BARREL)
                             .define('A', AllBlocks.ANDESITE_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .item().transform(customItemModel())
                     .register();
@@ -446,19 +446,19 @@ public class SimBlocks {
                     .transform(axeOrPickaxe())
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-                    .blockstate((c, p) -> SimBlockStateService.INSTANCE.genericModelBuilder(c, p,
+                    .blockstate(() -> (c, p) -> SimBlockStateService.INSTANCE.genericModelBuilder(c, p,
                             SimBlockStateGen::xyAltitudeSensor,
-                            (state) -> p.models().getExistingFile(p.modLoc("block/" + c.getName() + "/block"))))
+                            (state) -> BlockModelGenerators.plainVariant(p.modLoc("block/" + c.getName() + "/block"))))
                     .transform(DisplaySource.displaySource(SimDisplaySources.ALTITUDE_SENSOR_DISPLAY))
                     .onRegister(movementBehaviour(new AltitudeSensorMovementBehaviour()))
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("P")
                             .pattern("S")
                             .pattern("A")
                             .define('P', Items.PAPER)
                             .define('S', CommonMetal.IRON.plates)
                             .define('A', AllBlocks.ANDESITE_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -473,17 +473,17 @@ public class SimBlocks {
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .transform(DisplaySource.displaySource(SimDisplaySources.GIMBAL_DISPLAY))
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("C")
                             .pattern("G")
                             .pattern("B")
                             .define('C', Items.COMPASS)
                             .define('G', SimItems.GYRO_MECHANISM)
                             .define('B', AllBlocks.BRASS_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimItems.GYRO_MECHANISM))
+                            .unlockedBy("has_ingredient", p.has(SimItems.GYRO_MECHANISM))
                             .save(p)
                     )
-                    .blockstate(BlockStateGen.horizontalAxisBlockProvider(true))
+                    .blockstate(() -> BlockStateGen.horizontalAxisBlockProvider(true))
                     .item()
                     .transform(customItemModel())
                     .register();
@@ -494,17 +494,16 @@ public class SimBlocks {
                     .transform(axeOrPickaxe())
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-                    .blockstate((c, p) -> p.directionalBlock(c.get(), blockState -> p.models()
-                            .getExistingFile(p.modLoc("block/navigation_table/block"))))
+                    .blockstate(() -> (c, p) -> BlockStateGen.directionalBlock(c, p, blockState -> BlockModelGenerators.plainVariant(p.modLoc("block/navigation_table/block"))))
                     .transform(DisplaySource.displaySource(SimDisplaySources.NAV_TABLE_DISPLAY))
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("S")
                             .pattern("P")
                             .pattern("B")
                             .define('S', AllItems.BRASS_SHEET)
                             .define('P', AllItems.PRECISION_MECHANISM)
                             .define('B', AllBlocks.BRASS_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.PRECISION_MECHANISM))
+                            .unlockedBy("has_ingredient", p.has(AllItems.PRECISION_MECHANISM))
                             .save(p))
                     .item().transform(customItemModel())
                     .register();
@@ -514,19 +513,19 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::softMetal)
                     .transform(DisplaySource.displaySource(SimDisplaySources.OPTICAL_SENSOR_DISPLAY))
                     .properties(BlockBehaviour.Properties::noOcclusion)
-                    .blockstate((c, p) -> SimBlockStateService.INSTANCE.genericModelBuilder(c, p, SimBlockStateGen::xyLaser, (state) -> AssetLookup.forPowered(c, p).apply(state)))
+                    .blockstate(() -> (c, p) -> SimBlockStateService.INSTANCE.genericModelBuilder(c, p, SimBlockStateGen::xyLaser, (state) -> AssetLookup.forPowered(c, p).apply(state)))
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .item().transform(customItemModel())
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern(" A ")
                             .pattern(" C ")
                             .pattern(" B ")
                             .define('A', Tags.Items.GEMS_AMETHYST)
                             .define('B', AllBlocks.BRASS_CASING)
                             .define('C', AllItems.ELECTRON_TUBE)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
 
@@ -543,7 +542,7 @@ public class SimBlocks {
                     .transform(DisplaySource.displaySource(SimDisplaySources.DOCKING_CONNECTOR_DISPLAY))
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .properties(BlockBehaviour.Properties::dynamicShape)
-                    .blockstate(SimBlockStateGen::facingPoweredAxisBlockstate)
+                    .blockstate(() -> SimBlockStateGen::facingPoweredAxisBlockstate)
                     .item()
                     .transform(customItemModel())
                     .register();
@@ -552,7 +551,7 @@ public class SimBlocks {
             REGISTRATE.block("paired_docking_connector", PairedDockingConnectorBlock::new)
                     .tag(AllTags.AllBlockTags.NON_MOVABLE.tag)
                     .initialProperties(SharedProperties::stone)
-                    .blockstate((c, p) -> p.simpleBlock(c.get(), p.models().getExistingFile(p.modLoc("block/docking_connector/block"))))
+                    .blockstate(() -> (c, p) -> p.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(c.get(), BlockModelGenerators.plainVariant(p.modLoc("block/docking_connector/block"))))
                     .transform(pickaxeOnly())
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
                     .properties(properties -> properties
@@ -567,21 +566,21 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::stone)
                     .properties((p) -> p.noOcclusion()
                             .isRedstoneConductor(SimBlocks::never))
-                    .blockstate((c, p) -> BlockStateGen.axisBlock(c, p, s -> {
+                    .blockstate(() -> (c, p) -> BlockStateGen.axisBlock(c, p, s -> {
                         String suffix = s.getValue(AnalogTransmissionBlock.POWERED) ? "_on" : "";
                         Identifier path = Simulated.path("block/" + c.getName() + "/block" + suffix);
-                        return p.models().getExistingFile(path);
+                        return BlockModelGenerators.plainVariant(path);
                     }))
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .tag(BlockTags.MINEABLE_WITH_PICKAXE)
                     .tag(BlockTags.MINEABLE_WITH_AXE)
                     .item().transform(customItemModel())
-                    .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shapeless(RecipeCategory.MISC, c.get(), 1)
                             .requires(AllBlocks.BRASS_CASING)
                             .requires(AllBlocks.SHAFT)
                             .requires(AllBlocks.COGWHEEL)
                             .requires(AllItems.ELECTRON_TUBE)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
 
@@ -590,20 +589,20 @@ public class SimBlocks {
                     .initialProperties(SharedProperties::wooden)
                     .properties(p -> p.mapColor(MapColor.PODZOL))
                     .transform(axeOrPickaxe())
-                    .blockstate(new SteeringWheelGenerator()::generate)
+                    .blockstate(() -> new SteeringWheelGenerator()::generate)
                     .onRegister(ItemUseOverrides::addBlock)
                     .transform(SimStress.setCapacity(16.0))
                     .onRegister(BlockStressValues.setGeneratorSpeed(SteeringWheelBlockEntity.RPM))
                     .tag(SimTags.Blocks.LIGHT)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("C")
                             .pattern("A")
                             .pattern("S")
                             .define('C', AllBlocks.LARGE_COGWHEEL)
                             .define('A', AllBlocks.ANDESITE_CASING)
                             .define('S', AllBlocks.SHAFT)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.ANDESITE_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.ANDESITE_CASING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -614,13 +613,13 @@ public class SimBlocks {
                     .initialProperties(() -> Blocks.LEVER)
                     .transform(axeOrPickaxe())
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-                    .blockstate((c, p) -> p.horizontalFaceBlock(c.get(), AssetLookup.partialBaseModel(c, p)))
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .blockstate(() -> (c, p) -> p.generateHorizontalFaceBlock(c.get(), AssetLookup.partialBaseVariant(c, p)))
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("S")
                             .pattern("B")
                             .define('S', Items.STICK)
                             .define('B', AllBlocks.BRASS_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -629,9 +628,8 @@ public class SimBlocks {
     public static final BlockEntry<LinkedTypewriterBlock> LINKED_TYPEWRITER =
             REGISTRATE.block("linked_typewriter", LinkedTypewriterBlock::new)
                     .initialProperties(SharedProperties::softMetal)
-                    .blockstate((ctx, prov) -> {
-                        prov.horizontalBlock(ctx.get(), blockState -> prov.models()
-                                .getExistingFile(prov.modLoc("block/" + ctx.getName() + "/block" + (blockState.getValue(BlockStateProperties.POWERED) ? "_powered" : ""))));
+                    .blockstate(() -> (ctx, prov) -> {
+                        BlockStateGen.horizontalBlock(ctx, prov, blockState -> BlockModelGenerators.plainVariant(prov.modLoc("block/" + ctx.getName() + "/block" + (blockState.getValue(BlockStateProperties.POWERED) ? "_powered" : ""))));
                     })
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .transform(DisplaySource.displaySource(SimDisplaySources.LINKED_TYPEWRITER__DISPLAY))
@@ -644,18 +642,18 @@ public class SimBlocks {
             REGISTRATE.block("directional_linked_receiver", DirectionalLinkedReceiverBlock::new)
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.noOcclusion().forceSolidOn())
-                    .blockstate(SimBlockStateGen::facingPoweredAxisBlockstate)
+                    .blockstate(() -> SimBlockStateGen::facingPoweredAxisBlockstate)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.SUPER_LIGHT, SimTags.Blocks.QUARTER_VOLUME)
                     .transform(axeOrPickaxe())
                     .item().transform(customItemModel())
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("A")
                             .pattern("B")
                             .pattern("C")
                             .define('A', AllItems.TRANSMITTER)
                             .define('B', CommonMetal.IRON.plates)
                             .define('C', AllBlocks.BRASS_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
 
@@ -663,27 +661,27 @@ public class SimBlocks {
             REGISTRATE.block("modulating_linked_receiver", ModulatingLinkedReceiverBlock::new)
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.noOcclusion().forceSolidOn())
-                    .blockstate(SimBlockStateGen::facingPoweredAxisBlockstate)
+                    .blockstate(() -> SimBlockStateGen::facingPoweredAxisBlockstate)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, SimTags.Blocks.SUPER_LIGHT, SimTags.Blocks.QUARTER_VOLUME)
                     .transform(axeOrPickaxe())
                     .item().transform(customItemModel())
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern("A")
                             .pattern("B")
                             .pattern("C")
                             .define('A', AllItems.TRANSMITTER)
                             .define('B', CommonMetal.GOLD.plates)
                             .define('C', AllBlocks.BRASS_CASING)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.BRASS_CASING))
+                            .unlockedBy("has_ingredient", p.has(AllBlocks.BRASS_CASING))
                             .save(p))
                     .register();
 
     public static final BlockEntry<RedstoneAccumulatorBlock> REDSTONE_ACCUMULATOR =
             REGISTRATE.block("redstone_accumulator", RedstoneAccumulatorBlock::new)
                     .initialProperties(() -> Blocks.REPEATER)
-                    .blockstate(RedstoneAccumulatorBlockStateGen.generate())
+                    .blockstate(() -> RedstoneAccumulatorBlockStateGen.generate())
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag, SimTags.Blocks.DIODE)
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern(" Q ")
                             .pattern("RBT")
                             .pattern("SSS")
@@ -692,7 +690,7 @@ public class SimBlocks {
                             .define('R', SimTags.Items.REDSTONE_DUST)
                             .define('Q', AllItems.POLISHED_ROSE_QUARTZ)
                             .define('S', SimTags.Items.STONE)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimTags.Items.REDSTONE_DUST))
+                            .unlockedBy("has_ingredient", p.has(SimTags.Items.REDSTONE_DUST))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -701,9 +699,9 @@ public class SimBlocks {
     public static final BlockEntry<RedstoneInductorBlock> REDSTONE_INDUCTOR =
             REGISTRATE.block("redstone_inductor", RedstoneInductorBlock::new)
                     .initialProperties(() -> Blocks.REPEATER)
-                    .blockstate(SimBlockStateGen::redstoneInductorBlockstate)
+                    .blockstate(() -> SimBlockStateGen::redstoneInductorBlockstate)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag, SimTags.Blocks.DIODE)
-                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
                             .pattern(" C ")
                             .pattern("RBT")
                             .pattern("SSS")
@@ -712,7 +710,7 @@ public class SimBlocks {
                             .define('B', CommonMetal.BRASS.plates)
                             .define('C', CommonMetal.COPPER.plates)
                             .define('S', SimTags.Items.STONE)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimTags.Items.REDSTONE_DUST))
+                            .unlockedBy("has_ingredient", p.has(SimTags.Items.REDSTONE_DUST))
                             .save(p))
                     .item()
                     .transform(customItemModel())
@@ -722,18 +720,17 @@ public class SimBlocks {
             REGISTRATE.block("absorber", AbsorberBlock::new)
                     .initialProperties(SharedProperties::copperMetal)
                     .properties(BlockBehaviour.Properties::noOcclusion)
-                    .blockstate((ctx, prov) -> {
-                        prov.horizontalBlock(ctx.get(), blockState -> prov.models()
-                                .getExistingFile(prov.modLoc("block/" + ctx.getName() + "/block" + (blockState.getValue(BlockStateProperties.POWERED) ? "_powered" : ""))));
+                    .blockstate(() -> (ctx, prov) -> {
+                        BlockStateGen.horizontalBlock(ctx, prov, blockState -> BlockModelGenerators.plainVariant(prov.modLoc("block/" + ctx.getName() + "/block" + (blockState.getValue(BlockStateProperties.POWERED) ? "_powered" : ""))));
                     })
-//                    .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 1)
+//                    .recipe((c, p) -> p.shaped(RecipeCategory.MISC, c.get(), 1)
 //                            .pattern("G")
 //                            .pattern("S")
 //                            .pattern("R")
 //                            .define('G', Blocks.COPPER_GRATE)
 //                            .define('S', Blocks.SPONGE)
 //                            .define('R', Items.REDSTONE)
-//                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(SimTags.Items.REDSTONE_DUST))
+//                            .unlockedBy("has_ingredient", p.has(SimTags.Items.REDSTONE_DUST))
 //                            .save(p))
                     .item().transform(customItemModel())
                     .register();
@@ -744,15 +741,15 @@ public class SimBlocks {
                     .transform(pickaxeOnly())
                     .properties(p -> p.sound(SoundType.NETHERITE_BLOCK))
                     .properties(BlockBehaviour.Properties::noOcclusion)
-                    .blockstate(SimBlockStateGen::facingPoweredAxisBlockstate)
+                    .blockstate(() -> SimBlockStateGen::facingPoweredAxisBlockstate)
                     .item()
                     .tag(SimTags.Items.ROTATE_WITH_NAV_ARROW)
                     .transform(customItemModel())
-                    .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
+                    .recipe((c, p) -> p.shapeless(RecipeCategory.MISC, c.get(), 1)
                             .requires(SimTags.Items.REDSTONE_DUST)
                             .requires(CommonMetal.COPPER.plates)
                             .requires(AllBlocks.INDUSTRIAL_IRON_BLOCK)
-                            .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(CommonMetal.COPPER.ingots))
+                            .unlockedBy("has_ingredient", p.has(CommonMetal.COPPER.ingots))
                             .save(p))
                     .register();
 
@@ -762,20 +759,20 @@ public class SimBlocks {
                     .properties(p -> p.sound(SoundType.SCAFFOLDING))
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .lang("Symmetric Sail")
-                    .blockstate((c, p) ->
+                    .blockstate(() -> (c, p) ->
                             SimBlockStateService.INSTANCE.genericModelBuilder(c, p, SimBlockStateGen::xySymmetricSail,
-                                    (state) -> p.models().getExistingFile(Simulated.path("block/symmetric_sail/block"))))
+                                    (state) -> BlockModelGenerators.plainVariant(Simulated.path("block/symmetric_sail/block"))))
                     .recipe((c, p) -> {
-                        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 2)
+                        p.shapeless(RecipeCategory.MISC, c.get(), 2)
                                 .requires(AllBlocks.SAIL)
                                 .requires(AllBlocks.SAIL)
-                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllBlocks.SAIL))
+                                .unlockedBy("has_ingredient", p.has(AllBlocks.SAIL))
                                 .save(p);
 
-                        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, AllBlocks.SAIL, 1)
+                        p.shapeless(RecipeCategory.MISC, AllBlocks.SAIL, 1)
                                 .group("simulated:sail_asymmetry")
                                 .requires(c.get())
-                                .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(c.get()))
+                                .unlockedBy("has_ingredient", p.has(c.get()))
                                 .save(p);
                     })
                     .tag(BlockTags.MINEABLE_WITH_AXE, AllTags.AllBlockTags.WINDMILL_SAILS.tag, SimTags.Blocks.SYMMETRIC_SAILS)
@@ -791,7 +788,7 @@ public class SimBlocks {
             return REGISTRATE.block(colorName + "_symmetric_sail", p -> SymmetricSailBlock.withCanvas(p, colour))
                     .initialProperties(SharedProperties::wooden)
                     .properties(p -> p.sound(SoundType.SCAFFOLDING))
-                    .blockstate((c, p) -> BlockStateGen.axisBlock(c, p, blockState -> p.models()
+                    .blockstate(() -> (c, p) -> BlockStateGen.axisBlock(c, p, blockState -> p.models()
                             .withExistingParent(colorName + "_symmetric_sail",
                                     p.modLoc("block/symmetric_sail/block"))
                             .texture("0", Create.asResource("block/sail/canvas_" + colorName))
@@ -810,7 +807,7 @@ public class SimBlocks {
                 .properties(p -> p.forceSolidOn())
                 .transform(axeOnly())
                 .tag(SimTags.Blocks.NAMEPLATE_BLOCKS)
-                .blockstate((ctx, prov) -> prov.horizontalBlock(ctx.get(), state -> {
+                .blockstate(() -> (ctx, prov) -> BlockStateGen.horizontalBlock(ctx, prov, state -> {
                     NameplateBlock.Position position = state.getValue(NameplateBlock.POSITION);
                     return prov.models()
                             .withExistingParent(colorName + "_nameplate_" + position.getSerializedName(), prov.modLoc("block/nameplate/block_" + position.getSerializedName()))
@@ -822,18 +819,18 @@ public class SimBlocks {
                     // Only a recipe for the white one
                     return x.recipe((c, p) -> {
                         if (color == DyeColor.WHITE) {
-                            ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get(), 4)
+                            p.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get(), 4)
                                     .requires(Items.PAPER)
                                     .requires(Items.STICK)
                                     .requires(AllItems.ANDESITE_ALLOY)
-                                    .unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.ANDESITE_ALLOY))
+                                    .unlockedBy("has_ingredient", p.has(AllItems.ANDESITE_ALLOY))
                                     .save(p);
                         }
-                        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get())
+                        p.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get())
                                 .requires(SimTags.DYE_MAP.get(colorName))
                                 .requires(SimTags.Items.NAMEPLATE_ITEMS)
                                 .group("simualted:nameplate_dyeing")
-                                .unlockedBy("has_nameplate", RegistrateRecipeProvider.has(SimTags.Items.NAMEPLATE_ITEMS))
+                                .unlockedBy("has_nameplate", p.has(SimTags.Items.NAMEPLATE_ITEMS))
                                 .save(p, Simulated.path("crafting/" + c.getName() + "_from_other_nameplate"));
                     });
                 })
@@ -850,8 +847,8 @@ public class SimBlocks {
                     .transform(pickaxeOnly())
                     .initialProperties(SharedProperties::softMetal)
                     .properties(p -> p.forceSolidOn())
-                    .blockstate((ctx, prov) -> prov.directionalBlock(ctx.getEntry(),
-                            blockState -> prov.models().getExistingFile(
+                    .blockstate(() -> (ctx, prov) -> prov.directionalBlock(ctx.getEntry(),
+                            blockState -> BlockModelGenerators.plainVariant(
                                     prov.modLoc("block/spring/" + (blockState.getValue(SpringBlock.SIZE) == SpringBlock.Size.MEDIUM ? "" : (blockState.getValue(SpringBlock.SIZE).getSerializedName() + "_")) + "block"))))
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag, AllTags.AllBlockTags.BRITTLE.tag, AllTags.AllBlockTags.NON_MOVABLE.tag, SimTags.Blocks.LIGHT)
                     .loot((tables, block) -> {
@@ -875,12 +872,11 @@ public class SimBlocks {
                 .tag(SimTags.Blocks.HANDLES)
                 .onRegister(ItemUseOverrides::addBlock);
 
-        builder.blockstate((ctx, prov) -> {
+        builder.blockstate(() -> (ctx, prov) -> {
             SimBlockStateService.INSTANCE.directionalAxisBlock(ctx, prov, (blockState, vertical) -> {
                 final String suffix = vertical ? "vertical" : "horizontal";
                 if(variant == HandleBlock.Variant.IRON) {
-                    return prov.models()
-                            .getExistingFile(prov.modLoc("block/handle/block_" + suffix));
+                    return BlockModelGenerators.plainVariant(prov.modLoc("block/handle/block_" + suffix));
                 } else {
                     return prov.models()
                             .withExistingParent(ctx.getName() + "_" + suffix, prov.modLoc("block/handle/block_" + suffix))

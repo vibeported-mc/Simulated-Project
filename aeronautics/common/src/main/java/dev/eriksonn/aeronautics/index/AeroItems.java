@@ -22,10 +22,10 @@ public class AeroItems {
 	public static final ItemEntry<AviatorsGogglesItem> AVIATORS_GOGGLES = REGISTRATE
 					.item("aviators_goggles", AviatorsGogglesItem::new)
 					.lang("Aviator's Goggles")
-					.recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 1)
+					.recipe((c, p) -> p.shapeless(RecipeCategory.MISC, c.get(), 1)
 							.requires(AeroTags.ItemTags.LEATHERS)
 							.requires(AllItems.GOGGLES)
-							.unlockedBy("has_ingredient", RegistrateRecipeProvider.has(AllItems.GOGGLES))
+							.unlockedBy("has_ingredient", p.has(AllItems.GOGGLES))
 							.save(p))
 					.tag(AeroTags.ItemTags.ARMORS)
 					.tag(AeroTags.ItemTags.HEAD_ARMOR)

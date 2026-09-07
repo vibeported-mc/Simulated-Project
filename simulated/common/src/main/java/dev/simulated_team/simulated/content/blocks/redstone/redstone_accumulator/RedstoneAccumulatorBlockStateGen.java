@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.content.blocks.redstone.redstone_accumulator;
 
-import com.tterrag.registrate.providers.DataGenContext;
+import net.minecraft.client.data.models.BlockModelGenerators;com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import dev.simulated_team.simulated.Simulated;
@@ -70,6 +70,6 @@ public class RedstoneAccumulatorBlockStateGen {
     }
 
     private static ModelFile sub(final RegistrateBlockstateProvider p, final String suffix) {
-        return p.models().getExistingFile(Simulated.path("block/redstone_accumulator/" + suffix));
+        return BlockModelGenerators.plainVariant(Simulated.path("block/redstone_accumulator/" + suffix));
     }
 }

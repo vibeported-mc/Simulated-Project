@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.content.blocks.directional_gearshift;
 
-import com.tterrag.registrate.providers.DataGenContext;
+import net.minecraft.client.data.models.BlockModelGenerators;com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import dev.simulated_team.simulated.Simulated;
 import net.minecraft.core.Direction;
@@ -55,6 +55,6 @@ public class DirectionalGearshiftGenerator {
     }
 
     private static ModelFile model(final RegistrateBlockstateProvider p, final String part, final boolean powered, final boolean vertical) {
-        return p.models().getExistingFile(Simulated.path("block/directional_gearshift/" + (vertical ? "vertical/" : "horizontal/") + part + (powered ? "_powered" : "")));
+        return BlockModelGenerators.plainVariant(Simulated.path("block/directional_gearshift/" + (vertical ? "vertical/" : "horizontal/") + part + (powered ? "_powered" : "")));
     }
 }
