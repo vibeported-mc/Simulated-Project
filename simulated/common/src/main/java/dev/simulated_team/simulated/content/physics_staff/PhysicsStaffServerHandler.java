@@ -22,6 +22,11 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.createmod.catnip.api.data.Pair;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import dev.simulated_team.simulated.Simulated;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.core.UUIDUtil;
+import com.mojang.serialization.Codec;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
@@ -63,7 +68,8 @@ public class PhysicsStaffServerHandler extends SavedData {
     }
 
     public static void sendAllData(final Player player) {
-        final MinecraftServer server = player.getServer();
+        // 26.2: Entity.getServer is gone; the server is reached through the level.
+        final MinecraftServer server = player.level().getServer();
         assert server != null;
 
         for (final ServerLevel level : server.getAllLevels()) {
@@ -93,16 +99,28 @@ public class PhysicsStaffServerHandler extends SavedData {
         return handle;
     }
 
-    private static PhysicsStaffServerHandler create(final ServerLevel level, final CompoundTag nbt, final HolderLookup.Provider registries) {
+    private static PhysicsStaffServerHandler create(final ServerLevel level, final CompoundTag nbt) {
         final PhysicsStaffServerHandler sd = new PhysicsStaffServerHandler(level);
         sd.loadLocks(nbt.getListOrEmpty(ID));
         return sd;
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>Saved data is described by a {@link SavedDataType} -- an id, a constructor and a codec, all
+     * built per level -- rather than by a {@code SavedData.Factory} plus a separately-passed id. The
+     * codec here wraps the existing save/load pair, which keeps the on-disk shape identical.
+     */
+    public static SavedDataType<PhysicsStaffServerHandler> type(final ServerLevel level) {
+        return new SavedDataType<>(Simulated.path(ID),
+                ctx -> new PhysicsStaffServerHandler(level),
+                ctx -> Codec.of(
+                        CompoundTag.CODEC.comap(data -> data.save(new CompoundTag(), level.registryAccess())),
+                        CompoundTag.CODEC.map(tag -> create(level, tag))));
+    }
+
     public static PhysicsStaffServerHandler get(final ServerLevel level) {
-        final PhysicsStaffServerHandler data = level.getChunkSource().getDataStorage().computeIfAbsent(
-                new SavedData.Factory<>(PhysicsStaffServerHandler::new, (nbt, lookup) -> create(level, nbt, lookup), null),
-                PhysicsStaffServerHandler.ID);
+        final PhysicsStaffServerHandler data = level.getDataStorage().computeIfAbsent(type(level));
         data.level = level;
 
         return data;
@@ -186,7 +204,8 @@ public class PhysicsStaffServerHandler extends SavedData {
         );
     }
 
-    @Override
+    // 26.2: SavedData no longer declares save -- serialisation is the codec on its SavedDataType,
+    // and this method is what that codec wraps.
     public @NotNull CompoundTag save(final CompoundTag tag, final HolderLookup.@NotNull Provider provider) {
         final ListTag tags = new ListTag();
         this.saveLocks(tags);
@@ -195,15 +214,19 @@ public class PhysicsStaffServerHandler extends SavedData {
         return tag;
     }
 
+    // 26.2: NbtUtils lost its UUID helpers; a UUID is written and read through its codec.
     private void loadLocks(final ListTag list) {
         for (final Tag tag : list) {
-            final UUID uuid = NbtUtils.loadUUID(tag);
-            this.locks.put(uuid, new Lock(uuid, null));
+            UUIDUtil.CODEC.parse(NbtOps.INSTANCE, tag)
+                    .result()
+                    .ifPresent(uuid -> this.locks.put(uuid, new Lock(uuid, null)));
         }
     }
 
     private void saveLocks(final ListTag list) {
-        list.addAll(this.locks.keySet().stream().map(NbtUtils::createUUID).toList());
+        for (final UUID uuid : this.locks.keySet()) {
+            UUIDUtil.CODEC.encodeStart(NbtOps.INSTANCE, uuid).result().ifPresent(list::add);
+        }
     }
 
     public boolean isLocked(final SubLevel subLevel) {
