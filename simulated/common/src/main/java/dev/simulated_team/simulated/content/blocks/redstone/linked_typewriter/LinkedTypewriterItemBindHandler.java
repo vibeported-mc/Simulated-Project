@@ -65,7 +65,7 @@ public class LinkedTypewriterItemBindHandler {
         final LocalPlayer player = Minecraft.getInstance().player;
         final ItemStack mainHandItem = player.getMainHandItem();
         final ItemStack offhandItem = player.getOffhandItem();
-        if (Minecraft.getInstance().screen != null || (!(mainHandItem.getItem() instanceof LinkedTypewriterItem) && !(offhandItem.getItem() instanceof LinkedTypewriterItem))) {
+        if (Minecraft.getInstance().gui.screen() != null || (!(mainHandItem.getItem() instanceof LinkedTypewriterItem) && !(offhandItem.getItem() instanceof LinkedTypewriterItem))) {
             reset();
             return;
         }

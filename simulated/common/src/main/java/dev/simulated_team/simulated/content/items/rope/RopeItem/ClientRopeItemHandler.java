@@ -30,7 +30,7 @@ public class ClientRopeItemHandler {
 
         if (player == null || level == null)
             return;
-        if (Minecraft.getInstance().screen != null)
+        if (Minecraft.getInstance().gui.screen() != null)
             return;
 
         for (final InteractionHand hand : InteractionHand.values()) {

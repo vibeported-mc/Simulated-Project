@@ -87,7 +87,7 @@ public class LinkedTypewriterInteractionHandler {
             associateTypewriter(null);
         }
 
-        if (getMode() != Mode.SCREEN_BINDING && Minecraft.getInstance().screen != null && !be.isRemoved()) {
+        if (getMode() != Mode.SCREEN_BINDING && Minecraft.getInstance().gui.screen() != null && !be.isRemoved()) {
             VeilPacketManager.server().sendPacket(new TypewriterDisconnectUser(be.getBlockPos()));
             associateTypewriter(null);
         }

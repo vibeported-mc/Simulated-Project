@@ -64,7 +64,7 @@ public class SimulatedCommonClientEvents {
         final Minecraft mc = Minecraft.getInstance();
         final InteractCallback.KeyMappings mappings = InteractCallback.KeyMappings.getMappings();
 
-        if (mc.screen != null) {
+        if (mc.gui.screen() != null) {
             return Result.empty();
         }
 
@@ -89,7 +89,7 @@ public class SimulatedCommonClientEvents {
     public static Result onMouseMove(final double yaw, final double pitch) {
         final Minecraft mc = Minecraft.getInstance();
 
-        if (mc.screen != null) {
+        if (mc.gui.screen() != null) {
             return Result.empty();
         }
 
@@ -118,7 +118,7 @@ public class SimulatedCommonClientEvents {
      * @param deltaY y scroll value
      */
     public static Result onMouseScroll(final double deltaX, final double deltaY) {
-        if (Minecraft.getInstance().screen == null) {
+        if (Minecraft.getInstance().gui.screen() == null) {
             for (final InteractCallback interactCallback : SimClickInteractions.CLICK_INTERACTION_ENTRIES) {
                 final Result result = interactCallback.onScroll(deltaX, deltaY);
 
@@ -178,7 +178,7 @@ public class SimulatedCommonClientEvents {
         ZiplineClientManager.tick();
         LinkedTypewriterInteractionHandler.tick();
 
-        if (instance.screen != null) {
+        if (instance.gui.screen() != null) {
             HoldInteractionManager.stop();
         }
 

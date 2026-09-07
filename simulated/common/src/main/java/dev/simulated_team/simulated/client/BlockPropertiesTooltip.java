@@ -54,7 +54,7 @@ public class BlockPropertiesTooltip {
     }
 
     public static boolean shouldShowTooltip(final Condition condition, final TooltipFlag iTooltipFlag, final @Nullable Player player) {
-        if (Minecraft.getInstance().screen instanceof PonderUI) {
+        if (Minecraft.getInstance().gui.screen() instanceof PonderUI) {
             return true;
         }
 

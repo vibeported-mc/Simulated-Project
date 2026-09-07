@@ -2,7 +2,6 @@ package dev.simulated_team.simulated.content.items.plunger_launcher;
 
 import com.simibubi.create.content.equipment.armor.BacktankUtil;
 import com.simibubi.create.content.equipment.zapper.ShootableGadgetItemMethods;
-import com.simibubi.create.foundation.item.CustomArmPoseItem;
 import com.simibubi.create.foundation.utility.RaycastHelper;
 import dev.ryanhcode.sable.Sable;
 import dev.simulated_team.simulated.SimulatedClient;
@@ -16,14 +15,13 @@ import dev.simulated_team.simulated.network.packets.PlungerLauncherShootPacket;
 import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.service.SimEntityService;
 import foundry.veil.api.network.VeilPacketManager;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -66,7 +64,7 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
         if (!level.isClientSide()) {
             if (player.isShiftKeyDown()) {
                 LaunchedPlungerServerHandler.removePlayerPlungers(player);
-                player.sendSystemMessage(SimLang.translate("plunger_launcher.clear_plungers").color(0xaaaaaa).component(),true);
+                player.displayClientMessage(SimLang.translate("plunger_launcher.clear_plungers").color(0xaaaaaa).component(), true);
                 return InteractionResult.SUCCESS;
             }
 
@@ -75,7 +73,10 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
             level.playSound(null, barrelPos.x, barrelPos.y, barrelPos.z, SimSoundEvents.PLUNGER_LAUNCH.event(), SoundSource.PLAYERS, 1.0f, 1.0f);
 
             // add new plunger and set relevant data
-            final LaunchedPlungerEntity newPlunger = SimEntityTypes.PLUNGER.create(level);
+            final LaunchedPlungerEntity newPlunger = SimEntityTypes.PLUNGER.create(level, EntitySpawnReason.TRIGGERED);
+            if (newPlunger == null) {
+                return InteractionResult.FAIL;
+            }
             newPlunger.setPos(barrelPos);
 
             newPlunger.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 0.5F, 0.0F);
@@ -89,7 +90,7 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
 
             final LaunchedPlungerEntity plunger = duck.simulated$getLaunchedPlunger();
             if (plunger == null || plunger.isRemoved()) {
-                newPlunger.setData(LaunchedPlungerEntity.IS_FIRST);
+                newPlunger.setData(LaunchedPlungerEntity.IS_FIRST, true);
                 duck.simulated$setLaunchedPlunger(newPlunger);
                 ShootableGadgetItemMethods.applyCooldown(player, heldStack, interactionHand, b -> b.getItem() instanceof PlungerLauncherItem, 4);
                 reloadCooldown = false;
@@ -164,11 +165,6 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
     @Override
     public ItemUseAnimation getUseAnimation(final ItemStack stack) {
         return ItemUseAnimation.NONE;
-    }
-
-    @Override
-    public HumanoidModel.@Nullable ArmPose getArmPose(final ItemStack stack, final AbstractClientPlayer player, final InteractionHand hand) {
-        return HumanoidModel.ArmPose.CROSSBOW_HOLD;
     }
 
     @Override

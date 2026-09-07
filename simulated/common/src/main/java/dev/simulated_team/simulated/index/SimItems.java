@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.index;
 
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyItem;
 import com.simibubi.create.foundation.data.AssetLookup;
+import com.simibubi.create.foundation.item.CustomArmPoseClientExtension;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import com.tterrag.registrate.builders.ItemBuilder;
@@ -94,6 +95,10 @@ public class SimItems {
 
     public static final ItemEntry<PlungerLauncherItem> PLUNGER_LAUNCHER =
             REGISTRATE.item("plunger_launcher", PlungerLauncherItem::new)
+                    // 26.2 port: the arm pose was an interface the item implemented. 26.2's player
+                    // renderer asks the item's client extension instead, which keeps
+                    // AbstractClientPlayer out of a descriptor on a class the dedicated server loads.
+                    .clientExtension(() -> () -> CustomArmPoseClientExtension.INSTANCE)
                     .properties(p -> p.stacksTo(1).durability(200))
                     .model(AssetLookup.itemModelWithPartials())
                     .tag(Tags.Items.ENCHANTABLES, ItemTags.DURABILITY_ENCHANTABLE)
