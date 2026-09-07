@@ -12,6 +12,8 @@ import dev.simulated_team.simulated.index.SimGUITextures;
 import dev.simulated_team.simulated.network.packets.linked_typewriter.TypewriterMenuModifySlots;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,8 +95,8 @@ public class EntryModifierScreen {
         menu.slotsActive = true;
         final ItemStack first = psuedoEntry.first.getStack();
         final ItemStack second = psuedoEntry.second.getStack();
-        menu.ghostInventory.setStackInSlot(0, first);
-        menu.ghostInventory.setStackInSlot(1, second);
+        menu.ghostInventory.set(0, ItemResource.of(first), first.getCount());
+        menu.ghostInventory.set(1, ItemResource.of(second), second.getCount());
         VeilPacketManager.server().sendPacket(new TypewriterMenuModifySlots(first, second));
 
         return psuedoEntry;
@@ -116,7 +118,7 @@ public class EntryModifierScreen {
         final PoseStack ps = guiGraphics.pose();
 
         ps.pushPose();
-        guiGraphics.fillGradient(0, 0, this.parentScreen.width, this.parentScreen.height, 1, -1072689136, -804253680);
+        guiGraphics.fillGradient(0, 0, this.parentScreen.width, this.parentScreen.height, -1072689136, -804253680);
 
         ps.translate(0, 0, 2);
         MODIFICATION_MENU.render(guiGraphics, this.getCenterWidth(), this.getCenterHeight());
@@ -149,8 +151,8 @@ public class EntryModifierScreen {
 
         this.finishedEntryCallback = null;
         menu.slotsActive = false;
-        menu.ghostInventory.setStackInSlot(0, ItemStack.EMPTY);
-        menu.ghostInventory.setStackInSlot(1, ItemStack.EMPTY);
+        menu.ghostInventory.set(0, ItemResource.EMPTY, 0);
+        menu.ghostInventory.set(1, ItemResource.EMPTY, 0);
         VeilPacketManager.server().sendPacket(new TypewriterMenuModifySlots(ItemStack.EMPTY, ItemStack.EMPTY));
     }
 
@@ -176,8 +178,8 @@ public class EntryModifierScreen {
 
         public void finishModifications() {
             if (this.glfwKeyCode != -1) {
-                this.first(RedstoneLinkNetworkHandler.Frequency.of(EntryModifierScreen.this.parentScreen.getMenu().ghostInventory.getStackInSlot(0)));
-                this.second(RedstoneLinkNetworkHandler.Frequency.of(EntryModifierScreen.this.parentScreen.getMenu().ghostInventory.getStackInSlot(1)));
+                this.first(RedstoneLinkNetworkHandler.Frequency.of(ItemUtil.getStack(EntryModifierScreen.this.parentScreen.getMenu().ghostInventory, 0)));
+                this.second(RedstoneLinkNetworkHandler.Frequency.of(ItemUtil.getStack(EntryModifierScreen.this.parentScreen.getMenu().ghostInventory, 1)));
 
                 final LinkedTypewriterEntries.KeyboardEntry entry = new LinkedTypewriterEntries.KeyboardEntry(EntryModifierScreen.this.psuedoEntry.first,
                         EntryModifierScreen.this.psuedoEntry.second,

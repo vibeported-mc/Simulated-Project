@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.gui.widget.IconButton;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.MutableComponent;
 
 import java.util.List;
@@ -35,19 +36,25 @@ public class ConfirmationWidgetBase extends IconButton {
         graphics.renderComponentTooltip(Minecraft.getInstance().font, List.of(this.message.withColor(0xff0000)), mouseX, mouseY);
     }
 
+    /**
+      * <h2>26.2 note</h2>
+      * <p>{@code clicked} is gone -- {@code mouseClicked} asks {@code isMouseOver} itself and only
+      * calls {@code onClick} on a hit. Clicking away has to cancel the pending confirmation, and this
+      * is the only place that still sees such a click.
+      */
     @Override
-    protected boolean clicked(final double mouseX, final double mouseY) {
-        if (!this.isMouseOver(mouseX, mouseY)) {
+    public boolean mouseClicked(final MouseButtonEvent event, final boolean doubleClick) {
+        if (!this.isMouseOver(event.x(), event.y())) {
             this.confirmation = false;
         }
 
-        return super.clicked(mouseX, mouseY);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public void onClick(final double mouseX, final double mouseY) {
+    public void onClick(final MouseButtonEvent event, final boolean doubleClick) {
         if (this.confirmation) {
-            this.runCallback(mouseX, mouseY);
+            this.runCallback(event.x(), event.y());
             this.confirmation = false;
         } else {
             this.confirmation = true;

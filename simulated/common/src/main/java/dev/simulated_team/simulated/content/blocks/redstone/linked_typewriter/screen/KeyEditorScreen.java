@@ -1,7 +1,6 @@
 package dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.AllKeys;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
@@ -17,6 +16,7 @@ import net.createmod.catnip.api.client.gui.element.GuiGameElement;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -354,9 +354,9 @@ public class KeyEditorScreen {
                 ps.translate(0, ((float) KEY_ENTRY.height / 2) - 8, 0);
 
                 ps.translate(82, 0, 0);
-                GuiGameElement.of(this.entry.getFirstAsItemStack()).render(guiGraphics);
+                GuiGameElement.of(this.entry.getFirstAsItemStack()).submit(guiGraphics);
                 ps.translate(18, 0, 0);
-                GuiGameElement.of(this.entry.getSecondAsItemStack()).render(guiGraphics);
+                GuiGameElement.of(this.entry.getSecondAsItemStack()).submit(guiGraphics);
                 ps.popPose();
             }
         }
@@ -364,7 +364,7 @@ public class KeyEditorScreen {
         private void renderText(final GuiGraphicsExtractor guiGraphics, final PoseStack ps) {
             ps.pushPose();
             ps.translate((float) 9, 11, 0);
-            guiGraphics.text(Minecraft.getInstance().font, InputConstants.getKey(this.entry.glfwKeyCode, -1).getDisplayName(), 0, 0, 0xFFFFFF, true);
+            guiGraphics.text(Minecraft.getInstance().font, InputConstants.Type.KEYSYM.getOrCreate(this.entry.glfwKeyCode).getDisplayName(), 0, 0, 0xFFFFFF, true);
             ps.popPose();
         }
 
@@ -394,9 +394,7 @@ public class KeyEditorScreen {
                         : this.isHovered ? AllGuiTextures.BUTTON_HOVER
                         : this.green ? AllGuiTextures.BUTTON_GREEN : AllGuiTextures.BUTTON;
 
-                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
-                graphics.blit(button.location, 0, 0, button.getStartX(), button.getStartY(), button.getWidth(),
+                graphics.blit(RenderPipelines.GUI_TEXTURED, button.location, 0, 0, button.getStartX(), button.getStartY(), button.getWidth(),
                         button.getHeight());
                 this.icon.render(graphics, 1, 1);
             }

@@ -7,6 +7,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
 import net.minecraft.world.item.ItemStack;
 
 public record TypewriterMenuModifySlots(ItemStack first, ItemStack second) implements CustomPacketPayload {
@@ -23,8 +25,8 @@ public record TypewriterMenuModifySlots(ItemStack first, ItemStack second) imple
         final ServerPlayer player = context.player();
 
         if (player.containerMenu instanceof final LinkedTypewriterMenuCommon menu) {
-            menu.ghostInventory.setStackInSlot(0, this.first);
-            menu.ghostInventory.setStackInSlot(1, this.second);
+            menu.ghostInventory.set(0, ItemResource.of(this.first), this.first.getCount());
+            menu.ghostInventory.set(1, ItemResource.of(this.second), this.second.getCount());
         }
     }
 

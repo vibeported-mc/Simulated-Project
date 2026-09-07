@@ -24,6 +24,7 @@ import net.createmod.catnip.api.client.gui.element.GuiGameElement;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.renderer.Rect2i;
@@ -359,14 +360,16 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
     }
 
     @Override
-    public boolean mouseClicked(final double pMouseX, final double pMouseY, final int pButton) {
+    public boolean mouseClicked(final MouseButtonEvent event, final boolean doubleClick) {
         final int x = this.leftPos;
         final int y = this.topPos;
+        final double pMouseX = event.x();
+        final double pMouseY = event.y();
         if (this.confirmingReset && !(pMouseX > x + 8 && pMouseX < x + 26 && pMouseY > y + this.backgroundMain.height - 24 && pMouseY < y + this.backgroundMain.height - 6)) {
             this.confirmingReset = false;
         }
 
-        return super.mouseClicked(pMouseX, pMouseY, pButton);
+        return super.mouseClicked(event, doubleClick);
     }
 
     public LinkedTypewriterEntries getNewEntries() {

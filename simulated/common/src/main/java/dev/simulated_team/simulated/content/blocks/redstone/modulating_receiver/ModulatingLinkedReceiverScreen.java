@@ -1,27 +1,27 @@
 package dev.simulated_team.simulated.content.blocks.redstone.modulating_receiver;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.simibubi.create.foundation.gui.widget.ScrollInput;
-import dev.engine_room.flywheel.lib.transform.PoseTransformStack;
-import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.index.SimGUITextures;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import dev.simulated_team.simulated.network.packets.ConfigureModulatingLinkedRecieverPacket;
 import dev.simulated_team.simulated.util.SimColors;
+import dev.simulated_team.simulated.util.render.FadedTexturedQuadRenderState;
 import foundry.veil.api.network.VeilPacketManager;
 import net.createmod.catnip.api.data.Iterate;
 import net.createmod.catnip.api.client.gui.AbstractSimiScreen;
 import net.createmod.catnip.api.client.gui.ScreenOpener;
+import net.createmod.catnip.api.client.gui.UIRenderHelper;
 import net.createmod.catnip.api.client.gui.element.GuiGameElement;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
 
 public class ModulatingLinkedReceiverScreen extends AbstractSimiScreen {
     private final ModulatingLinkedReceiverBlockEntity be;
@@ -106,8 +106,6 @@ public class ModulatingLinkedReceiverScreen extends AbstractSimiScreen {
         final int x = this.guiLeft;
         final int y = this.guiTop;
 
-        final PoseStack ms = graphics.pose();
-
         this.background.render(graphics, x, y);
 
         graphics.text(this.font, this.title, x + (this.background.width - 8) / 2 - this.font.width(this.title) / 2, y + 4, SimColors.TITLE_DARK_RED, false);
@@ -137,33 +135,27 @@ public class ModulatingLinkedReceiverScreen extends AbstractSimiScreen {
 
         final SimGUITextures sprite = SimGUITextures.MODULATINGLINK_POWERED_LANE;
 
-        sprite.bind();
+        graphics.blit(RenderPipelines.GUI_TEXTURED, sprite.location, x + bandStart + 1, y + 25, sprite.startX, sprite.startY,
+                minPos - bandStart, sprite.height, sprite.texWidth, sprite.texHeight);
 
-        graphics.blit(sprite.location, x + bandStart + 1, y + 25, sprite.startX, sprite.startY, minPos - bandStart, sprite.height);
-
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        final Tesselator tesselator = Tesselator.getInstance();
-        final BufferBuilder bufferbuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-
+        // 26.2 port: the lit band fades out along its length, which no blit overload can express. It
+        // used to be a Tesselator and a BufferUploader call; GUI drawing is collected as render
+        // states now, so the fade arrives as one. It runs left to right rather than top to bottom,
+        // so the transparent end is named by the quad's right-hand pair.
         final float imageSize = 256f;
         final float uvx1 = (sprite.startX + minPos - bandStart) / imageSize;
         final float uvx2 = (sprite.startX + maxPos - bandStart) / imageSize;
         final float uvy1 = sprite.startY / imageSize;
         final float uvy2 = (sprite.startY + sprite.height) / imageSize;
 
-        final float px1 = (float) (x + minPos);
-        final float px2 = (float) (x + maxPos);
-        final float py1 = (float) (y + 25);
-        final float py2 = (y + 25 + sprite.height);
-
-        bufferbuilder.addVertex(ms.last().pose(), px2, py1, 0).setUv(uvx2, uvy1).setColor(1f, 1f, 1f, 0f);
-        bufferbuilder.addVertex(ms.last().pose(), px1, py1, 0).setUv(uvx1, uvy1).setColor(1f, 1f, 1f, 1f);
-        bufferbuilder.addVertex(ms.last().pose(), px1, py2, 0).setUv(uvx1, uvy2).setColor(1f, 1f, 1f, 1f);
-        bufferbuilder.addVertex(ms.last().pose(), px2, py2, 0).setUv(uvx2, uvy2).setColor(1f, 1f, 1f, 0f);
-        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
-        RenderSystem.disableBlend();
+        graphics.submitGuiElementRenderState(new FadedTexturedQuadRenderState(
+                new Matrix3x2f(graphics.pose()),
+                UIRenderHelper.getScissor(graphics),
+                sprite.bind(),
+                0xFFFFFFFF, 0x00FFFFFF,
+                x + minPos, x + maxPos,
+                y + 25, y + 25 + sprite.height,
+                uvx1, uvx2, uvy1, uvy2));
 
         SimGUITextures.MODULATINGLINK_MARKER.render(graphics, x + minPos, y + 23);
         SimGUITextures.MODULATINGLINK_MARKER.render(graphics, x + maxPos, y + 23);
@@ -176,35 +168,37 @@ public class ModulatingLinkedReceiverScreen extends AbstractSimiScreen {
         final float minPos2 = 5.5f * ((this.be.minRange - 1) * (smoothing + maxDistance - 1)) / ((maxDistance - 1) * (smoothing + this.be.minRange - 1));
         final float maxPos2 = 5.5f * ((this.be.maxRange - 1) * (smoothing + maxDistance - 1)) / ((maxDistance - 1) * (smoothing + this.be.maxRange - 1));
 
+        // 26.2 port: the GUI transform stack is two-dimensional, so where an element sits within the
+        // scene and which way it is viewed from travel with the element rather than being pushed
+        // around it. The plates' vertical offsets, pose translations between draws before, become the
+        // element's own local position.
+        final Matrix3x2fStack ps = graphics.pose();
+        final int previewX = x + this.background.width + 4;
+        final int previewY = y + this.background.height + 4;
+
         for (final boolean bottom : Iterate.trueAndFalse) {
-
-
-            final TransformStack<PoseTransformStack> msr = TransformStack.of(ms);
-            msr.pushPose()
-                    .translate(x + this.background.width + 4, y + this.background.height + 4, 100)
-                    .scale(40)
-                    .rotateXDegrees(-22)
-                    .rotateYDegrees(63);
+            float localY = -(bottom ? minPos2 : maxPos2) / 16.0f;
             if (!bottom)
-                msr.translate(0, -0.5 / 16.0, 0);//why on earth are these translations backwards?
-            msr.translate(0, -(bottom ? minPos2 : maxPos2) / 16.0, 0);
+                localY += -0.5f / 16.0f;//why on earth are these translations backwards?
 
-            GuiGameElement.of(SimPartialModels.MODULATING_RECEIVER_PLATE)
-                    .render(graphics);
-            msr.popPose();
+            ps.pushMatrix();
+            ps.translate(previewX, previewY);
+            GuiGameElement.of(SimPartialModels.MODULATING_RECEIVER_PLATE.get())
+                    .atLocal(0, localY, 0)
+                    .viewRotate(-22, 63, 0)
+                    .scale(40)
+                    .submit(graphics);
+            ps.popMatrix();
         }
 
-        ms.pushPose();
-        final TransformStack<PoseTransformStack> msr = TransformStack.of(ms);
-        msr.pushPose()
-                .translate(x + this.background.width + 4, y + this.background.height + 4, 100)
-                .scale(40)
-                .rotateXDegrees(-22)
-                .rotateYDegrees(63);
+        ps.pushMatrix();
+        ps.translate(previewX, previewY);
         GuiGameElement.of(this.be.getBlockState()
                         .setValue(ModulatingLinkedReceiverBlock.FACING, Direction.UP))
-                .render(graphics);
-        msr.popPose();
+                .viewRotate(-22, 63, 0)
+                .scale(40)
+                .submit(graphics);
+        ps.popMatrix();
     }
 
     private void label(final GuiGraphicsExtractor graphics, final int x, final int y, final Component text) {
