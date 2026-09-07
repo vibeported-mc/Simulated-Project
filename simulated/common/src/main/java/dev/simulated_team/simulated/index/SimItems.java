@@ -16,8 +16,6 @@ import dev.simulated_team.simulated.content.physics_staff.PhysicsStaffItem;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import dev.simulated_team.simulated.registrate.simulated_tab.CreativeTabItemTransforms;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;

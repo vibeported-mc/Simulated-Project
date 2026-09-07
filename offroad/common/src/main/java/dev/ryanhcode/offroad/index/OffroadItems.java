@@ -9,8 +9,6 @@ import dev.ryanhcode.offroad.Offroad;
 import dev.ryanhcode.offroad.content.components.TireLike;
 import dev.ryanhcode.offroad.content.items.tire.TireItem;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 

@@ -9,7 +9,6 @@ import dev.eriksonn.aeronautics.content.components.Levitating;
 import dev.eriksonn.aeronautics.content.items.AviatorsGogglesItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;

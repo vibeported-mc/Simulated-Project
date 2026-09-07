@@ -19,7 +19,6 @@ import dev.simulated_team.simulated.index.SimItems;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
