@@ -40,7 +40,9 @@ public record CFluidType(Fluid fluid, DataComponentPatch data) {
         final Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(tag.getStringOr("Fluid", "")));
         DataComponentPatch data = DataComponentPatch.EMPTY;
         if (tag.contains("data")) {
-            final DataResult<Pair<DataComponentPatch, Tag>> result = DataComponentPatch.CODEC.decode(NbtOps.INSTANCE, tag.getCompound("data"));
+            // 26.2: getCompound hands back an Optional; contains() above already established it.
+            final DataResult<Pair<DataComponentPatch, Tag>> result =
+                    DataComponentPatch.CODEC.decode(NbtOps.INSTANCE, tag.getCompoundOrEmpty("data"));
             if (result.isError()) {
                 Simulated.LOGGER.warn(result.error().get().message());
             } else {

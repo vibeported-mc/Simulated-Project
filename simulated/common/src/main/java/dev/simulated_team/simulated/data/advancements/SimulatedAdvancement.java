@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.data.advancements;
 
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import dev.simulated_team.simulated.util.SimColors;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.triggers.InventoryChangeTrigger;
 import net.minecraft.advancements.predicates.ItemPredicate;
@@ -61,7 +62,8 @@ public class SimulatedAdvancement {
             this.builder.addCriterion("0", this.builtinTrigger.createCriterion(this.builtinTrigger.instance()));
         }
 
-        this.builder.display(t.icon, Component.translatable(this.titleKey()),
+        // 26.2: the icon is an ItemStackTemplate, and the overload taking a stack is gone.
+        this.builder.display(t.icon.getItem(), Component.translatable(this.titleKey()),
                 Component.translatable(this.descriptionKey()).withStyle(s -> s.withColor(SimColors.ADVANCABLE_GOLD)),
                 id.equals("root") ? this.background : null, t.type.advancementType, t.type.toast, t.type.announce, t.type.hide);
 
@@ -230,7 +232,10 @@ public class SimulatedAdvancement {
 
         public Builder whenItemCollected(final TagKey<Item> tag) {
             return this.externalTrigger(InventoryChangeTrigger.TriggerInstance
-                    .hasItems(ItemPredicate.Builder.item().of(tag).build()));
+                    .hasItems(ItemPredicate.Builder.item()
+                    // 26.2: a tag predicate resolves through the item registry rather than holding
+                    // the tag key, so the lookup has to be handed in.
+                    .of(BuiltInRegistries.ITEM, tag).build()));
         }
 
         public  Builder awardedForFree() {

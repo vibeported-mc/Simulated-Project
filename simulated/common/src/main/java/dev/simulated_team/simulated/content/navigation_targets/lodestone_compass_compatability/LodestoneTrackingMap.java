@@ -16,6 +16,9 @@ import dev.simulated_team.simulated.network.packets.lodestone_compass.UpdateClie
 import foundry.veil.api.network.VeilPacketManager;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import com.mojang.serialization.Codec;
+import dev.simulated_team.simulated.Simulated;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -43,12 +46,7 @@ public class LodestoneTrackingMap extends SavedData {
 
 	private static final LevelAttached<LodestoneTrackingMap> LODESTONE_MAP = new LevelAttached<>(level -> {
 		if (level instanceof ServerLevel sl) {
-			return sl.getDataStorage().computeIfAbsent(
-					new Factory<>(
-							() -> new LodestoneTrackingMap(sl),
-							(tag, prov) -> LodestoneTrackingMap.load(sl, tag),
-							null
-					), FILE_ID);
+			return sl.getDataStorage().computeIfAbsent(type(sl));
 		}
 
 		return null;
@@ -64,6 +62,20 @@ public class LodestoneTrackingMap extends SavedData {
 		}
 
 		return LODESTONE_MAP.get(level);
+	}
+
+	/**
+	 * <h2>26.2 note</h2>
+	 * <p>Saved data is described by a {@link SavedDataType} -- an id, a constructor and a codec, all
+	 * built per level -- rather than by a {@code SavedData.Factory} plus a separately-passed id. The
+	 * codec wraps the existing save/load pair, so the on-disk shape is unchanged.
+	 */
+	private static SavedDataType<LodestoneTrackingMap> type(final ServerLevel level) {
+		return new SavedDataType<>(Simulated.path(FILE_ID),
+				ctx -> new LodestoneTrackingMap(level),
+				ctx -> Codec.of(
+						CompoundTag.CODEC.comap(data -> data.save(new CompoundTag(), level.registryAccess())),
+						CompoundTag.CODEC.map(tag -> load(level, tag))));
 	}
 
 	private static LodestoneTrackingMap load(final ServerLevel level, final CompoundTag tag) {
@@ -85,7 +97,8 @@ public class LodestoneTrackingMap extends SavedData {
 		this.associatedLevel = new WeakReference<>(level);
 	}
 
-	@Override
+	// 26.2: SavedData no longer declares save -- serialisation is the codec on its SavedDataType,
+	// and this method is what that codec wraps.
 	@NotNull
 	public CompoundTag save(final @NotNull CompoundTag compoundTag, final HolderLookup.@NotNull Provider provider) {
 		final ListTag lodestoneInformationList = new ListTag();
