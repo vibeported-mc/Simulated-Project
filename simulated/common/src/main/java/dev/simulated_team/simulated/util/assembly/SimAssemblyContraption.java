@@ -232,7 +232,7 @@ public class SimAssemblyContraption {
         // Slime blocks and super glue drag adjacent blocks if possible
         for (final BlockPos offsetDirection : DIRECTION_OFFSETS) {
             final int absTotal = Math.abs(offsetDirection.getX()) + Math.abs(offsetDirection.getY()) + Math.abs(offsetDirection.getZ());
-            final Direction offsetDirectionNullable = absTotal == 1 ? Direction.fromDelta(offsetDirection.getX(), offsetDirection.getY(), offsetDirection.getZ()) : null;
+            final Direction offsetDirectionNullable = absTotal == 1 ? Direction.getNearest(offsetDirection.getX(), offsetDirection.getY(), offsetDirection.getZ(), null) : null;
 
             final BlockPos offsetPos = pos.offset(offsetDirection);
             final BlockState blockState = world.getBlockState(offsetPos);

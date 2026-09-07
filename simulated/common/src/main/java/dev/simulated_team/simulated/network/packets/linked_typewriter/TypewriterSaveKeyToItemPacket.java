@@ -37,7 +37,7 @@ public record TypewriterSaveKeyToItemPacket(InteractionHand hand, LinkedTypewrit
 
         CompoundTag currentTag = new CompoundTag();
         if (item.has(DataComponents.BLOCK_ENTITY_DATA)) {
-            currentTag = item.get(DataComponents.BLOCK_ENTITY_DATA).copyTag();
+            currentTag = item.get(DataComponents.BLOCK_ENTITY_DATA).copyTagWithoutId();
         } else {
             currentTag.putString("id", item.getItem().toString());
         }

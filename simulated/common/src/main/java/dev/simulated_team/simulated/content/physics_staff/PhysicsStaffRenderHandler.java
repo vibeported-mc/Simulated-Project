@@ -135,7 +135,7 @@ public class PhysicsStaffRenderHandler {
             ps.matrixPush();
             final Vector3dc renderPos = clientSubLevel.renderPose().position();
             ps.translate(renderPos.x() - cameraPos.x(), renderPos.y() - cameraPos.y(), renderPos.z() - cameraPos.z());
-            ps.rotate(client.getEntityRenderDispatcher().cameraOrientation());
+            ps.rotate(client.gameRenderer.mainCamera().rotation());
 
             final VertexConsumer buffer = bufferSource.getBuffer(SimRenderTypes.lock());
 

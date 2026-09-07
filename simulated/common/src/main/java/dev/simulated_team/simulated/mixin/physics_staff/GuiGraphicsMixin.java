@@ -52,7 +52,7 @@ public abstract class GuiGraphicsMixin {
             corner.mul(scale);
 
             final int slotHeight = (int) (corner.y - position.y);
-            RenderSystem.enableScissor((int) position.x,
+            graphics.enableScissor((int) position.x,
                     window.getHeight() - (int) position.y - slotHeight,
                     (int) (corner.x - position.x),
                     slotHeight);
@@ -61,7 +61,7 @@ public abstract class GuiGraphicsMixin {
         original.call(entity, level, stack, x, y, seed, guiOffset);
 
         if (isStaff) {
-            RenderSystem.disableScissor();
+            graphics.disableScissor();
         }
     }
 
