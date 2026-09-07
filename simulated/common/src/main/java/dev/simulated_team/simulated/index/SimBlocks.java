@@ -3,6 +3,8 @@ package dev.simulated_team.simulated.index;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.data.models.model.TextureSlot;
+import net.minecraft.client.data.models.model.TextureMapping;
+import net.minecraft.client.data.models.model.ModelTemplate;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllTags;
@@ -340,22 +342,24 @@ public class SimBlocks {
                             .unlockedBy("has_ingredient", p.has(CommonMetal.IRON.plates))
                             .save(p))
                     .item()
-                    .model((c, p) -> p
-                            .withExistingParent(colorName + "_portable_engine", p.modLoc("block/portable_engine/item"))
-                            .texture("0", p.modLoc("block/portable_engine/" + colorName))
-                            .texture("particle", p.modLoc("block/portable_engine/" + colorName))
-                    )
+                    .model(() -> (c, p) -> p.generateWithTemplate(c.getEntry(),
+                            new ModelTemplate(java.util.Optional.of(p.modLoc("block/portable_engine/item")),
+                                    java.util.Optional.empty(), TextureSlot.create("0"), TextureSlot.PARTICLE),
+                            new TextureMapping()
+                                    .put(TextureSlot.create("0"), p.modLoc("block/portable_engine/" + colorName))
+                                    .put(TextureSlot.PARTICLE, p.modLoc("block/portable_engine/" + colorName))))
                     .build()
                     .register();
         } else {
             return createPortableEngine(color)
                     .transform(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.applyBlock())
                     .item()
-                    .model((c, p) -> p
-                            .withExistingParent(colorName + "_portable_engine", p.modLoc("block/portable_engine/item"))
-                            .texture("0", p.modLoc("block/portable_engine/" + colorName))
-                            .texture("particle", p.modLoc("block/portable_engine/" + colorName))
-                    )
+                    .model(() -> (c, p) -> p.generateWithTemplate(c.getEntry(),
+                            new ModelTemplate(java.util.Optional.of(p.modLoc("block/portable_engine/item")),
+                                    java.util.Optional.empty(), TextureSlot.create("0"), TextureSlot.PARTICLE),
+                            new TextureMapping()
+                                    .put(TextureSlot.create("0"), p.modLoc("block/portable_engine/" + colorName))
+                                    .put(TextureSlot.PARTICLE, p.modLoc("block/portable_engine/" + colorName))))
                     .build()
                     .register();
         }
@@ -792,12 +796,12 @@ public class SimBlocks {
             return REGISTRATE.block(colorName + "_symmetric_sail", p -> SymmetricSailBlock.withCanvas(p, colour))
                     .initialProperties(SharedProperties::wooden)
                     .properties(p -> p.sound(SoundType.SCAFFOLDING))
-                    .blockstate(() -> (c, p) -> BlockStateGen.axisBlock(c, p, blockState -> p.models()
+                    .blockstate(() -> (c, p) -> BlockStateGen.axisBlock(c, p, blockState -> BlockModelGenerators.plainVariant(p.getBuilder()
                             .parent(p.modLoc("block/symmetric_sail/block"))
                             .texture(TextureSlot.create("0"), new Material(Create.asResource("block/sail/canvas_" + colorName)))
                             .texture(TextureSlot.create("1"), new Material(p.modLoc("block/symmetric_sail/side_" + colorName)))
                             .texture(TextureSlot.PARTICLE, new Material(Create.asResource("block/sail/canvas_" + colorName)))
-                            .build(p.modLoc("block/" + colorName + "_symmetric_sail"))))
+                            .build(p.modLoc("block/" + colorName + "_symmetric_sail")))))
                     .tag(BlockTags.MINEABLE_WITH_AXE, AllTags.AllBlockTags.WINDMILL_SAILS.tag, SimTags.Blocks.SYMMETRIC_SAILS)
                     .loot((p, b) -> p.dropOther(b, WHITE_SYMMETRIC_SAIL.asItem()))
                     .register();
@@ -842,7 +846,7 @@ public class SimBlocks {
                 .onRegisterAfter(Registries.ITEM, v -> ItemDescription.useKey(v, "block.simulated.nameplate"))
                 .item()
                 .tag(SimTags.Items.NAMEPLATE_ITEMS)
-                .transform(b -> b.model(SimBlockStateGen.coloredBlockItemModel("nameplate/" + colorName + "_nameplate", "nameplate/item")).build())
+                .transform(b -> b.model(() -> SimBlockStateGen.coloredBlockItemModel("nameplate/" + colorName + "_nameplate", "nameplate/item")).build())
                 .transform(CreativeTabItemTransforms.VisibilityType.SEARCH_ONLY.conditionalApplyBlock(() -> !colorName.equals(DyeColor.WHITE.getSerializedName())))
                 .register();
     });
