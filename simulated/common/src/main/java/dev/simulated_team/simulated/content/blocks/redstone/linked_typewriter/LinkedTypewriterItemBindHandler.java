@@ -19,7 +19,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.LayeredDraw;
+import net.neoforged.neoforge.client.gui.GuiLayer;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -43,7 +43,8 @@ import java.util.List;
  */
 public class LinkedTypewriterItemBindHandler {
 
-    public static final LayeredDraw.Layer OVERLAY = LinkedTypewriterItemBindHandler::renderOverlay;
+    // 26.2: a HUD layer is NeoForge's GuiLayer; LayeredDraw.Layer is gone.
+    public static final GuiLayer OVERLAY = LinkedTypewriterItemBindHandler::renderOverlay;
 
     private static BlockPos clickedPos;
     private static final List<AABB> outlines = new ArrayList<>();
@@ -110,7 +111,7 @@ public class LinkedTypewriterItemBindHandler {
                 LinkedTypewriterInteractionHandler.preventPress(key, scanCode);
 
                 SimLang.builder()
-                        .translate("linked_typewriter.bind_success", InputConstants.getKey(key, scanCode).getDisplayName().getString())
+                        .translate("linked_typewriter.bind_success", InputConstants.Type.KEYSYM.getOrCreate(key).getDisplayName().getString())
                         .sendStatus(Minecraft.getInstance().player);
             }
         }
@@ -144,7 +145,7 @@ public class LinkedTypewriterItemBindHandler {
 
         final int x = (guiGraphics.guiWidth() / 3) - width / 2;
         final int y = guiGraphics.guiHeight() - height - 24;
-        guiGraphics.renderComponentTooltip(Minecraft.getInstance().font, list, x, y);
+        guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, list, java.util.Optional.empty(), x, y);
 
         guiGraphics.pose().popMatrix();
     }

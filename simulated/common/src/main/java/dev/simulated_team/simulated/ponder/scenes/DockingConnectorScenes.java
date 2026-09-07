@@ -157,7 +157,7 @@ public class DockingConnectorScenes {
         world.showSection(mainBeltSelection,Direction.DOWN);
 
         scene.world().modifyBlockEntity(new BlockPos(11,1,4), FluidTankBlockEntity.class, be -> be.getTankInventory()
-                .fill(new FluidStack(Fluids.LAVA,12000), IFluidHandler.FluidAction.EXECUTE));
+                .insert(FluidResource.of(Fluids.LAVA), 12000, null));
         scene.idle(10);
 
         BlockPos entryBeltCart = new BlockPos(3,2,4);
@@ -245,7 +245,7 @@ public class DockingConnectorScenes {
         effects.indicateRedstone(new BlockPos(10,3,5));
         scene.idle(10);
         overlay.showText(80)
-                .pointAt(new Vec3.atCenterOf(BlockPos(9,3,5)))
+                .pointAt(Vec3.atCenterOf(new BlockPos(9, 3, 5)))
                 .attachKeyFrame()
                 .placeNearTarget()
                 .text("Redstone Comparators can be used to read the Docking progress");

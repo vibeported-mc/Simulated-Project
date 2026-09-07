@@ -33,7 +33,7 @@ public class ConfirmationWidgetBase extends IconButton {
     }
 
     public void renderHoveredText(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY) {
-        graphics.renderComponentTooltip(Minecraft.getInstance().font, List.of(this.message.withColor(0xff0000)), mouseX, mouseY);
+        graphics.setTooltipForNextFrame(Minecraft.getInstance().font, List.of(this.message.withColor(0xff0000)), java.util.Optional.empty(), mouseX, mouseY);
     }
 
     /**
