@@ -18,7 +18,7 @@ public class DefaultMaterialsMixin {
     @Final
     public static Material SOLID;
 
-    @Inject(method = "forRenderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderType;translucent()Lnet/minecraft/client/renderer/RenderType;"), cancellable = true)
+    @Inject(method = "forRenderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/rendertype/RenderType;translucent()Lnet/minecraft/client/renderer/rendertype/RenderType;"), cancellable = true)
     private static void aeronautics$injectMaterialMapping(final RenderType layer, final CallbackInfoReturnable<Material> cir) {
         if (layer == AeroRenderTypes.levitite()) {
             cir.setReturnValue(SOLID);

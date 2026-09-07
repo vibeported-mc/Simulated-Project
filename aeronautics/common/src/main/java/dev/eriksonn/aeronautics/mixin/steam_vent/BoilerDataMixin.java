@@ -104,7 +104,7 @@ public abstract class BoilerDataMixin {
 		[number]su via n engines
 		[number]su via n vents
 	 */
-	@Inject(method = "addToGoggleTooltip", at = @At(value = "INVOKE", target = "Lnet/createmod/catnip/lang/LangBuilder;forGoggles(Ljava/util/List;)V", shift = At.Shift.AFTER, ordinal = 2), cancellable = true)
+	@Inject(method = "addToGoggleTooltip", at = @At(value = "INVOKE", target = "Lnet/createmod/catnip/api/lang/LangBuilder;forGoggles(Ljava/util/List;)V", shift = At.Shift.AFTER, ordinal = 2), cancellable = true)
 	private void aeronautics$reformatBoilerTooltip(final List<Component> tooltip, final boolean isPlayerSneaking, final int boilerSize, final CallbackInfoReturnable<Boolean> cir, @Local final double totalSU, @Local(ordinal = 1) int boilerLevel) {
 		CreateLang.number(totalSU)
 				.translate("generic.unit.stress")
