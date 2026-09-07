@@ -13,7 +13,7 @@ import dev.simulated_team.simulated.util.hold_interaction.BlockHoldInteraction;
 import foundry.veil.api.network.VeilPacketManager;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -122,7 +122,7 @@ public class PhysicsAssemblerGUIHandler extends BlockHoldInteraction {
     }
 
     @Override
-    public void renderOverlay(final GuiGraphics graphics, final int width1, final int height1, final boolean hideGui) {
+    public void renderOverlay(final GuiGraphicsExtractor graphics, final int width1, final int height1, final boolean hideGui) {
         if (hideGui)
             return;
         final PoseStack ps = graphics.pose();

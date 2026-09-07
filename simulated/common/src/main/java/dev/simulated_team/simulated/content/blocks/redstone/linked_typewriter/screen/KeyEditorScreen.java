@@ -16,7 +16,7 @@ import net.createmod.catnip.api.animation.LerpedFloat;
 import net.createmod.catnip.api.client.gui.element.GuiGameElement;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -223,7 +223,7 @@ public class KeyEditorScreen {
         this.deactivateAllWidgets();
     }
 
-    public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
+    public void render(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
         guiGraphics.enableScissor(0, this.topPos() + 20, this.parentScreen.width, this.topPos() + KEY_MENU.height - 35);
 
         for (final KeyEntryWidget wrapper : this.keyboardEntryWrappers) {
@@ -261,7 +261,7 @@ public class KeyEditorScreen {
         }
     }
 
-    public void renderBG(final GuiGraphics guiGraphics, final float v, final int i, final int i1) {
+    public void renderBG(final GuiGraphicsExtractor guiGraphics, final float v, final int i, final int i1) {
         KEY_MENU.render(guiGraphics, this.leftPos(), this.topPos());
 
         guiGraphics.enableScissor(0, this.topPos() + 20, this.parentScreen.width, this.topPos() + KEY_MENU.height - 35);
@@ -308,7 +308,7 @@ public class KeyEditorScreen {
                     + (index * (SimGUITextures.LINKED_TYPEWRITER_KEY_ENTRY.height + ENTRY_HEIGHT_PADDING_PIXELS));
         }
 
-        public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
+        public void render(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps) {
             ps.pushPose();
             final int x = KeyEditorScreen.this.leftPos() + 12;
             final float y = this.getCurrentHeight(pt);
@@ -323,7 +323,7 @@ public class KeyEditorScreen {
             ps.popPose();
         }
 
-        public void renderBackground(final GuiGraphics guiGraphics, final float pt, final int mouseX, final int mouseY) {
+        public void renderBackground(final GuiGraphicsExtractor guiGraphics, final float pt, final int mouseX, final int mouseY) {
             final PoseStack ps = guiGraphics.pose();
 
             final int editIconOffset = 167;
@@ -348,7 +348,7 @@ public class KeyEditorScreen {
             this.deleteWidget.setY((int) (y + iconY - 9));
         }
 
-        private void renderItems(final GuiGraphics guiGraphics, final PoseStack ps) {
+        private void renderItems(final GuiGraphicsExtractor guiGraphics, final PoseStack ps) {
             if (!KeyEditorScreen.this.parentScreen.modifier.modifying) {
                 ps.pushPose();
                 ps.translate(0, ((float) KEY_ENTRY.height / 2) - 8, 0);
@@ -361,14 +361,14 @@ public class KeyEditorScreen {
             }
         }
 
-        private void renderText(final GuiGraphics guiGraphics, final PoseStack ps) {
+        private void renderText(final GuiGraphicsExtractor guiGraphics, final PoseStack ps) {
             ps.pushPose();
             ps.translate((float) 9, 11, 0);
             guiGraphics.drawString(Minecraft.getInstance().font, InputConstants.getKey(this.entry.glfwKeyCode, -1).getDisplayName(), 0, 0, 0xFFFFFF, true);
             ps.popPose();
         }
 
-        private void renderWidgets(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps, final int editIconOffset, final float iconY) {
+        private void renderWidgets(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt, final PoseStack ps, final int editIconOffset, final float iconY) {
             ps.pushPose();
             ps.translate(editIconOffset, iconY - 9, 0);
             this.editWidget.render(guiGraphics, mouseX, mouseY, pt);
@@ -385,7 +385,7 @@ public class KeyEditorScreen {
         }
 
         @Override
-        public void doRender(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
+        public void doRender(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
             if (this.visible) {
                 this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 

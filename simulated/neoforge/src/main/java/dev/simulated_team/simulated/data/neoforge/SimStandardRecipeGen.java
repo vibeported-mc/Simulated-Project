@@ -5,7 +5,7 @@ import dev.simulated_team.simulated.Simulated;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.SpecialRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Recipe;
 
@@ -26,7 +26,7 @@ public class SimStandardRecipeGen extends BaseRecipeProvider {
     }
 
     private GeneratedRecipe createSpecial(final Function<CraftingBookCategory, Recipe<?>> builder, final String recipeType, final String path) {
-        final ResourceLocation location = Simulated.path(recipeType + "/" + path);
+        final Identifier location = Simulated.path(recipeType + "/" + path);
 
         return this.register(consumer -> {
             final SpecialRecipeBuilder b = SpecialRecipeBuilder.special(builder);

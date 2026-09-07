@@ -371,7 +371,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         final SubLevel subLevelA = this.getContainingSubLevel();
         final SubLevel subLevelB = this.getAttachedSubLevel();
 
-        final Vec3i facingVec3I = this.getBlockState().getValue(DirectionalKineticBlock.FACING).getNormal();
+        final Vec3i facingVec3I = this.getBlockState().getValue(DirectionalKineticBlock.FACING).getUnitVec3i();
         final Vector3dc facingVec = new Vector3d(facingVec3I.getX(), facingVec3I.getY(), facingVec3I.getZ());
 
         double inertiaA = Double.MAX_VALUE;
@@ -577,8 +577,8 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         if (!plateState.is(SimBlocks.SWIVEL_BEARING_LINK_BLOCK)) return;
 
         final Vector3d anchorPos = JOMLConversion.toJOML(this.getBlockPos().relative(this.getBlockState().getValue(DirectionalKineticBlock.FACING)).getCenter());
-        final Vec3 facingVec = Vec3.atLowerCornerOf(this.getBlockState().getValue(DirectionalKineticBlock.FACING).getNormal());
-        final Vec3 plateFacingVec = Vec3.atLowerCornerOf(plateState.getValue(DirectionalKineticBlock.FACING).getNormal());
+        final Vec3 facingVec = Vec3.atLowerCornerOf(this.getBlockState().getValue(DirectionalKineticBlock.FACING).getUnitVec3i());
+        final Vec3 plateFacingVec = Vec3.atLowerCornerOf(plateState.getValue(DirectionalKineticBlock.FACING).getUnitVec3i());
 
         final RotaryConstraintConfiguration constraint = new RotaryConstraintConfiguration(
                 anchorPos,
@@ -849,7 +849,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
         @Override
         public Vec3 getLocalOffset(final LevelAccessor level, final BlockPos pos, final BlockState state) {
             return super.getLocalOffset(level, pos, state)
-                    .subtract(Vec3.atLowerCornerOf(state.getValue(SwivelBearingBlock.FACING).getNormal())
+                    .subtract(Vec3.atLowerCornerOf(state.getValue(SwivelBearingBlock.FACING).getUnitVec3i())
                             .scale(5 / 16f));
         }
 

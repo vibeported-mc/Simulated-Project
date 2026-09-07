@@ -17,7 +17,7 @@ import net.createmod.catnip.api.theme.Color;
 import net.createmod.ponder.api.client.PonderPalette;
 import net.createmod.ponder.api.client.element.ElementLink;
 import net.createmod.ponder.api.client.element.WorldSectionElement;
-import net.createmod.ponder.api.scene.*;
+import net.createmod.ponder.api.client.scene.*;
 import net.createmod.ponder.impl.client.instruction.AnimateWorldSectionInstruction;
 import net.createmod.ponder.impl.client.instruction.FadeOutOfSceneInstruction;
 import net.createmod.ponder.impl.client.instruction.ShowInputInstruction;

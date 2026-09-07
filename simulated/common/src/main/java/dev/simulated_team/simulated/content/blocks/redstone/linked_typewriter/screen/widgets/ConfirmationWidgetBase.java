@@ -3,7 +3,7 @@ package dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.s
 import com.simibubi.create.foundation.gui.widget.IconButton;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.MutableComponent;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class ConfirmationWidgetBase extends IconButton {
     }
 
     @Override
-    public void doRender(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
+    public void doRender(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
         super.doRender(graphics, mouseX, mouseY, partialTicks);
 
         if (this.isHovered && this.visible && this.active && this.confirmation) {
@@ -31,7 +31,7 @@ public class ConfirmationWidgetBase extends IconButton {
         }
     }
 
-    public void renderHoveredText(final GuiGraphics graphics, final int mouseX, final int mouseY) {
+    public void renderHoveredText(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY) {
         graphics.renderComponentTooltip(Minecraft.getInstance().font, List.of(this.message.withColor(0xff0000)), mouseX, mouseY);
     }
 

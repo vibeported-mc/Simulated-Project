@@ -12,7 +12,7 @@ import dev.simulated_team.simulated.index.SimSoundEvents;
 import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
@@ -180,7 +180,7 @@ public class DiagramStickyNote extends DiagramButton {
     }
 
     @Override
-    protected void renderWidget(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void renderWidget(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
         final PoseStack ps = guiGraphics.pose();
         ps.pushPose();
 
@@ -257,7 +257,7 @@ public class DiagramStickyNote extends DiagramButton {
 
     }
 
-    private void renderCustomCOM(final GuiGraphics guiGraphics, final PoseStack stack) {
+    private void renderCustomCOM(final GuiGraphicsExtractor guiGraphics, final PoseStack stack) {
         if (this.parent.config.displayCenterOfMass()) {
             stack.pushPose();
             final Vector3d centerOfMass = new Vector3d(this.parent.subLevel.logicalPose().rotationPoint());

@@ -13,7 +13,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -109,7 +109,7 @@ public class NameplateBlockEntity extends SmartBlockEntity implements ClipboardC
      * this method is only called on the server. Data is synced to the client when data is sent afterwards
      */
     public void checkAndUpdateController(final DyeColor color, final Direction facing) {
-        final BlockPos leftPos = this.getBlockPos().offset(facing.getClockWise(Direction.Axis.Y).getNormal());
+        final BlockPos leftPos = this.getBlockPos().offset(facing.getClockWise(Direction.Axis.Y).getUnitVec3i());
 
         final boolean wasController = this.controller;
         final BlockState leftState = this.getLevel().getBlockState(leftPos);
@@ -177,7 +177,7 @@ public class NameplateBlockEntity extends SmartBlockEntity implements ClipboardC
             return getClosestDistance(nbe.findController(), point);
         }
 
-        final Vec3i dir = nbe.getBlockState().getValue(NameplateBlock.FACING).getCounterClockWise().getNormal();
+        final Vec3i dir = nbe.getBlockState().getValue(NameplateBlock.FACING).getCounterClockWise().getUnitVec3i();
         Vec3 A = nbe.getBlockPos().getCenter();
         Vec3 B = A.add(dir.getX() * nbe.controllerWidth, dir.getY() * nbe.controllerWidth, dir.getZ() * nbe.controllerWidth);
         final SubLevel subLevel = Sable.HELPER.getContaining(nbe);
@@ -227,10 +227,10 @@ public class NameplateBlockEntity extends SmartBlockEntity implements ClipboardC
             return -988212;
         } else {
             final double d = 0.4;
-            final int j = (int) ((double) FastColor.ARGB32.red(i) * 0.4);
-            final int k = (int) ((double) FastColor.ARGB32.green(i) * 0.4);
-            final int l = (int) ((double) FastColor.ARGB32.blue(i) * 0.4);
-            return FastColor.ARGB32.color(0, j, k, l);
+            final int j = (int) ((double) ARGB.red(i) * 0.4);
+            final int k = (int) ((double) ARGB.green(i) * 0.4);
+            final int l = (int) ((double) ARGB.blue(i) * 0.4);
+            return ARGB.color(0, j, k, l);
         }
     }
 
@@ -362,7 +362,7 @@ public class NameplateBlockEntity extends SmartBlockEntity implements ClipboardC
         }
 
         final Direction facing = this.getBlockState().getValue(NameplateBlock.FACING);
-        final Vec3i off = facing.getCounterClockWise(Direction.Axis.Y).getNormal();
+        final Vec3i off = facing.getCounterClockWise(Direction.Axis.Y).getUnitVec3i();
 
         final AABB bounds = AABB.encapsulatingFullBlocks(this.getBlockPos(), this.getBlockPos().offset(off.multiply(this.controllerWidth - 1)));
         return bounds;

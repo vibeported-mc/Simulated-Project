@@ -3,7 +3,7 @@ package dev.simulated_team.simulated.mixin.diagram;
 import com.mojang.blaze3d.platform.NativeImage;
 import dev.simulated_team.simulated.mixin_interface.diagram.LightTextureExtension;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(LightTexture.class)
+@Mixin(LightCoordsUtil.class)
 public abstract class LightTextureMixin implements LightTextureExtension {
 
     @Shadow

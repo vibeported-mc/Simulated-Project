@@ -18,7 +18,7 @@ import dev.ryanhcode.offroad.content.components.TireLike;
 import dev.simulated_team.simulated.data.SimBlockStateGen;
 import dev.simulated_team.simulated.index.SimItems;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.ItemTags;

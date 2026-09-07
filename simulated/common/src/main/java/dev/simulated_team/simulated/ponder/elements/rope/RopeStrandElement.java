@@ -16,10 +16,10 @@ import net.createmod.ponder.api.client.element.AnimatedSceneElement;
 import net.createmod.ponder.api.client.level.PonderLevel;
 import net.createmod.ponder.api.client.scene.PonderScene;
 import net.createmod.ponder.impl.client.element.AnimatedSceneElementBase;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -75,7 +75,7 @@ public class RopeStrandElement extends AnimatedSceneElementBase implements Anima
     }
 
     @Override
-    protected void renderLast(final PonderLevel world, final MultiBufferSource buffer, final GuiGraphics graphics, final float fade, final float pt) {
+    protected void renderLast(final PonderLevel world, final MultiBufferSource buffer, final GuiGraphicsExtractor graphics, final float fade, final float pt) {
         final SuperByteBuffer middle = CachedBuffers.partialFacing(SimPartialModels.ROPE, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
         final SuperByteBuffer knot = CachedBuffers.partialFacing(SimPartialModels.ROPE_KNOT, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
         final VertexConsumer vb = buffer.getBuffer(RenderType.solid());
@@ -123,7 +123,7 @@ public class RopeStrandElement extends AnimatedSceneElementBase implements Anima
             ps.mulPose(orientation);
             ps.translate(-0.5, -0.5, -0.5);
             final BlockPos pos = BlockPos.containing(globalRenderPos.x, globalRenderPos.y, globalRenderPos.z);
-            final int worldLight = LightTexture.FULL_BLOCK;
+            final int worldLight = LightCoordsUtil.FULL_BLOCK;
 
             knot.light(worldLight)
                     .renderInto(ps, vb);

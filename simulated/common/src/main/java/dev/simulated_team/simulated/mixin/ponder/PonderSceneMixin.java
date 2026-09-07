@@ -5,7 +5,7 @@ import dev.simulated_team.simulated.mixin_interface.ponder.PonderSceneExtension;
 import net.createmod.catnip.api.animation.LerpedFloat;
 import net.createmod.catnip.render.SuperRenderTypeBuffer;
 import net.createmod.ponder.api.client.scene.PonderScene;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -105,7 +105,7 @@ public class PonderSceneMixin implements PonderSceneExtension {
     @Shadow
     private PonderScene.SceneTransform transform;
     @Redirect(remap=false,method="renderScene",at = @At(value="INVOKE",target="Lnet/createmod/ponder/foundation/PonderScene$SceneCamera;set(FF)V"))
-    public void onCameraSet(PonderScene.SceneCamera instance, float xRotation, float yRotation, SuperRenderTypeBuffer buffer, GuiGraphics graphics, float pt)
+    public void onCameraSet(PonderScene.SceneCamera instance, float xRotation, float yRotation, SuperRenderTypeBuffer buffer, GuiGraphicsExtractor graphics, float pt)
     {
         instance.set( -transform.xRotation.getValue(pt), transform.yRotation.getValue(pt) + 180);
     }

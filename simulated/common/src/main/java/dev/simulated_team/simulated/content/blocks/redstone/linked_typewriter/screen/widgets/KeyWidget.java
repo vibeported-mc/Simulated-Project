@@ -10,7 +10,7 @@ import net.createmod.catnip.api.data.Couple;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.createmod.catnip.api.client.gui.widget.AbstractSimiWidget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.DyeColor;
@@ -38,7 +38,7 @@ public class KeyWidget extends AbstractSimiWidget {
         this.screen = screen;
     }
 
-    public void render(final GuiGraphics pGuiGraphics, final int x, final int y, final int pMouseX, final int pMouseY, final float pPartialTick, final boolean keyboardActive) {
+    public void render(final GuiGraphicsExtractor pGuiGraphics, final int x, final int y, final int pMouseX, final int pMouseY, final float pPartialTick, final boolean keyboardActive) {
         this.bound = this.screen.getNewEntries().getKeyMap().containsKey(this.keyNum);
 
         this.setX(x);
@@ -48,7 +48,7 @@ public class KeyWidget extends AbstractSimiWidget {
     }
 
     @Override
-    public void renderWidget(@NotNull final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
+    public void renderWidget(@NotNull final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
         final SimGUITextures start = this.bound ? SimGUITextures.KEY_START : SimGUITextures.INACTIVE_KEY_START;
         final SimGUITextures middle = this.bound ? SimGUITextures.KEY_MIDDLE : SimGUITextures.INACTIVE_KEY_MIDDLE;
         final SimGUITextures end = this.bound ? SimGUITextures.KEY_END : SimGUITextures.INACTIVE_KEY_END;
@@ -78,7 +78,7 @@ public class KeyWidget extends AbstractSimiWidget {
         }
     }
 
-    protected void renderHover(@NotNull final GuiGraphics pGuiGraphics, final int pMouseX, final int pMouseY, final float pPartialTick) {
+    protected void renderHover(@NotNull final GuiGraphicsExtractor pGuiGraphics, final int pMouseX, final int pMouseY, final float pPartialTick) {
         LinkedTypewriterEntries.KeyboardEntry keyboardEntry = this.screen.getNewEntries().getEntry(this.keyNum);
         if (keyboardEntry == null) {
             keyboardEntry = this.EMPTY;
@@ -123,7 +123,7 @@ public class KeyWidget extends AbstractSimiWidget {
                 .getDisplayName();
     }
 
-    private void renderBackground(@NotNull final GuiGraphics pGuiGraphics, final int x, final int y, final int w, final int h) {
+    private void renderBackground(@NotNull final GuiGraphicsExtractor pGuiGraphics, final int x, final int y, final int w, final int h) {
         final SimGUITextures bg = SimGUITextures.LINKED_TYPEWRITER_TOOLTIP_BACKGROUND;
         pGuiGraphics.blitSprite(bg.location, x, y, 0, w, h);
     }

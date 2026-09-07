@@ -25,17 +25,17 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
@@ -105,11 +105,11 @@ public class LaunchedPlungerEntityRenderer extends EntityRenderer<LaunchedPlunge
         Vec3 perpendicularNormal = Vec3.ZERO;
         final Direction dir = entity.getData(LaunchedPlungerEntity.PLUNGED_DIRECTION);
         if (entity.isPlunged()) {
-            selfNormal = Vec3.atLowerCornerOf(dir.getNormal());
+            selfNormal = Vec3.atLowerCornerOf(dir.getUnitVec3i());
             if (dir.getAxis().isHorizontal()) {
-                perpendicularNormal = Vec3.atLowerCornerOf(Direction.UP.getNormal());
+                perpendicularNormal = Vec3.atLowerCornerOf(Direction.UP.getUnitVec3i());
             } else {
-                perpendicularNormal = Vec3.atLowerCornerOf(Direction.NORTH.getNormal());
+                perpendicularNormal = Vec3.atLowerCornerOf(Direction.NORTH.getUnitVec3i());
             }
         } else {
             selfNormal = entity.calculateViewVector(-Mth.lerp(pt, entity.xRotO, entity.getXRot()),-Mth.lerp(pt, entity.yRotO, entity.getYRot())).reverse();
@@ -148,7 +148,7 @@ public class LaunchedPlungerEntityRenderer extends EntityRenderer<LaunchedPlunge
             Vec3 otherNormal = Vec3.ZERO;
             if (other.isPlunged()) {
                 final Direction otherDir = other.getData(LaunchedPlungerEntity.PLUNGED_DIRECTION);
-                otherNormal = Vec3.atLowerCornerOf(otherDir.getNormal());
+                otherNormal = Vec3.atLowerCornerOf(otherDir.getUnitVec3i());
             } else {
                 otherNormal = other.calculateViewVector(-Mth.lerp(pt, other.xRotO, other.getXRot()),-Mth.lerp(pt, other.yRotO, other.getYRot())).reverse();
             }
@@ -403,8 +403,8 @@ public class LaunchedPlungerEntityRenderer extends EntityRenderer<LaunchedPlunge
     }
 
     @Override
-    public ResourceLocation getTextureLocation(final LaunchedPlungerEntity entity) {
-        return ResourceLocation.withDefaultNamespace("missing");
+    public Identifier getTextureLocation(final LaunchedPlungerEntity entity) {
+        return Identifier.withDefaultNamespace("missing");
     }
 
     @Override

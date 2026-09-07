@@ -267,7 +267,7 @@ public class PortableEngineBlockEntity extends GeneratingKineticBlockEntity impl
 
             final Direction direction = this.getBlockState()
                     .getValue(BlockStateProperties.HORIZONTAL_FACING);
-            final Vec3i N = direction.getNormal();
+            final Vec3i N = direction.getUnitVec3i();
             final Vec3 N2 = new Vec3(N.getX(), N.getY(), N.getZ());
             pos = pos.add(-N.getX() * 0.53, -0.1, -N.getZ() * 0.53);
             final Vec3 speed = VecHelper.offsetRandomly(Vec3.ZERO, RandomSource.create(), 0.01f).add(N2.scale(-0.03));
@@ -355,7 +355,7 @@ public class PortableEngineBlockEntity extends GeneratingKineticBlockEntity impl
         Vec3 hatchPos = VecHelper.getCenterOf(this.worldPosition);
 
         final Direction direction = this.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
-        final Vec3i facingDirI = direction.getNormal();
+        final Vec3i facingDirI = direction.getUnitVec3i();
         final Vec3 facingDir = new Vec3(facingDirI.getX(), facingDirI.getY(), facingDirI.getZ());
         final Vec3 rightDir = facingDir.yRot((float) (Math.PI / 2.0));
 

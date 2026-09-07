@@ -7,7 +7,7 @@ import dev.simulated_team.simulated.ponder.records.PonderLineRecord;
 import net.createmod.catnip.api.client.outliner.LineOutline;
 import net.createmod.catnip.api.client.render.PonderRenderTypes;
 import net.createmod.catnip.render.SuperRenderTypeBuffer;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
@@ -44,7 +44,7 @@ public class LerpedLineOutline extends LineOutline {
         final VertexConsumer consumer = buffer.getBuffer(PonderRenderTypes.outlineSolid());
         this.params.loadColor(this.colorTemp);
         final Vector4f color = this.colorTemp;
-        final int lightmap = LightTexture.FULL_BRIGHT;
+        final int lightmap = LightCoordsUtil.FULL_BRIGHT;
         final boolean disableLineNormals = false;
         this.renderInner(ms, consumer, camera, pt, width, color, lightmap, disableLineNormals);
     }

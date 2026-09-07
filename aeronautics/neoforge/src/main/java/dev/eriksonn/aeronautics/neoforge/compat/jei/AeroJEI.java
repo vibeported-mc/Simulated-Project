@@ -12,7 +12,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -22,12 +22,12 @@ import java.util.List;
 @JeiPlugin
 public final class AeroJEI implements IModPlugin {
 
-    private static final ResourceLocation ID = Aeronautics.path("jei_plugin");
+    private static final Identifier ID = Aeronautics.path("jei_plugin");
     private static final RecipeType<RecipeHolder<ConversionRecipe>> MYSTERY_CONVERSION =
             RecipeType.createRecipeHolderType(Create.asResource("mystery_conversion"));
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return ID;
     }
 
@@ -50,7 +50,7 @@ public final class AeroJEI implements IModPlugin {
             final Ingredient input,
             final ItemStack output
     ) {
-        final ResourceLocation recipeId = Aeronautics.path("conversion_" + name);
+        final Identifier recipeId = Aeronautics.path("conversion_" + name);
         final ConversionRecipe recipe = new StandardProcessingRecipe.Builder<>(ConversionRecipe::new, recipeId)
                 .withItemIngredients(input)
                 .withSingleItemOutput(output)

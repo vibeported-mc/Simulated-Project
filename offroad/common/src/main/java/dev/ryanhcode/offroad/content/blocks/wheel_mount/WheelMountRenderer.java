@@ -17,10 +17,10 @@ import net.createmod.catnip.api.client.render.CachedBuffers;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -122,7 +122,7 @@ public class WheelMountRenderer extends KineticBlockEntityRenderer<WheelMountBlo
             ms.mulPose(Axis.ZP.rotation((float) Math.toRadians(rotation.z)));
 
             if (tireLike.model().isPresent()) {
-                final ResourceLocation model = tireLike.model().get();
+                final Identifier model = tireLike.model().get();
                 ms.translate(tireLike.offset().x, tireLike.offset().y, tireLike.offset().z);
                 final SuperByteBuffer wheel = CachedBuffers.partial(PartialModel.of(model), state);
                 wheel.light(light)

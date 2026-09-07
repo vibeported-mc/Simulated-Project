@@ -22,7 +22,7 @@ import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -136,7 +136,7 @@ public class SimulatedCommonClientEvents {
      *
      * @param graphics Minecraft's abstract GUIGraphics class
      */
-    public static void renderOverlays(final GuiGraphics graphics, final float pt) {
+    public static void renderOverlays(final GuiGraphicsExtractor graphics, final float pt) {
         final int width = graphics.guiWidth();
         final int height = graphics.guiHeight();
 

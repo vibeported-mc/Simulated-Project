@@ -9,12 +9,12 @@ import dev.simulated_team.simulated.ponder.scenes.*;
 import net.createmod.ponder.api.client.registration.PonderSceneRegistrationHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class SimPonderScenes {
-    public static void register(final PonderSceneRegistrationHelper<ResourceLocation> registry) {
+    public static void register(final PonderSceneRegistrationHelper<Identifier> registry) {
         final PonderSceneRegistrationHelper<ItemProviderEntry<?, ?>> helper = registry.withKeyFunction(DeferredHolder::getId);
 
         //PHYSICS
@@ -105,7 +105,7 @@ public class SimPonderScenes {
     private static ItemProviderEntry<Item, Item> vanillaItemProvider(final String id) {
         return new ItemProviderEntry<>(
                 Simulated.getRegistrate(),
-                DeferredHolder.create(ResourceKey.create(Registries.ITEM, ResourceLocation.withDefaultNamespace(id)))
+                DeferredHolder.create(ResourceKey.create(Registries.ITEM, Identifier.withDefaultNamespace(id)))
         );
     }
 }

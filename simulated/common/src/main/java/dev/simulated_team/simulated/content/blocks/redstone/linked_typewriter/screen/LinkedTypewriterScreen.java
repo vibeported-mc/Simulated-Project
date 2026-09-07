@@ -23,7 +23,7 @@ import foundry.veil.api.network.VeilPacketManager;
 import net.createmod.catnip.api.client.gui.element.GuiGameElement;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.renderer.Rect2i;
@@ -241,7 +241,7 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
     }
 
     @Override
-    public void render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float pt) {
+    public void render(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float pt) {
         final PoseStack ps = guiGraphics.pose();
         ps.pushPose();
         ps.translate(0, 0, -1);
@@ -264,7 +264,7 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
     }
 
     @Override
-    protected void renderForeground(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void renderForeground(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
 
         final PoseStack ps = graphics.pose();
         ps.pushPose();
@@ -277,7 +277,7 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
     }
 
     @Override
-    protected void renderBg(final GuiGraphics guiGraphics, final float pt, final int mx, final int my) {
+    protected void renderBg(final GuiGraphicsExtractor guiGraphics, final float pt, final int mx, final int my) {
         final int titleX = (this.backgroundMain.width / 2) - (Minecraft.getInstance().font.width(this.getTitle()) / 2);
 
         if (!this.keyEditorScreen.active) {
@@ -313,7 +313,7 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
         }
     }
 
-    private void renderTypeWriter(final GuiGraphics graphics, final int x, final int y) {
+    private void renderTypeWriter(final GuiGraphicsExtractor graphics, final int x, final int y) {
         final PoseStack ps = graphics.pose();
 
         final TransformStack<PoseTransformStack> msr = TransformStack.of(ps);
@@ -503,7 +503,7 @@ public class LinkedTypewriterScreen extends AbstractSimiContainerScreen<LinkedTy
             this.add(kWid);
         }
 
-        public void render(final GuiGraphics guiGraphics, final int x, final int y, final int mouseX, final int mouseY, final float pt, final boolean keyboardActive) {
+        public void render(final GuiGraphicsExtractor guiGraphics, final int x, final int y, final int mouseX, final int mouseY, final float pt, final boolean keyboardActive) {
             int length = 0;
             for (final KeyWidget key : this) {
                 key.render(guiGraphics, x + length, y, mouseX, mouseY, pt, keyboardActive);

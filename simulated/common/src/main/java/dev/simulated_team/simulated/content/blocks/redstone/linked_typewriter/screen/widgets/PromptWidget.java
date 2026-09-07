@@ -5,7 +5,7 @@ import dev.simulated_team.simulated.content.blocks.redstone.linked_typewriter.sc
 import dev.simulated_team.simulated.data.SimLang;
 import net.createmod.catnip.api.client.gui.widget.AbstractSimiWidget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 public class PromptWidget extends AbstractSimiWidget {
@@ -19,7 +19,7 @@ public class PromptWidget extends AbstractSimiWidget {
     }
 
     @Override
-    protected void doRender(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void doRender(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
         super.doRender(graphics, mouseX, mouseY, partialTicks);
 
         if (this.entryModifierScreen.modifying && this.entryModifierScreen.psuedoEntry != null) {

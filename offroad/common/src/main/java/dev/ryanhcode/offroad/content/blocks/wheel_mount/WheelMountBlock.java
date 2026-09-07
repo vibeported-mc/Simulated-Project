@@ -15,7 +15,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -91,7 +91,7 @@ public class WheelMountBlock extends HorizontalKineticBlock implements IBE<Wheel
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(final ItemStack heldItem, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
+    protected InteractionResult useItemOn(final ItemStack heldItem, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
         final Direction hitDirection = blockHitResult.getDirection();
 
         if(!hitDirection.equals(blockState.getValue(HORIZONTAL_FACING)) && hitDirection != Direction.DOWN) {
@@ -105,7 +105,7 @@ public class WheelMountBlock extends HorizontalKineticBlock implements IBE<Wheel
                         || (heldItem.has(OffroadDataComponents.TIRE) && potentialTire.has(OffroadDataComponents.TIRE))
                         || (heldItem.has(OffroadDataComponents.TIRE) && potentialTire.isEmpty())
                 ) {
-                    return ItemInteractionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
 
                 return super.useItemOn(heldItem, blockState, level, blockPos, player, interactionHand, blockHitResult);
@@ -113,7 +113,7 @@ public class WheelMountBlock extends HorizontalKineticBlock implements IBE<Wheel
         }
 
         if (this.switchStacks(level, blockPos, player, interactionHand)) {
-            return ItemInteractionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
 
         return super.useItemOn(heldItem, blockState, level, blockPos, player, interactionHand, blockHitResult);

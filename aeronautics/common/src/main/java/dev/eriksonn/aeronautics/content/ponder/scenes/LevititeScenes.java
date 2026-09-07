@@ -17,7 +17,7 @@ import net.createmod.ponder.api.client.scene.ParticleEmitter;
 import net.createmod.ponder.api.client.PonderPalette;
 import net.createmod.ponder.api.client.element.ElementLink;
 import net.createmod.ponder.api.client.element.WorldSectionElement;
-import net.createmod.ponder.api.scene.*;
+import net.createmod.ponder.api.client.scene.*;
 import net.createmod.ponder.impl.client.scene.SelectionImpl;
 import net.createmod.ponder.impl.client.element.InputWindowElement;
 import net.minecraft.core.BlockPos;

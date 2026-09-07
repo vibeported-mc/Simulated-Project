@@ -10,7 +10,7 @@ import dev.eriksonn.aeronautics.neoforge.index.AeroFluidsNeoForge;
 import foundry.veil.forge.event.ForgeVeilRegisterBlockLayersEvent;
 import foundry.veil.forge.event.ForgeVeilRegisterFixedBuffersEvent;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;

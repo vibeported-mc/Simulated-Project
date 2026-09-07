@@ -10,7 +10,7 @@ import foundry.veil.api.network.VeilPacketManager;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
 import net.createmod.catnip.api.client.gui.UIRenderHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -49,7 +49,7 @@ public class ThrottleLeverHandler extends BlockHoldInteraction {
     }
 
     @Override
-    public void renderOverlay(final GuiGraphics graphics, final int width, final int height, final boolean hideGui) {
+    public void renderOverlay(final GuiGraphicsExtractor graphics, final int width, final int height, final boolean hideGui) {
         if (hideGui)
             return;
 

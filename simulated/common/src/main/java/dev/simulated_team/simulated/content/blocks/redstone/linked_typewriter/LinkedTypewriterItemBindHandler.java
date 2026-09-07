@@ -18,7 +18,7 @@ import net.createmod.catnip.api.client.outliner.Outliner;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -118,7 +118,7 @@ public class LinkedTypewriterItemBindHandler {
         reset();
     }
 
-    public static void renderOverlay(final GuiGraphics guiGraphics, final DeltaTracker deltaTracker) {
+    public static void renderOverlay(final GuiGraphicsExtractor guiGraphics, final DeltaTracker deltaTracker) {
         if (LinkedTypewriterInteractionHandler.getMode() != LinkedTypewriterInteractionHandler.Mode.BINDING_FROM_ITEM) {
             return;
         }

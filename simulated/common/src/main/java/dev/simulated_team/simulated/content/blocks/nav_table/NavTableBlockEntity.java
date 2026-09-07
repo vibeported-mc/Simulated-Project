@@ -189,13 +189,13 @@ public class NavTableBlockEntity extends SmartBlockEntity implements Clearable {
         // ponder rendering logic where only the visual arrow direction is cared about
         if (this.level.isClientSide && this.isVirtual()) {
             final Direction facing = this.getBlockState().getValue(NavTableBlock.FACING);
-            final Vec3i normal = facing.getNormal();
+            final Vec3i normal = facing.getUnitVec3i();
 
             final double andleRad = Math.toRadians(this.lerpedAngleDegrees.getValue());
             Vec3 targetPos = new Vec3(Math.cos(andleRad), 0, Math.sin(andleRad));
             targetPos = NavigationTarget.getPlaneProjectedPos(targetPos, normal);
 
-            final double dot = -targetPos.dot(Vec3.atLowerCornerOf(direction.getNormal()));
+            final double dot = -targetPos.dot(Vec3.atLowerCornerOf(direction.getUnitVec3i()));
             return (int) (Math.asin(dot) / Math.PI * 30 + 0.5);
         }
 

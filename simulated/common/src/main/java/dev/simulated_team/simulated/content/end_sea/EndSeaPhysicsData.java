@@ -9,7 +9,7 @@ import dev.simulated_team.simulated.network.packets.end_sea.ClientboundEndSeaPac
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -66,17 +66,17 @@ public class EndSeaPhysicsData {
         public static final ReloadListener INSTANCE = new ReloadListener();
 
         public static final String NAME = "end_sea";
-        public static final ResourceLocation ID = Simulated.path(NAME);
+        public static final Identifier ID = Simulated.path(NAME);
 
         public ReloadListener() {
             super(GSON, NAME);
         }
 
         @Override
-        protected void apply(final Map<ResourceLocation, JsonElement> map, final ResourceManager resourceManager, final ProfilerFiller profiler) {
+        protected void apply(final Map<Identifier, JsonElement> map, final ResourceManager resourceManager, final ProfilerFiller profiler) {
             END_SEA_PHYSICS_DATA.clear();
 
-            for (final Map.Entry<ResourceLocation, JsonElement> entry : map.entrySet()) {
+            for (final Map.Entry<Identifier, JsonElement> entry : map.entrySet()) {
                 try {
                     final DataResult<EndSeaPhysics> dataResult = EndSeaPhysics.CODEC.parse(JsonOps.INSTANCE, entry.getValue());
 

@@ -5,8 +5,8 @@ import dev.simulated_team.simulated.Simulated;
 import net.createmod.catnip.api.client.gui.UIRenderHelper;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.createmod.catnip.api.theme.Color;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public enum SimGUITextures implements ScreenElement {
@@ -72,7 +72,7 @@ public enum SimGUITextures implements ScreenElement {
     LINKED_TYPEWRITER_TRASH_CONFIRM_HOVER("linked_typewriter/linked_typewriter", 113, 127, 18, 18);
 
     @NotNull
-    public final ResourceLocation location;
+    public final Identifier location;
 
     public final int width, height;
     public final int startX, startY;
@@ -98,7 +98,7 @@ public enum SimGUITextures implements ScreenElement {
         this(namespace, location, startX, startY, width, height, 256, 256);
     }
 
-    SimGUITextures(final ResourceLocation location, final int startX, final int startY, final int width, final int height, final int texWidth, final int texHeight) {
+    SimGUITextures(final Identifier location, final int startX, final int startY, final int width, final int height, final int texWidth, final int texHeight) {
         this.location = location;
         this.width = width;
         this.height = height;
@@ -109,7 +109,7 @@ public enum SimGUITextures implements ScreenElement {
     }
 
     SimGUITextures(final String namespace, final String location, final int startX, final int startY, final int width, final int height, final int texWidth, final int texHeight) {
-        final ResourceLocation loc = ResourceLocation.tryBuild(namespace, "textures/gui/" + location + ".png");
+        final Identifier loc = Identifier.tryBuild(namespace, "textures/gui/" + location + ".png");
         assert loc != null; //location should never be null here, if it is, we messed up
 
         this.location = loc;
@@ -125,15 +125,15 @@ public enum SimGUITextures implements ScreenElement {
         RenderSystem.setShaderTexture(0, this.location);
     }
 
-    public void render(final GuiGraphics graphics, final int x, final int y) {
+    public void render(final GuiGraphicsExtractor graphics, final int x, final int y) {
         graphics.blit(this.location, x, y, this.startX, this.startY, this.width, this.height, this.texWidth, this.texHeight);
     }
 
-    public void render (final GuiGraphics graphics, final int x, final int y, final int width, final int height) {
+    public void render (final GuiGraphicsExtractor graphics, final int x, final int y, final int width, final int height) {
         graphics.blit(this.location, x, y, this.startX, this.startY, width, height, this.texWidth, this.texHeight);
     }
 
-    public void render(final GuiGraphics graphics, final int x, final int y, final Color c) {
+    public void render(final GuiGraphicsExtractor graphics, final int x, final int y, final Color c) {
         this.bind();
         UIRenderHelper.drawColoredTexture(graphics, c, x, y, 0, this.startX, this.startY, this.width, this.height, this.texWidth, this.texHeight);
     }

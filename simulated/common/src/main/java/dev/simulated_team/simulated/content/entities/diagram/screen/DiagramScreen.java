@@ -34,15 +34,15 @@ import net.createmod.catnip.api.lang.LangBuilder;
 import net.createmod.catnip.api.theme.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -290,17 +290,17 @@ public class DiagramScreen extends AbstractSimiScreen {
     }
 
     // this is horrid :(
-    private HashMap<ResourceLocation, Tuple<Greeble, ArrayList<Greeble.TextureSlice>>> genGreebleSet(final RandomSource random) {
-        final HashMap<ResourceLocation, Tuple<Greeble, ArrayList<Greeble.TextureSlice>>> greebleSet = new HashMap<>();
+    private HashMap<Identifier, Tuple<Greeble, ArrayList<Greeble.TextureSlice>>> genGreebleSet(final RandomSource random) {
+        final HashMap<Identifier, Tuple<Greeble, ArrayList<Greeble.TextureSlice>>> greebleSet = new HashMap<>();
 
-        for (final Map.Entry<ResourceLocation, Greeble> entry : SimResourceManagers.GREEBLE.entrySet()) {
+        for (final Map.Entry<Identifier, Greeble> entry : SimResourceManagers.GREEBLE.entrySet()) {
             greebleSet.put(entry.getKey(), new Tuple<>(entry.getValue(), entry.getValue().shuffled()));
         }
 
         return greebleSet;
     }
 
-    private ResourceLocation randomGreeble(final RandomSource random) {
+    private Identifier randomGreeble(final RandomSource random) {
         float weightSum = 0;
 
         for (final Greeble greeble : SimResourceManagers.GREEBLE.entries()) {
@@ -309,7 +309,7 @@ public class DiagramScreen extends AbstractSimiScreen {
 
         float weight = random.nextFloat() * weightSum;
 
-        for (final Map.Entry<ResourceLocation, Greeble> greeble : SimResourceManagers.GREEBLE.entrySet()) {
+        for (final Map.Entry<Identifier, Greeble> greeble : SimResourceManagers.GREEBLE.entrySet()) {
             weight -= greeble.getValue().weight();
 
             if (weight <= 0) {
@@ -322,7 +322,7 @@ public class DiagramScreen extends AbstractSimiScreen {
     private void addGreebles(final int diagramX, final int diagramY) {
         final RandomSource random = this.subLevel.getLevel().getRandom();
 
-        final HashMap<ResourceLocation, Tuple<Greeble, ArrayList<Greeble.TextureSlice>>> greebleSet = this.genGreebleSet(random);
+        final HashMap<Identifier, Tuple<Greeble, ArrayList<Greeble.TextureSlice>>> greebleSet = this.genGreebleSet(random);
         final List<AABB> placed = new ObjectArrayList<>();
 
         // Avoid top-left region (diagram buttons are placed there)
@@ -337,7 +337,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         this.finalFbo.bindRead();
 
         for (int i = 0; i < greebles; i++) {
-            final ResourceLocation greebleID = this.randomGreeble(random);
+            final Identifier greebleID = this.randomGreeble(random);
             final Greeble greeble = SimResourceManagers.GREEBLE.get(greebleID);
             final ArrayList<Greeble.TextureSlice> slices = greebleSet.get(greebleID).getB();
             if (slices.isEmpty()) {
@@ -464,7 +464,7 @@ public class DiagramScreen extends AbstractSimiScreen {
     }
 
     @Override
-    protected void renderWindowBackground(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void renderWindowBackground(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
         graphics.fill(0, 0, this.width, this.height, -10, 0x4fffffff);
     }
 
@@ -579,7 +579,7 @@ public class DiagramScreen extends AbstractSimiScreen {
     }
 
     @Override
-    protected void renderWindow(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void renderWindow(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
         final PoseStack ps = graphics.pose();
 
         if (this.subLevel.isRemoved() || this.diagram.isRemoved()) {
@@ -657,7 +657,7 @@ public class DiagramScreen extends AbstractSimiScreen {
     }
 
     @Override
-    protected void renderWindowForeground(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void renderWindowForeground(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
         final PoseStack ps = graphics.pose();
 
         this.renderMagnificationHighlight(graphics, mouseX, mouseY, ps);
@@ -671,7 +671,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         super.renderWindowForeground(graphics, mouseX, mouseY, partialTicks);
     }
 
-    private void renderMagnificationHighlight(final GuiGraphics graphics, final int mouseX, final int mouseY, final PoseStack ps) {
+    private void renderMagnificationHighlight(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final PoseStack ps) {
         final boolean initiallyWithinNote = this.note.contains(MAGNIFYING_CENTER.x, MAGNIFYING_CENTER.y);
 
         this.updateMagnificationBox(mouseX, mouseY);
@@ -739,7 +739,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         return dest;
     }
 
-    public static void renderFBO(final GuiGraphics graphics, final AdvancedFbo fbo, final int width, final int height) {
+    public static void renderFBO(final GuiGraphicsExtractor graphics, final AdvancedFbo fbo, final int width, final int height) {
         final int id = fbo.getColorTextureAttachment(0).getId();
 
         RenderSystem.setShaderTexture(0, id);
@@ -758,7 +758,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         RenderSystem.disableBlend();
     }
 
-    public void renderArrows(final GuiGraphics graphics,
+    public void renderArrows(final GuiGraphicsExtractor graphics,
                              final int mouseX,
                              final int mouseY,
                              final int areaOriginX,
@@ -774,7 +774,7 @@ public class DiagramScreen extends AbstractSimiScreen {
 
             final Map<ForceGroup, List<ForceClusterFinder.Cluster>> clusters = new HashMap<>();
 
-            for (final ResourceLocation groupId : this.config.enabledForceGroups()) {
+            for (final Identifier groupId : this.config.enabledForceGroups()) {
                 final ForceGroup group = ForceGroups.REGISTRY.get(groupId);
                 assert group != null;
 
@@ -790,7 +790,7 @@ public class DiagramScreen extends AbstractSimiScreen {
                 }
             }
 
-            for (final ResourceLocation groupId : this.config.enabledForceGroups()) {
+            for (final Identifier groupId : this.config.enabledForceGroups()) {
                 final ForceGroup group = ForceGroups.REGISTRY.get(groupId);
                 assert group != null;
 
@@ -819,7 +819,7 @@ public class DiagramScreen extends AbstractSimiScreen {
     /**
      * Renders a force arrow for a given point force and force group
      */
-    private void renderForceArrow(final GuiGraphics graphics,
+    private void renderForceArrow(final GuiGraphicsExtractor graphics,
                                   final ForceGroup forceGroup,
                                   final ForceClusterFinder.Cluster pointForce,
                                   final double maxArrowLength,
@@ -995,7 +995,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         return Mth.lerp(partialTicks, this.lastTabOffset, this.tabOffset);
     }
 
-    private void renderCenterOfMass(final GuiGraphics graphics) {
+    private void renderCenterOfMass(final GuiGraphicsExtractor graphics) {
         final Vector3d centerOfMass = new Vector3d(this.subLevel.logicalPose().rotationPoint());
         final Vector2d screenCoords = getScreenCoords(centerOfMass, LOCAL_ORIENTATION, LOCAL_CAMERA_POSITION, PROJECTION_MAT, DIAGRAM_TEXTURE.width, DIAGRAM_TEXTURE.height);
 
@@ -1050,7 +1050,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         this.serverData = data;
     }
 
-    public static void renderTooltip(final GuiGraphics guiGraphics, final int x, final int y, final List<FormattedText> lines) {
+    public static void renderTooltip(final GuiGraphicsExtractor guiGraphics, final int x, final int y, final List<FormattedText> lines) {
         final Font font = Minecraft.getInstance().font;
 
         final Color colorBackground = new Color(0xff3d322a);
@@ -1067,10 +1067,10 @@ public class DiagramScreen extends AbstractSimiScreen {
 //        return true;
 //    }
 
-    public record GreebleRenderable(int x, int y, int width, int height, ResourceLocation texture,
+    public record GreebleRenderable(int x, int y, int width, int height, Identifier texture,
                                     Greeble.TextureSlice slice) implements Renderable {
         @Override
-        public void render(final GuiGraphics guiGraphics, final int i, final int i1, final float v) {
+        public void render(final GuiGraphicsExtractor guiGraphics, final int i, final int i1, final float v) {
             guiGraphics.blit(this.texture, this.x, this.y, this.slice.x(), this.slice.y(), this.slice.width(), this.slice.height(), this.width, this.height);
         }
     }

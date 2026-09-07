@@ -30,7 +30,6 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -114,7 +113,7 @@ public class SimNeoForgeCommonEvents {
 		if (event.getLevel().isClientSide()) {
 			if (event.getPlayer() != null && event.getUsePhase() == UseItemOnBlockEvent.UsePhase.ITEM_AFTER_BLOCK) {
 				if (SimulatedCommonClientEvents.useItemOnBlockEvent(event.getLevel(), event.getPlayer(), event.getItemStack(), event.getHand())) {
-					event.cancelWithResult(ItemInteractionResult.CONSUME);
+					event.cancelWithResult(InteractionResult.CONSUME);
 				}
 			}
 

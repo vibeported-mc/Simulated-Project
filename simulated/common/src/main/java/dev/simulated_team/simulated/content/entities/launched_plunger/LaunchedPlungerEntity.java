@@ -151,7 +151,7 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
 
         if (this.getData(IS_PLUNGED)) {
             this.setDeltaMovement(Vec3.ZERO);
-            this.lookAt(EntityAnchorArgument.Anchor.FEET, this.position().add(Vec3.atLowerCornerOf(this.getData(PLUNGED_DIRECTION).getNormal()).scale(0.05f)));
+            this.lookAt(EntityAnchorArgument.Anchor.FEET, this.position().add(Vec3.atLowerCornerOf(this.getData(PLUNGED_DIRECTION).getUnitVec3i()).scale(0.05f)));
 
             if (this.firstTick) {
                 this.plungedTime = 20;
@@ -191,7 +191,7 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
         Vec3 pos = this.getPosition(partialTick);
 
         if (this.isPlunged()) {
-            pos = pos.add(Vec3.atLowerCornerOf(this.getData(PLUNGED_DIRECTION).getNormal()).scale(0.6));
+            pos = pos.add(Vec3.atLowerCornerOf(this.getData(PLUNGED_DIRECTION).getUnitVec3i()).scale(0.6));
         }
 
         return pos;
@@ -204,7 +204,7 @@ public class LaunchedPlungerEntity extends ThrowableProjectile {
         Vec3 pos = this.position();
 
         if (this.isPlunged()) {
-            pos = pos.add(Vec3.atLowerCornerOf(this.getData(PLUNGED_DIRECTION).getNormal()).scale(0.6));
+            pos = pos.add(Vec3.atLowerCornerOf(this.getData(PLUNGED_DIRECTION).getUnitVec3i()).scale(0.6));
         }
 
         return pos;

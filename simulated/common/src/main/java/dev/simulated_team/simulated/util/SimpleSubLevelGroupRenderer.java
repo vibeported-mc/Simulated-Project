@@ -95,7 +95,7 @@ public class SimpleSubLevelGroupRenderer {
 
         final Minecraft minecraft = Minecraft.getInstance();
         final GameRenderer gameRenderer = minecraft.gameRenderer;
-        final LightTexture lightTexture = gameRenderer.lightTexture();
+        final LightCoordsUtil lightTexture = gameRenderer.lightTexture();
         final VanillaSubLevelBlockEntityRenderer beRenderer = new VanillaSubLevelBlockEntityRenderer(minecraft.getBlockEntityRenderDispatcher(), minecraft.renderBuffers(), new Long2ObjectOpenHashMap<>());
 
         CAMERA.setup(cameraPosition, null, minecraft.level, orientation, 0f);

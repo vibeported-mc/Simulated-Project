@@ -12,7 +12,7 @@ import net.createmod.ponder.api.client.scene.PonderScene;
 import net.createmod.ponder.impl.client.element.InputWindowElement;
 import net.createmod.ponder.impl.client.gui.PonderUI;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
@@ -95,7 +95,7 @@ public class KeybindWindowElement extends InputWindowElement {
     }
 
     @Override
-    public void render(final @NotNull PonderScene scene, final PonderUI screen, final @NotNull GuiGraphics graphics, final float partialTicks, final float fade) {
+    public void render(final @NotNull PonderScene scene, final PonderUI screen, final @NotNull GuiGraphicsExtractor graphics, final float partialTicks, final float fade) {
         final Font font = screen.getFontRenderer();
         int width = 0;
         int height = 0;

@@ -14,7 +14,7 @@ import dev.simulated_team.simulated.content.blocks.symmetric_sail.SymmetricSailB
 import dev.simulated_team.simulated.content.blocks.util.AbstractDirectionalAxisBlock;
 import dev.simulated_team.simulated.service.SimBlockStateService;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
@@ -92,7 +92,7 @@ public class SimBlockStateGen {
         return new XYHolder(xRot, yRot);
     }
 
-    public static <I extends BlockItem, P> NonNullFunction<ItemBuilder<I, P>, P> customItemModel(final ResourceLocation path) {
+    public static <I extends BlockItem, P> NonNullFunction<ItemBuilder<I, P>, P> customItemModel(final Identifier path) {
         return b -> b.model(SimBlockStateGen.customBlockItemModel(path))
                 .build();
     }
@@ -103,7 +103,7 @@ public class SimBlockStateGen {
      * item name
      */
     public static <I extends BlockItem> NonNullBiConsumer<DataGenContext<Item, I>, RegistrateItemModelProvider> customBlockItemModel(
-            final ResourceLocation path) {
+            final Identifier path) {
         return (c, p) -> {
             p.withExistingParent(c.getName(), path);
         };

@@ -16,7 +16,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -32,25 +32,25 @@ public class SimulatedRegistrate extends CreateRegistrate {
 
     public static final Set<String> MODS = new HashSet<>();
     public static final List<Supplier<Item>> TAB_ITEMS = Collections.synchronizedList(new ArrayList<>());
-    public static final Map<ResourceLocation, ResourceLocation> ITEM_TO_SECTION = new ConcurrentHashMap<>();
+    public static final Map<Identifier, Identifier> ITEM_TO_SECTION = new ConcurrentHashMap<>();
 
-    private static final Map<ResourceLocation, Supplier<ItemLike>> NAVIGATION_TARGET_ITEMS = new ConcurrentHashMap<>();
+    private static final Map<Identifier, Supplier<ItemLike>> NAVIGATION_TARGET_ITEMS = new ConcurrentHashMap<>();
 
-    private ResourceLocation currentSection;
+    private Identifier currentSection;
 
-    public SimulatedRegistrate(final ResourceLocation initialSection, final String modId) {
+    public SimulatedRegistrate(final Identifier initialSection, final String modId) {
         super(modId);
         this.currentSection = initialSection;
         MODS.add(modId);
     }
 
-    public SimulatedRegistrate inSection(final ResourceLocation section) {
+    public SimulatedRegistrate inSection(final Identifier section) {
         this.currentSection = section;
         return this;
     }
 
     public <T> Codec<T> byNameCodecExpanded(final ResourceKey<? extends Registry<T>> key) {
-        return ResourceLocation.CODEC.flatXmap((resourceLoc) -> {
+        return Identifier.CODEC.flatXmap((resourceLoc) -> {
             T gatheredEntry = null;
             for (final RegistryEntry<T, T> entry : this.getAll(key)) {
                 if (entry.getId().equals(resourceLoc)) {
@@ -65,7 +65,7 @@ public class SimulatedRegistrate extends CreateRegistrate {
                 return DataResult.error(() -> "Unknown registry element in " + key + ":" + resourceLoc);
             }
         }, (T) -> {
-            ResourceLocation id = null;
+            Identifier id = null;
             for (final RegistryEntry<T, T> entry : this.getAll(key)) {
                 if (entry.is(T)) {
                     id = entry.getId();
@@ -81,7 +81,7 @@ public class SimulatedRegistrate extends CreateRegistrate {
         });
     }
 
-    public static ResourceLocation sectionOf(final Item item) {
+    public static Identifier sectionOf(final Item item) {
         return ITEM_TO_SECTION.get(BuiltInRegistries.ITEM.getKey(item));
     }
 
@@ -98,7 +98,7 @@ public class SimulatedRegistrate extends CreateRegistrate {
         return entry;
     }
 
-    public void addExtraItem(final ResourceLocation item) {
+    public void addExtraItem(final Identifier item) {
         TAB_ITEMS.add(() -> BuiltInRegistries.ITEM.get(item));
         ITEM_TO_SECTION.put(item, this.currentSection);
     }
@@ -119,7 +119,7 @@ public class SimulatedRegistrate extends CreateRegistrate {
     }
 
     public static void onAddDefaultComponents(BiConsumer<ItemLike, Consumer<DataComponentPatch.Builder>> modify) {
-        for (Map.Entry<ResourceLocation, Supplier<ItemLike>> entry : NAVIGATION_TARGET_ITEMS.entrySet()) {
+        for (Map.Entry<Identifier, Supplier<ItemLike>> entry : NAVIGATION_TARGET_ITEMS.entrySet()) {
             NavigationTarget target = SimRegistries.NAVIGATION_TARGET.get(entry.getKey());
             ItemLike item = entry.getValue().get();
             modify.accept(item, builder -> builder

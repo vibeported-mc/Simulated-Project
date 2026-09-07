@@ -21,7 +21,7 @@ import net.createmod.ponder.api.client.element.ElementLink;
 import net.createmod.ponder.api.client.element.ParrotElement;
 import net.createmod.ponder.api.client.element.ParrotPose;
 import net.createmod.ponder.api.client.element.WorldSectionElement;
-import net.createmod.ponder.api.scene.*;
+import net.createmod.ponder.api.client.scene.*;
 import net.createmod.ponder.impl.client.element.TextWindowElement;
 import net.createmod.ponder.impl.client.instruction.RotateSceneInstruction;
 import net.createmod.ponder.impl.client.instruction.TextInstruction;

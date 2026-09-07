@@ -13,7 +13,7 @@ import net.createmod.catnip.api.animation.LerpedFloat;
 import net.createmod.ponder.api.client.PonderPalette;
 import net.createmod.ponder.api.client.element.ElementLink;
 import net.createmod.ponder.api.client.element.WorldSectionElement;
-import net.createmod.ponder.api.scene.*;
+import net.createmod.ponder.api.client.scene.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;

@@ -424,7 +424,7 @@ public class TorsionSpringBlockEntity extends KineticBlockEntity implements Extr
         @Override
         public Vec3 getLocalOffset(final LevelAccessor level, final BlockPos pos, final BlockState state) {
             return super.getLocalOffset(level, pos, state)
-                    .add(Vec3.atLowerCornerOf(state.getValue(TorsionSpringBlock.FACING).getNormal()).scale(-5 / 16f));
+                    .add(Vec3.atLowerCornerOf(state.getValue(TorsionSpringBlock.FACING).getUnitVec3i()).scale(-5 / 16f));
         }
 
         @Override

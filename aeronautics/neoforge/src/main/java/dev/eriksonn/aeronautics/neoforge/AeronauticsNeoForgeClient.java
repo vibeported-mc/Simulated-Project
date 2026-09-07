@@ -10,7 +10,7 @@ import dev.eriksonn.aeronautics.neoforge.events.AeroNeoForgeClientEvents;
 import foundry.veil.forge.event.ForgeVeilRegisterBlockLayersEvent;
 import net.createmod.catnip.config.ui.BaseConfigScreen;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;

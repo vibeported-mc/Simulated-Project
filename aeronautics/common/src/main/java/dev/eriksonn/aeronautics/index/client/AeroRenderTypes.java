@@ -7,8 +7,8 @@ import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.content.blocks.levitite.LevititeShaderManager;
 import foundry.veil.api.client.render.VeilRenderBridge;
 import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 
 import static org.lwjgl.opengl.GL11C.glDisable;
 import static org.lwjgl.opengl.GL11C.glEnable;
@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL30C.GL_RASTERIZER_DISCARD;
 
 public class AeroRenderTypes extends RenderType {
 
-    public static final ResourceLocation LEVITITE_SHADER = Aeronautics.path("levitite/levitite");
+    public static final Identifier LEVITITE_SHADER = Aeronautics.path("levitite/levitite");
     private static final ShaderStateShard LEVITITE_SHADER_SHARD = new LevititeShaderState(VeilRenderBridge.shaderState(LEVITITE_SHADER), new OutputStateShard("disabled", () -> {
         RENDERTYPE_SOLID_SHADER.setupRenderState();
         RenderSystem.colorMask(false, false, false, false);

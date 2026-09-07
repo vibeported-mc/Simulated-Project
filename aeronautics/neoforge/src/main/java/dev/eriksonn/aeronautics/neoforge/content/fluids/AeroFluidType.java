@@ -7,7 +7,7 @@ import net.createmod.catnip.api.theme.Color;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
@@ -18,10 +18,10 @@ import java.util.function.Supplier;
 public abstract class AeroFluidType extends FluidType implements IClientFluidTypeExtensions {
 	private Vector3f fogColor;
 	private Supplier<Float> fogDistance;
-	private final ResourceLocation stillTexture;
-	private final ResourceLocation flowingTexture;
+	private final Identifier stillTexture;
+	private final Identifier flowingTexture;
 
-	public AeroFluidType(Properties properties, ResourceLocation stillTexture, ResourceLocation flowingTexture) {
+	public AeroFluidType(Properties properties, Identifier stillTexture, Identifier flowingTexture) {
 		super(properties);
 		this.stillTexture = stillTexture;
 		this.flowingTexture = flowingTexture;
@@ -37,16 +37,16 @@ public abstract class AeroFluidType extends FluidType implements IClientFluidTyp
 	}
 
 	public interface Factory {
-		AeroFluidType create(Properties properties, ResourceLocation stillTexture, ResourceLocation flowingTexture);
+		AeroFluidType create(Properties properties, Identifier stillTexture, Identifier flowingTexture);
 	}
 
 	@Override
-	public @NotNull ResourceLocation getStillTexture() {
+	public @NotNull Identifier getStillTexture() {
 		return this.stillTexture;
 	}
 
 	@Override
-	public @NotNull ResourceLocation getFlowingTexture() {
+	public @NotNull Identifier getFlowingTexture() {
 		return this.flowingTexture;
 	}
 

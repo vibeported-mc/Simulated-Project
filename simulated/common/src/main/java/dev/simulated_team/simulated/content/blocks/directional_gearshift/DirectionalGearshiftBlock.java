@@ -109,8 +109,8 @@ public class DirectionalGearshiftBlock extends DirectionalAxisKineticBlock imple
         final Direction leftDirection = this.getLeftDirection(state);
         final Direction rightDirection = this.getRightDirection(state);
 
-        final int leftSignal = level.getSignal(pos.offset(leftDirection.getNormal()), leftDirection);
-        final int rightSignal = level.getSignal(pos.offset(rightDirection.getNormal()), rightDirection);
+        final int leftSignal = level.getSignal(pos.offset(leftDirection.getUnitVec3i()), leftDirection);
+        final int rightSignal = level.getSignal(pos.offset(rightDirection.getUnitVec3i()), rightDirection);
 
         final boolean previouslyLeftPowered = state.getValue(LEFT_POWERED);
         if (previouslyLeftPowered != (leftSignal > 0)) {

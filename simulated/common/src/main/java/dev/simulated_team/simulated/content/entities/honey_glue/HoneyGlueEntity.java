@@ -101,21 +101,21 @@ public class HoneyGlueEntity extends Entity implements SpecialEntityItemRequirem
             final Direction.AxisDirection positive = Direction.AxisDirection.POSITIVE;
             final double max = axis.choose(extents.x, extents.y, extents.z);
             final Vec3 normal = Vec3.atLowerCornerOf(Direction.fromAxisAndDirection(axis, positive)
-                    .getNormal());
+                    .getUnitVec3i());
             for (final Direction.Axis axis2 : Iterate.axes) {
                 if (axis2 == axis) {
                     continue;
                 }
                 final double max2 = axis2.choose(extents.x, extents.y, extents.z);
                 final Vec3 normal2 = Vec3.atLowerCornerOf(Direction.fromAxisAndDirection(axis2, positive)
-                        .getNormal());
+                        .getUnitVec3i());
                 for (final Direction.Axis axis3 : Iterate.axes) {
                     if (axis3 == axis2 || axis3 == axis) {
                         continue;
                     }
                     final double max3 = axis3.choose(extents.x, extents.y, extents.z);
                     final Vec3 normal3 = Vec3.atLowerCornerOf(Direction.fromAxisAndDirection(axis3, positive)
-                            .getNormal());
+                            .getUnitVec3i());
 
                     for (int i = 0; i <= max * 2; i++) {
                         for (final int o1 : Iterate.zeroAndOne) {

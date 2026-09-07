@@ -17,7 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -61,13 +61,13 @@ public class NavTableBlock extends DirectionalBlock implements IBE<NavTableBlock
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(final ItemStack itemStack, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
+    protected InteractionResult useItemOn(final ItemStack itemStack, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
         if (level.isClientSide() && this.canSwitchStacks(itemStack, level, blockPos)) {
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         if (this.switchStacks(level, blockPos, player, interactionHand)) {
-            return ItemInteractionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
 
         return super.useItemOn(itemStack, blockState, level, blockPos, player, interactionHand, blockHitResult);

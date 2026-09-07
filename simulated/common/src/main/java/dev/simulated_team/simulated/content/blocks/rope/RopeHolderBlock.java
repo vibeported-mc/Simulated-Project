@@ -11,7 +11,7 @@ import dev.simulated_team.simulated.content.blocks.rope.strand.server.ServerRope
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,30 +20,30 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 public interface RopeHolderBlock <T extends SmartBlockEntity> extends BlockSubLevelAssemblyListener, IBE<T> {
-    static <T extends SmartBlockEntity> ItemInteractionResult shearRope(final RopeHolderBlock<T> block, final Level level, final BlockPos pos, final ServerPlayer player) {
+    static <T extends SmartBlockEntity> InteractionResult shearRope(final RopeHolderBlock<T> block, final Level level, final BlockPos pos, final ServerPlayer player) {
         return block.onBlockEntityUseItemOn(level, pos, be -> {
             final RopeStrandHolderBehavior ropeHolder = block.getHolder(be);
 
             final ServerRopeStrand strand = ropeHolder.getAttachedStrand();
             if (strand == null) {
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             }
 
             final RopeAttachment ropeAttachment = strand.getAttachment(RopeAttachmentPoint.START);
             if (ropeAttachment == null) {
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             }
             final BlockPos attachment = ropeAttachment.blockAttachment();
 
             final BlockEntity blockEntity = level.getBlockEntity(attachment);
 
-            if (!(blockEntity instanceof final SmartBlockEntity smartBlockEntity)) return ItemInteractionResult.FAIL;
+            if (!(blockEntity instanceof final SmartBlockEntity smartBlockEntity)) return InteractionResult.FAIL;
 
             final RopeStrandHolderBehavior otherHolder = smartBlockEntity.getBehaviour(RopeStrandHolderBehavior.TYPE);
-            if (otherHolder == null) return ItemInteractionResult.FAIL;
+            if (otherHolder == null) return InteractionResult.FAIL;
 
             otherHolder.destroyRope(player, pos.getCenter(), !player.hasInfiniteMaterials());
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         });
     }
 

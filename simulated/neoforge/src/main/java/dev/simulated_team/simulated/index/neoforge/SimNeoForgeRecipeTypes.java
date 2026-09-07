@@ -7,7 +7,7 @@ import dev.simulated_team.simulated.data.neoforge.PortableEngineDyeingRecipe;
 import net.createmod.catnip.api.lang.Lang;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.crafting.*;
 import net.neoforged.bus.api.IEventBus;
@@ -24,7 +24,7 @@ public enum SimNeoForgeRecipeTypes implements IRecipeTypeInfo, StringRepresentab
     PORTABLE_ENGINE_DYEING(() -> new SimpleCraftingRecipeSerializer<>(PortableEngineDyeingRecipe::new), () -> RecipeType.CRAFTING, false);
 
     public static final Codec<SimNeoForgeRecipeTypes> CODEC = StringRepresentable.fromEnum(SimNeoForgeRecipeTypes::values);
-    public final ResourceLocation id;
+    public final Identifier id;
     public final Supplier<RecipeSerializer<?>> serializerSupplier;
     private final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> serializerObject;
     @Nullable
@@ -53,7 +53,7 @@ public enum SimNeoForgeRecipeTypes implements IRecipeTypeInfo, StringRepresentab
     }
 
     @Override
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return this.id;
     }
 

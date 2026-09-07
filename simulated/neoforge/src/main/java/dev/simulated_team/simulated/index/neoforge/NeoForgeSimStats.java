@@ -3,7 +3,7 @@ package dev.simulated_team.simulated.index.neoforge;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimStats;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.stats.StatFormatter;
 import net.minecraft.stats.Stats;
 import net.neoforged.bus.api.IEventBus;
@@ -12,7 +12,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.ArrayList;
 
 public class NeoForgeSimStats extends SimStats {
-    public static final DeferredRegister<ResourceLocation> CUSTOM_STAT = DeferredRegister.create(BuiltInRegistries.CUSTOM_STAT, Simulated.MOD_ID);
+    public static final DeferredRegister<Identifier> CUSTOM_STAT = DeferredRegister.create(BuiltInRegistries.CUSTOM_STAT, Simulated.MOD_ID);
     private static final ArrayList<SimStats.Stat> STATS_TO_LOAD = new ArrayList<>();
 
     // makes the statistics appear in the menu for a game session even before being awarded for the fist time :p
@@ -31,7 +31,7 @@ public class NeoForgeSimStats extends SimStats {
 
     @Override
     protected SimStats.Stat makeCustomStat(final String key, final StatFormatter formatter) {
-        final ResourceLocation resourcelocation = Simulated.path(key);
+        final Identifier resourcelocation = Simulated.path(key);
         final SimStats.Stat stat = new SimStats.Stat(CUSTOM_STAT.register(key, () -> resourcelocation), formatter);
         STATS_TO_LOAD.add(stat);
         return stat;

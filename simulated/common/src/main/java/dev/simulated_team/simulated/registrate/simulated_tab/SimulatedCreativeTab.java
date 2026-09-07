@@ -17,12 +17,12 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
@@ -40,10 +40,10 @@ public class SimulatedCreativeTab {
 	private static final int ITEMS_PER_ROW = 9;
 
 	public static int CURRENT_ROW = 0;
-	public static final Object2IntOpenHashMap<ResourceLocation> SECTION_Y_VALUES = new Object2IntOpenHashMap<>();
+	public static final Object2IntOpenHashMap<Identifier> SECTION_Y_VALUES = new Object2IntOpenHashMap<>();
 	private static final IntList SECTION_ITEM_COUNTS = new IntArrayList();
 
-	public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphics graphics, int mouseX, int mouseY) {
+	public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
 		final PoseStack ps = graphics.pose();
 		ps.pushPose();
 
@@ -56,7 +56,7 @@ public class SimulatedCreativeTab {
 		final List<SimulatedSection> sections = SimResourceManagers.SIMULATED_SECTION.sortedEntries();
 
 		for (final SimulatedSection section : sections) {
-			ResourceLocation id = SimResourceManagers.SIMULATED_SECTION.getId(section);
+			Identifier id = SimResourceManagers.SIMULATED_SECTION.getId(section);
 			int yValue = SECTION_Y_VALUES.getInt(id);
 			final int sectionRow = (yValue - CURRENT_ROW);
 			if (sectionRow < 0 || sectionRow > 4) continue;
@@ -67,7 +67,7 @@ public class SimulatedCreativeTab {
 			int w = 162;
 			int h = 18;
 
-			ResourceLocation bannerTexture = section.sprite();
+			Identifier bannerTexture = section.sprite();
 
 			if (section.animateOnHover()) {
 				boolean isHovering =
@@ -95,7 +95,7 @@ public class SimulatedCreativeTab {
 		RenderSystem.disableDepthTest();
 	}
 
-	public static void drawAuraText(GuiGraphics graphics, Component text, int color1, int color2, int x, int y) {
+	public static void drawAuraText(GuiGraphicsExtractor graphics, Component text, int color1, int color2, int x, int y) {
 		Font font = Minecraft.getInstance().font;
 		Window window = Minecraft.getInstance().getWindow();
 		float scale = (float) window.getGuiScale();
@@ -134,7 +134,7 @@ public class SimulatedCreativeTab {
 			final Item item = entry.get();
 			final ItemStack stack = item.getDefaultInstance();
 
-			final ResourceLocation sectionId = SimulatedRegistrate.sectionOf(item);
+			final Identifier sectionId = SimulatedRegistrate.sectionOf(item);
 			if(sectionId == null)
 				continue;
 
@@ -164,7 +164,7 @@ public class SimulatedCreativeTab {
 				}
 			}
 
-			ResourceLocation id = SimResourceManagers.SIMULATED_SECTION.getId(key);
+			Identifier id = SimResourceManagers.SIMULATED_SECTION.getId(key);
 			SECTION_Y_VALUES.put(id, y);
 			SECTION_ITEM_COUNTS.add(itemCount);
 			final int rowCount = Math.ceilDiv(itemCount, ITEMS_PER_ROW);
@@ -210,7 +210,7 @@ public class SimulatedCreativeTab {
 		}
 	}
 
-	public static void setPlaying(ResourceLocation resourceLocation, boolean playing) {
+	public static void setPlaying(Identifier resourceLocation, boolean playing) {
 		TextureAtlasSprite sprite = Minecraft.getInstance().getGuiSprites().getSprite(resourceLocation);
 		SpriteContents.Ticker ticker = ((SpriteContentsExtension) sprite.contents()).simulated$getTicker();
 		if (ticker instanceof TickerExtension extension) {

@@ -6,7 +6,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.simibubi.create.content.equipment.goggles.GoggleOverlayRenderer;
 import dev.simulated_team.simulated.index.SimClickInteractions;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +34,7 @@ public class GoggleOverlayRendererMixin {
     }
 
     @Inject(method = "renderOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), remap = false, cancellable = true)
-    private static void dontRenderTheText(final GuiGraphics guiGraphics, final DeltaTracker deltaTracker, final CallbackInfo ci) {
+    private static void dontRenderTheText(final GuiGraphicsExtractor guiGraphics, final DeltaTracker deltaTracker, final CallbackInfo ci) {
         if (hoverTicks - deltaTracker.getGameTimeDeltaTicks() <= 0) {
             ci.cancel();
         }

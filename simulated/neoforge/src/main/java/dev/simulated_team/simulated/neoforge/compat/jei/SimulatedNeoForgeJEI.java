@@ -5,7 +5,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -14,10 +14,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class SimulatedNeoForgeJEI implements IModPlugin {
 
-    private static final ResourceLocation ID = Simulated.path("jei_plugin/neoforge");
+    private static final Identifier ID = Simulated.path("jei_plugin/neoforge");
 
     @Override
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return ID;
     }
 

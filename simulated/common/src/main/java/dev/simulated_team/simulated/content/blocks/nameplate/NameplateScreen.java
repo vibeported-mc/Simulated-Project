@@ -7,11 +7,11 @@ import dev.simulated_team.simulated.data.SimLang;
 import dev.simulated_team.simulated.network.packets.name_plate.NameplateChangeNamePacket;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
@@ -87,7 +87,7 @@ public class NameplateScreen extends Screen {
    }
 
    @Override
-   public void render(final GuiGraphics gui, final int pMouseX, final int pMouseY, final float pPartialTick) {
+   public void render(final GuiGraphicsExtractor gui, final int pMouseX, final int pMouseY, final float pPartialTick) {
       Lighting.setupForFlatItems();
       this.renderBackground(gui, pMouseX, pMouseY, pPartialTick);
       gui.drawCenteredString(this.font, this.title, this.width / 2, 40, 16777215);
@@ -114,7 +114,7 @@ public class NameplateScreen extends Screen {
       return false;
    }
 
-   protected void renderSignBackground(final GuiGraphics gui, final BlockState pState) {
+   protected void renderSignBackground(final GuiGraphicsExtractor gui, final BlockState pState) {
       final String color = ((NameplateBlock) pState.getBlock()).getColor().getSerializedName();
 
       final PoseStack ps = gui.pose();
@@ -136,11 +136,11 @@ public class NameplateScreen extends Screen {
       ps.popPose();
    }
 
-   protected void offsetSign(final GuiGraphics pGuiGraphics, final BlockState pState) {
+   protected void offsetSign(final GuiGraphicsExtractor pGuiGraphics, final BlockState pState) {
       pGuiGraphics.pose().translate((float)this.width / 2.0F, this.height / 2f - 26, 50.0F);
    }
 
-   private void renderSign(final GuiGraphics pGuiGraphics) {
+   private void renderSign(final GuiGraphicsExtractor pGuiGraphics) {
       final PoseStack ps = pGuiGraphics.pose();
 
       ps.pushPose();
@@ -159,7 +159,7 @@ public class NameplateScreen extends Screen {
       ps.popPose();
    }
 
-   private void renderSignText(final GuiGraphics pGuiGraphics) {
+   private void renderSignText(final GuiGraphicsExtractor pGuiGraphics) {
       final int lineHeight = 8;
       pGuiGraphics.pose().translate(0.0F, 0.0F, 4.0F);
 

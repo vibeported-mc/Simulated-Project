@@ -18,7 +18,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -94,7 +93,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(final ItemStack itemStack, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
+    protected InteractionResult useItemOn(final ItemStack itemStack, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
         final ItemStack heldItem = player.getItemInHand(interactionHand);
 
         final Item linkedControllerItem = AllItems.LINKED_CONTROLLER.asItem();
@@ -107,7 +106,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
                 LinkedControllerClientHandler.MODE = LinkedControllerClientHandler.Mode.IDLE;
             }
 
-            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         if (heldItem.isEmpty() && interactionHand == InteractionHand.MAIN_HAND) {
@@ -141,7 +140,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
             });
 
             if (success.getValue()) {
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
 

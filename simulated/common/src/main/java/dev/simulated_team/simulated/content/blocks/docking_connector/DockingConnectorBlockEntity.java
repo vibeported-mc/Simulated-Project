@@ -273,7 +273,7 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         }
 
         // connection in the same block grid
-        final BlockPos sameGridConnection = this.getBlockPos().offset(direction.getNormal().multiply(3));
+        final BlockPos sameGridConnection = this.getBlockPos().offset(direction.getUnitVec3i().multiply(3));
 
         if (this.isExtended() && this.level.getBlockEntity(sameGridConnection) instanceof final DockingConnectorBlockEntity other) {
             if (other.getBlockState().getValue(BlockStateProperties.FACING).getOpposite() == direction && other.isExtended()) {
@@ -514,18 +514,18 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
 
     @Override
     public Vector3d setMagneticMoment(final Vector3d v) {
-        v.set(JOMLConversion.toJOML(Vec3.atLowerCornerOf(this.getBlockState().getValue(DockingConnectorBlock.FACING).getNormal())));
+        v.set(JOMLConversion.toJOML(Vec3.atLowerCornerOf(this.getBlockState().getValue(DockingConnectorBlock.FACING).getUnitVec3i())));
         v.mul(Math.sqrt(SimConfigService.INSTANCE.server().physics.dockingConnectorStrength.get()));
         return v;
     }
 
     @Override
     public Vec3 getMagnetPosition() {
-        return Vec3.atCenterOf(this.getBlockPos()).add(Vec3.atLowerCornerOf(this.getBlockState().getValue(RedstoneMagnetBlock.FACING).getNormal()).scale(1.4));
+        return Vec3.atCenterOf(this.getBlockPos()).add(Vec3.atLowerCornerOf(this.getBlockState().getValue(RedstoneMagnetBlock.FACING).getUnitVec3i()).scale(1.4));
     }
 
     public Vec3 getTipPosition() {
-        return Vec3.atCenterOf(this.getBlockPos()).add(Vec3.atLowerCornerOf(this.getBlockState().getValue(RedstoneMagnetBlock.FACING).getNormal()).scale(1.5));
+        return Vec3.atCenterOf(this.getBlockPos()).add(Vec3.atLowerCornerOf(this.getBlockState().getValue(RedstoneMagnetBlock.FACING).getUnitVec3i()).scale(1.5));
     }
 
     @Override

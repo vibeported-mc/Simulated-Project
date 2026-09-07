@@ -89,7 +89,7 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
         final BlockState state = this.getBlockState();
 
         final Direction facing = state.getValue(SpringBlock.FACING);
-        final Vec3i facingVec = facing.getNormal();
+        final Vec3i facingVec = facing.getUnitVec3i();
 
         double scale = 0.5 - 4.0 / 16.0;
         return JOMLConversion.atCenterOf(this.worldPosition)
@@ -214,8 +214,8 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
         }
 
         //#region alignment torque
-        final Vector3d globalNormalA = JOMLConversion.atLowerCornerOf(state.getValue(SpringBlock.FACING).getNormal());
-        final Vector3d globalNormalB = JOMLConversion.atLowerCornerOf(partner.getBlockState().getValue(SpringBlock.FACING).getNormal());
+        final Vector3d globalNormalA = JOMLConversion.atLowerCornerOf(state.getValue(SpringBlock.FACING).getUnitVec3i());
+        final Vector3d globalNormalB = JOMLConversion.atLowerCornerOf(partner.getBlockState().getValue(SpringBlock.FACING).getUnitVec3i());
 
         subLevel.logicalPose().transformNormal(globalNormalA);
         if (partnerSubLevel != null) {

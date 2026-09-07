@@ -116,7 +116,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity implements SimMa
         if (probability > 0 && this.level.random.nextFloat() < probability) {
             final boolean negative = this.level.random.nextBoolean();
 
-            Vec3i dir = (this.getBlockState().getValue(RedstoneMagnetBlock.FACING)).getNormal();
+            Vec3i dir = (this.getBlockState().getValue(RedstoneMagnetBlock.FACING)).getUnitVec3i();
             if (negative) {
                 dir = dir.multiply(-1);
             }
@@ -173,7 +173,7 @@ public class RedstoneMagnetBlockEntity extends SmartBlockEntity implements SimMa
 
     @Override
     public Vector3d setMagneticMoment(final Vector3d v) {
-        v.set(JOMLConversion.toJOML(Vec3.atLowerCornerOf(this.getBlockState().getValue(RedstoneMagnetBlock.FACING).getNormal())));
+        v.set(JOMLConversion.toJOML(Vec3.atLowerCornerOf(this.getBlockState().getValue(RedstoneMagnetBlock.FACING).getUnitVec3i())));
         v.mul((this.signalStrength / 15.0) * Math.sqrt(SimConfigService.INSTANCE.server().physics.redstoneMagnetStrength.get()));
         return v;
     }

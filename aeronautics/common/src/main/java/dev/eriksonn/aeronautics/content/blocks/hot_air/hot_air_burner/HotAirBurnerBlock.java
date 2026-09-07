@@ -20,7 +20,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -94,7 +94,7 @@ public class HotAirBurnerBlock extends Block implements IBE<HotAirBurnerBlockEnt
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(final ItemStack stack, final BlockState state, final Level level, final BlockPos pos, final Player player, final InteractionHand hand, final BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(final ItemStack stack, final BlockState state, final Level level, final BlockPos pos, final Player player, final InteractionHand hand, final BlockHitResult hitResult) {
         final Variant conversion = Variant.getConversionFromItem(stack.getItem());
 
         if (conversion != null) {
@@ -102,11 +102,11 @@ public class HotAirBurnerBlock extends Block implements IBE<HotAirBurnerBlockEnt
             if (conversion != current) {
                 level.setBlockAndUpdate(pos, state.setValue(VARIANT, conversion));
                 level.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), conversion.sound, SoundSource.BLOCKS, 1, 1, false);
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
 
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override

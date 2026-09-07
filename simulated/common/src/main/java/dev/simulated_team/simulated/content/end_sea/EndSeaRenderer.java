@@ -1,6 +1,6 @@
 package dev.simulated_team.simulated.content.end_sea;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.simulated_team.simulated.Simulated;
@@ -13,7 +13,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -26,7 +26,7 @@ import org.lwjgl.opengl.GL30;
  */
 public class EndSeaRenderer {
 
-    private static final ResourceLocation SHADER = Simulated.path("end_sea");
+    private static final Identifier SHADER = Simulated.path("end_sea");
 
     private static final int LAYER_COUNT = 48;
     private static final VertexFormat FORMAT = VertexFormat.builder()

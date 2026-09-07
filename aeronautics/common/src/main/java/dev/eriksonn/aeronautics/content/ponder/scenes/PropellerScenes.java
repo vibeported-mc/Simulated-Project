@@ -16,9 +16,9 @@ import dev.eriksonn.aeronautics.content.ponder.instructions.PropellerParticleSpa
 import it.unimi.dsi.fastutil.floats.FloatUnaryOperator;
 import net.createmod.catnip.api.math.Pointing;
 import net.createmod.ponder.api.client.PonderPalette;
-import net.createmod.ponder.api.element.*;
-import net.createmod.ponder.api.scene.*;
-import net.createmod.ponder.foundation.instruction.*;
+import net.createmod.ponder.api.client.element.*;
+import net.createmod.ponder.api.client.scene.*;
+import net.createmod.ponder.impl.client.instruction.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;

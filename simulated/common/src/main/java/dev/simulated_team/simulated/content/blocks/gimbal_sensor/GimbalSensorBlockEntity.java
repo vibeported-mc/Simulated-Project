@@ -112,7 +112,7 @@ public class GimbalSensorBlockEntity extends SmartBlockEntity implements IHaveGo
         if (subLevel == null)
             return;
 
-        final Vector3d ld = JOMLConversion.toJOML(Vec3.atLowerCornerOf(Direction.DOWN.getNormal()));
+        final Vector3d ld = JOMLConversion.toJOML(Vec3.atLowerCornerOf(Direction.DOWN.getUnitVec3i()));
         subLevel.logicalPose().orientation().transformInverse(ld);
 
         this.XAngle = ld.y() < 0 || ld.z() * ld.z() > 0.001 ? atan2(ld.z(), -ld.y()) : 0;

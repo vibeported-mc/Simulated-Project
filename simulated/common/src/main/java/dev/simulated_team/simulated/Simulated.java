@@ -18,7 +18,7 @@ import dev.simulated_team.simulated.util.SimAssemblyHelper;
 import dev.simulated_team.simulated.util.SimColors;
 import net.createmod.catnip.api.client.lang.FontHelper;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Rarity;
 import org.slf4j.Logger;
 
@@ -77,8 +77,8 @@ public final class Simulated {
         return REGISTRATE.get();
     }
 
-    public static ResourceLocation path(final String path) {
-        return ResourceLocation.tryBuild(MOD_ID, path);
+    public static Identifier path(final String path) {
+        return Identifier.tryBuild(MOD_ID, path);
     }
 
 }

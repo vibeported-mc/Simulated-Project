@@ -79,7 +79,7 @@ public class VelocitySensorBlockEntity extends SmartBlockEntity implements IHave
 
     @Override
     public void tick() {
-        this.currentNormal = JOMLConversion.toJOML(Vec3.atLowerCornerOf(AbstractDirectionalAxisBlock.getDirectionOfAxis(this.getBlockState()).getNormal()));
+        this.currentNormal = JOMLConversion.toJOML(Vec3.atLowerCornerOf(AbstractDirectionalAxisBlock.getDirectionOfAxis(this.getBlockState()).getUnitVec3i()));
         super.tick();
 
         final SubLevel subLevel = this.subLevelReference.get();

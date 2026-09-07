@@ -6,11 +6,11 @@ import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.simibubi.create.foundation.render.RenderTypes;
 import dev.simulated_team.simulated.Simulated;
 import foundry.veil.api.client.render.VeilRenderBridge;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import java.util.function.Function;
 
 public final class SimRenderTypes extends RenderType {
@@ -94,7 +94,7 @@ public final class SimRenderTypes extends RenderType {
                     .setCullState(CULL)
                     .createCompositeState(false));
 
-    private static final Function<ResourceLocation, RenderType> SPRING = Util.memoize((ResourceLocation texture) -> {
+    private static final Function<Identifier, RenderType> SPRING = Util.memoize((Identifier texture) -> {
         CompositeState state = RenderType.CompositeState.builder()
                 .setShaderState(VeilRenderBridge.shaderState(Simulated.path("spring/spring")))
                 .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
@@ -138,7 +138,7 @@ public final class SimRenderTypes extends RenderType {
         return shadersActive ? Sheets.translucentCullBlockSheet() : RenderTypes.itemGlowingTranslucent();
     }
 
-    public static RenderType spring(final ResourceLocation texture) {
+    public static RenderType spring(final Identifier texture) {
         return SPRING.apply(texture);
     }
 }

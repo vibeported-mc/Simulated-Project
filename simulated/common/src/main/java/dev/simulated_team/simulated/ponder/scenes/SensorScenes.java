@@ -27,7 +27,7 @@ import net.createmod.ponder.api.client.element.ElementLink;
 import net.createmod.ponder.api.client.element.ParrotElement;
 import net.createmod.ponder.api.client.element.ParrotPose;
 import net.createmod.ponder.api.client.element.WorldSectionElement;
-import net.createmod.ponder.api.scene.*;
+import net.createmod.ponder.api.client.scene.*;
 import net.createmod.ponder.impl.client.element.ElementLinkImpl;
 import net.createmod.ponder.impl.client.instruction.CreateParrotInstruction;
 import net.createmod.ponder.impl.client.instruction.FadeOutOfSceneInstruction;
@@ -235,7 +235,7 @@ public class SensorScenes {
     // Optical Sensor
 
     private static void opticalSensorSetHitPos(final WorldInstructions world, final BlockPos hitBlockPos, final BlockPos lp, final Direction laserDir, final float scale) {
-        final Vec3 newHit = Vec3.atCenterOf(hitBlockPos).add(Vec3.atLowerCornerOf(laserDir.getOpposite().getNormal()).scale(scale));
+        final Vec3 newHit = Vec3.atCenterOf(hitBlockPos).add(Vec3.atLowerCornerOf(laserDir.getOpposite().getUnitVec3i()).scale(scale));
         world.modifyBlockEntity(lp, OpticalSensorBlockEntity.class, laser -> laser.laser.setVirtualHitPos(newHit));
     }
 
@@ -421,7 +421,7 @@ public class SensorScenes {
     }
 
     private static void laserSetHitPos(final WorldInstructions world, final BlockPos hitBlockPos, final BlockPos lp, final Direction laserDir) {
-        final Vec3 newHit = Vec3.atCenterOf(hitBlockPos).add(Vec3.atLowerCornerOf(laserDir.getOpposite().getNormal()).scale(0.5f));
+        final Vec3 newHit = Vec3.atCenterOf(hitBlockPos).add(Vec3.atLowerCornerOf(laserDir.getOpposite().getUnitVec3i()).scale(0.5f));
         world.modifyBlockEntity(lp, LaserPointerBlockEntity.class, laser -> laser.sensorInteraction.setVirtualHitPos(newHit));
     }
 

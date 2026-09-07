@@ -258,7 +258,7 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
     protected AABB calculateBoundingBox(final BlockPos blockPos, final Direction direction) {
         Vec3 pos = Vec3.atLowerCornerOf(this.getPos())
                 .add(.5, .5, .5)
-                .subtract(Vec3.atLowerCornerOf(direction.getNormal())
+                .subtract(Vec3.atLowerCornerOf(direction.getUnitVec3i())
                         .scale(0.46875));
         double d1 = pos.x;
         double d2 = pos.y;
@@ -268,15 +268,15 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
         final Axis axis = direction.getAxis();
         if (this.size == 2)
             pos = pos.add(Vec3.atLowerCornerOf(axis.isHorizontal() ? direction.getCounterClockWise()
-                                    .getNormal()
+                                    .getUnitVec3i()
                                     : this.verticalOrientation.getClockWise()
-                                    .getNormal())
+                                    .getUnitVec3i())
                             .scale(0.5))
                     .add(Vec3
-                            .atLowerCornerOf(axis.isHorizontal() ? Direction.UP.getNormal()
-                                    : direction == Direction.UP ? this.verticalOrientation.getNormal()
+                            .atLowerCornerOf(axis.isHorizontal() ? Direction.UP.getUnitVec3i()
+                                    : direction == Direction.UP ? this.verticalOrientation.getUnitVec3i()
                                     : this.verticalOrientation.getOpposite()
-                                    .getNormal())
+                                    .getUnitVec3i())
                             .scale(0.5));
 
         d1 = pos.x;

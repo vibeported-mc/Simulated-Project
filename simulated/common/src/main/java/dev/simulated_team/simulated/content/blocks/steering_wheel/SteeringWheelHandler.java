@@ -9,10 +9,10 @@ import dev.simulated_team.simulated.util.hold_interaction.BlockHoldInteraction;
 import dev.simulated_team.simulated.util.hold_interaction.HoldInteractionManager;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -39,7 +39,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
 
 
     @Override
-    public void renderOverlay(final GuiGraphics guiGraphics, final int width1, final int height1, final boolean hideGui) {
+    public void renderOverlay(final GuiGraphicsExtractor guiGraphics, final int width1, final int height1, final boolean hideGui) {
         final Minecraft mc = Minecraft.getInstance();
         if (hideGui) {
             return;
@@ -49,7 +49,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
             return;
         }
 
-        final ResourceLocation tex = Simulated.path("textures/gui/steering_wheel.png");
+        final Identifier tex = Simulated.path("textures/gui/steering_wheel.png");
         final float magicOffset = 0.56f;
 
         final int x = ((width1 - 223) / 2) + SimConfigService.INSTANCE.client().blockConfig.steeringWheelXOffset.get();

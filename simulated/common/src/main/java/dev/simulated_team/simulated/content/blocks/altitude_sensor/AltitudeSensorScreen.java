@@ -12,7 +12,7 @@ import net.createmod.catnip.api.animation.LerpedFloat;
 import net.createmod.catnip.api.client.gui.AbstractSimiScreen;
 import net.createmod.catnip.api.client.gui.ScreenOpener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -65,7 +65,7 @@ public class AltitudeSensorScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public void renderBackground(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTick) {
+    public void renderBackground(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTick) {
         final int a = ((int) (0x50 * Math.min(1, (this.ticksOpen + AnimationTickHolder.getPartialTicks()) / 20f))) << 24;
         graphics.fillGradient(0, 0, this.width, this.height, 0x101010 | a, 0x101010 | a);
 
@@ -73,7 +73,7 @@ public class AltitudeSensorScreen extends AbstractSimiScreen {
     }
 
     @Override
-    protected void renderWindow(final GuiGraphics graphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void renderWindow(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float partialTicks) {
 
         final float visualHighPT = this.visualHighSignal.getValue(partialTicks);
         final float visualLowPT = this.visualLowSignal.getValue(partialTicks);

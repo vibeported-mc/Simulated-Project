@@ -5,7 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.material.FluidState;
@@ -24,7 +24,7 @@ public class LevititeBlendTicker {
 	public LevititeBlendTicker(final CompoundTag toDeserialize, final Level level) {
 		this.level = level;
 		this.pos = NbtUtils.readBlockPos(toDeserialize, "pos").get();
-		this.context = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().get(ResourceLocation.parse(toDeserialize.getString("context")));
+		this.context = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().get(Identifier.parse(toDeserialize.getString("context")));
 
 		this.deserialize(toDeserialize);
 	}
@@ -116,7 +116,7 @@ public class LevititeBlendTicker {
 		tag.putBoolean("requiresCatalyst", this.requiresCatalyst);
 
 		tag.put("pos", NbtUtils.writeBlockPos(this.getPos()));
-		ResourceLocation resourceLocation = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().getKey(this.context);
+		Identifier resourceLocation = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().getKey(this.context);
 		tag.putString("context", resourceLocation.toString());
 
 		tag.putBoolean("isDormant", this.isDormant);
