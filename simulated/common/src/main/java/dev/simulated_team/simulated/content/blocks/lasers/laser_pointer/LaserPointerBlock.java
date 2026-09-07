@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -74,8 +75,8 @@ public class LaserPointerBlock extends DirectionalBlock implements IBE<LaserPoin
     }
 
     @Override
-    public void neighborChanged(final BlockState state, final Level world, final BlockPos pos, final Block neighborBlock, final BlockPos fromPos, final boolean moving) {
-        super.neighborChanged(state, world, pos, neighborBlock, fromPos, moving);
+    public void neighborChanged(final BlockState state, final Level world, final BlockPos pos, final Block neighborBlock, final @Nullable Orientation orientation, final boolean moving) {
+        super.neighborChanged(state, world, pos, neighborBlock, orientation, moving);
         if (!world.isClientSide()) {
             final boolean powered = world.hasNeighborSignal(pos);
             world.setBlock(pos, state.setValue(POWERED, powered), 7);

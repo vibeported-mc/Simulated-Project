@@ -1,7 +1,5 @@
 package dev.simulated_team.simulated.content.blocks.throttle_lever;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 import dev.simulated_team.simulated.network.packets.ThrottleLeverSignalPacket;
 import dev.simulated_team.simulated.util.SimColors;
@@ -16,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3x2fStack;
 
 public class ThrottleLeverHandler extends BlockHoldInteraction {
     protected boolean inverted = false;
@@ -60,24 +59,24 @@ public class ThrottleLeverHandler extends BlockHoldInteraction {
         final int y;
         x = width / 2 - w / 2 + 16;
         y = height / 2 - h / 2;
-        final PoseStack ps = graphics.pose();
+        // 26.2 port: the GUI pose is a 2D matrix stack -- z translates are gone, and a rotation is
+        // an angle about the screen rather than a quaternion about an axis.
+        final Matrix3x2fStack ps = graphics.pose();
 
-        ps.pushPose();
+        ps.pushMatrix();
 
-        ps.translate(x + w / 2, y + h / 2, 0);
-        ps.mulPose(Axis.ZP.rotationDegrees(90.0f));
-        ps.translate(-x - w / 2, -y - h / 2, 0);
+        ps.translate(x + w / 2f, y + h / 2f);
+        ps.rotate((float) Math.toRadians(90.0));
+        ps.translate(-x - w / 2f, -y - h / 2f);
 
         AllGuiTextures.BRASS_FRAME_TL.render(graphics, x, y);
         AllGuiTextures.BRASS_FRAME_TR.render(graphics, x + w - 4, y);
         AllGuiTextures.BRASS_FRAME_BL.render(graphics, x, y + h - 4);
         AllGuiTextures.BRASS_FRAME_BR.render(graphics, x + w - 4, y + h - 4);
-        final int zLevel = 2;
-
-        UIRenderHelper.drawStretched(graphics, x, y + 4, 3, h - 8, zLevel, AllGuiTextures.BRASS_FRAME_LEFT);
-        UIRenderHelper.drawStretched(graphics, x + w - 3, y + 4, 3, h - 8, zLevel, AllGuiTextures.BRASS_FRAME_RIGHT);
-        UIRenderHelper.drawCropped(graphics, x + 4, y, w - 8, 3, zLevel, AllGuiTextures.BRASS_FRAME_TOP);
-        UIRenderHelper.drawCropped(graphics, x + 4, y + h - 3, w - 8, 3, zLevel, AllGuiTextures.BRASS_FRAME_BOTTOM);
+        UIRenderHelper.drawStretched(graphics, x, y + 4, 3, h - 8, AllGuiTextures.BRASS_FRAME_LEFT);
+        UIRenderHelper.drawStretched(graphics, x + w - 3, y + 4, 3, h - 8, AllGuiTextures.BRASS_FRAME_RIGHT);
+        UIRenderHelper.drawCropped(graphics, x + 4, y, w - 8, 3, AllGuiTextures.BRASS_FRAME_TOP);
+        UIRenderHelper.drawCropped(graphics, x + 4, y + h - 3, w - 8, 3, AllGuiTextures.BRASS_FRAME_BOTTOM);
 
         final int valueBarX = x + 3;
         final int valueBarWidth = w - 6;
@@ -85,13 +84,12 @@ public class ThrottleLeverHandler extends BlockHoldInteraction {
         for (int w1 = 0; w1 < valueBarWidth; w1 += AllGuiTextures.VALUE_SETTINGS_BAR.getWidth() - 1)
             UIRenderHelper.drawCropped(graphics, valueBarX + w1, y + 3,
                     Math.min(AllGuiTextures.VALUE_SETTINGS_BAR.getWidth() - 1, valueBarWidth - w1), 8,
-                    zLevel, AllGuiTextures.VALUE_SETTINGS_BAR);
+                    AllGuiTextures.VALUE_SETTINGS_BAR);
 
-        ps.popPose();
+        ps.popMatrix();
 
 
-        ps.pushPose();
-        ps.translate(0.0, 0.0, 4.0);
+        ps.pushMatrix();
         final float partialTick = AnimationTickHolder.getPartialTicks();
         final float currentValue = this.lastAnimatedValue * (1 - partialTick) + this.animatedValue * partialTick;
 
@@ -99,20 +97,19 @@ public class ThrottleLeverHandler extends BlockHoldInteraction {
         final int cx = x + w / 2 - 7;
         final float cy = y + h / 2 - 9 + cursorY;
         final int cursorWidth = 14;
-        ps.pushPose();
-        ps.translate(0, cy, 0);
+        ps.pushMatrix();
+        ps.translate(0, cy);
 
         AllGuiTextures.VALUE_SETTINGS_CURSOR_LEFT.render(graphics, cx - 3, 0);
-        UIRenderHelper.drawCropped(graphics, cx, 0, cursorWidth, 14, zLevel, AllGuiTextures.VALUE_SETTINGS_CURSOR);
+        UIRenderHelper.drawCropped(graphics, cx, 0, cursorWidth, 14, AllGuiTextures.VALUE_SETTINGS_CURSOR);
         AllGuiTextures.VALUE_SETTINGS_CURSOR_RIGHT.render(graphics, cx + cursorWidth, 0);
 
-        ps.translate(0.0, 0.0, 4.0);
 
         graphics.text(Minecraft.getInstance().font, String.valueOf(this.inverted ? 15 - this.signal : this.signal), cx + 1, 3, SimColors.THROTTLE_VALUE_BROWN, false);
 
-        ps.popPose();
+        ps.popMatrix();
 
-        ps.popPose();
+        ps.popMatrix();
     }
 
     @Override

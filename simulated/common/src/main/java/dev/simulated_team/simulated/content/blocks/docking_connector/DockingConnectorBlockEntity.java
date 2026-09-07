@@ -25,6 +25,7 @@ import dev.simulated_team.simulated.util.SimMathUtils;
 import dev.simulated_team.simulated.util.SimMovementContext;
 import net.createmod.catnip.api.animation.LerpedFloat;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -556,6 +557,15 @@ public class DockingConnectorBlockEntity extends SmartBlockEntity implements Sim
         }
 
         return List.of(otherSubLevel);
+    }
+
+    @Override
+    public void preRemoveSideEffects(final BlockPos pos, final BlockState state) {
+        // 26.2 port: was the second half of DockingConnectorBlock#onRemove. Dropping what a block
+        // entity holds belongs to the block entity now.
+        if (this.level != null)
+            Containers.dropContents(this.level, pos, this.inventory);
+        super.preRemoveSideEffects(pos, state);
     }
 
     @Override

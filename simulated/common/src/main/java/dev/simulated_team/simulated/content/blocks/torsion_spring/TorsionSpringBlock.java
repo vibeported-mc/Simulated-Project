@@ -17,6 +17,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -52,8 +53,8 @@ public class TorsionSpringBlock extends DirectionalKineticBlock implements IBE<T
     }
 
     @Override
-    protected void neighborChanged(final BlockState blockState, final Level level, final BlockPos blockPos, final Block block, final BlockPos blockPos2, final boolean bl) {
-        super.neighborChanged(blockState, level, blockPos, block, blockPos2, bl);
+    protected void neighborChanged(final BlockState blockState, final Level level, final BlockPos blockPos, final Block block, final @Nullable Orientation orientation, final boolean bl) {
+        super.neighborChanged(blockState, level, blockPos, block, orientation, bl);
         final boolean signal = level.hasNeighborSignal(blockPos);
         if (signal != blockState.getValue(POWERED)) {
             level.setBlock(blockPos, blockState.setValue(POWERED, signal), 2); // idk what this magic number does... copied from DiodeBlock

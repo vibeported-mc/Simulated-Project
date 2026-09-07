@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -93,17 +94,16 @@ public class SteamVentBlock extends Block implements IBE<SteamVentBlockEntity>, 
     }
 
     @Override
-    public void onRemove(final BlockState pState, final @NotNull Level level, final @NotNull BlockPos pos, final @NotNull BlockState newState, final boolean pIsMoving) {
-        this.withBlockEntityDo(level, pos, x -> x.rawSignalStrength = 0);
-        if (pState.hasBlockEntity() && (!pState.is(newState.getBlock()) || !newState.hasBlockEntity()))
-            level.removeBlockEntity(pos);
-
-        for (Direction dir : Iterate.directions) {
-            if (level.getBlockEntity(pos.relative(dir)) instanceof SteamVentBlockEntity vent) {
+    public void affectNeighborsAfterRemoval(final BlockState state, final @NotNull ServerLevel level, final @NotNull BlockPos pos, final boolean movedByPiston) {
+        // 26.2 port: was onRemove. Discarding the block entity is vanilla's job now, and zeroing this
+        // vent's own signal happens on the way out, in SteamVentBlockEntity#preRemoveSideEffects --
+        // by the time this runs the block entity is gone. What is left is the neighbours' business.
+        for (final Direction dir : Iterate.directions) {
+            if (level.getBlockEntity(pos.relative(dir)) instanceof final SteamVentBlockEntity vent) {
                 vent.signalSync();
             }
         }
-        FluidTankBlock.updateBoilerState(pState, level, pos.relative(Direction.DOWN));
+        FluidTankBlock.updateBoilerState(state, level, pos.relative(Direction.DOWN));
     }
 
     @Override
@@ -119,7 +119,7 @@ public class SteamVentBlock extends Block implements IBE<SteamVentBlockEntity>, 
     }
 
     @Override
-    public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block blockIn, final BlockPos fromPos, final boolean isMoving) {
+    public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block blockIn, final @Nullable Orientation orientation, final boolean isMoving) {
         if (level.isClientSide())
             return;
 

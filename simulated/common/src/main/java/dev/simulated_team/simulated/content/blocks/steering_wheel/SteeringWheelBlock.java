@@ -16,6 +16,8 @@ import dev.simulated_team.simulated.index.SimClickInteractions;
 import dev.simulated_team.simulated.util.QuietUse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -187,10 +189,11 @@ public class SteeringWheelBlock extends HorizontalDirectionalBlock
     }
 
     @Override
-    public BlockState updateShape(final BlockState pState, final Direction pDirection, final BlockState pNeighborState,
-                                  final LevelAccessor pLevel, final BlockPos pCurrentPos, final BlockPos pNeighborPos) {
-        this.updateWater(pLevel, pState, pCurrentPos);
-        return pState;
+    protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks,
+                                    final BlockPos pos, final Direction direction, final BlockPos neighbourPos,
+                                    final BlockState neighbourState, final RandomSource random) {
+        this.updateWater(level, ticks, state, pos);
+        return state;
     }
 
     @Override

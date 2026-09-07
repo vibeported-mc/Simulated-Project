@@ -15,6 +15,8 @@ import net.createmod.catnip.api.placement.IPlacementHelper;
 import net.createmod.catnip.api.placement.PlacementHelpers;
 import net.createmod.catnip.api.placement.PlacementOffset;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -40,6 +42,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
@@ -58,7 +61,7 @@ public class NameplateBlock extends HorizontalDirectionalBlock implements IBE<Na
     public static final EnumProperty<Position> POSITION = EnumProperty.create("position", Position.class);
     public static final MapCodec<NameplateBlock> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(propertiesCodec(), DyeColor.CODEC.fieldOf("DyeColor").forGetter(NameplateBlock::getColor)).apply(instance, NameplateBlock::new));
 
-    private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
+    private static final IPlacementHelper PLACEMENT_HELPER = PlacementHelpers.register(new PlacementHelper());
 
     protected final DyeColor color;
 
@@ -151,9 +154,8 @@ public class NameplateBlock extends HorizontalDirectionalBlock implements IBE<Na
     @Override
     protected InteractionResult useItemOn(final ItemStack itemStack, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
         if (!player.isShiftKeyDown() && player.mayBuild()) {
-            final IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
-            if (itemStack.getItem() instanceof final BlockItem bi && blockState.is(bi.getBlock()) && placementHelper.matchesItem(itemStack)) {
-                final InteractionResult result = placementHelper.getOffset(player, level, blockState, blockPos, blockHitResult)
+                        if (itemStack.getItem() instanceof final BlockItem bi && blockState.is(bi.getBlock()) && PLACEMENT_HELPER.matchesItem(itemStack)) {
+                final InteractionResult result = PLACEMENT_HELPER.getOffset(player, level, blockState, blockPos, blockHitResult)
                         .placeInWorld(level, (BlockItem) itemStack.getItem(), player, interactionHand, blockHitResult);
                 if (result == InteractionResult.SUCCESS) {
                     return InteractionResult.SUCCESS;
@@ -211,15 +213,15 @@ public class NameplateBlock extends HorizontalDirectionalBlock implements IBE<Na
     }
 
     @Override
-    public void neighborChanged(final BlockState state, final Level level, final BlockPos selfPos, final Block neighborBlock, final BlockPos neighborPos, final boolean pMovedByPiston) {
-        super.neighborChanged(state, level, selfPos, neighborBlock, neighborPos, pMovedByPiston);
+    public void neighborChanged(final BlockState state, final Level level, final BlockPos selfPos, final Block neighborBlock, final @Nullable Orientation orientation, final boolean pMovedByPiston) {
+        super.neighborChanged(state, level, selfPos, neighborBlock, orientation, pMovedByPiston);
         if (level.getBlockEntity(selfPos) instanceof NameplateBlockEntity nbe) {
 
-            if (neighborPos.equals(selfPos.relative(state.getValue(FACING).getClockWise(Direction.Axis.Y)))) {
-                nbe.checkAndUpdateController(this.color, state.getValue(FACING));
-            } else {
-                nbe.findController().checkAndUpdateController(this.color, state.getValue(FACING));
-            }
+            // 26.2 port: the update carries an Orientation rather than the position it came from, so
+            // "was it my clockwise neighbour" cannot be asked directly. Whichever branch ran, the
+            // controller chain ends up walked from this plate; starting at the controller is the
+            // safe half of the two, so it is what both cases do now.
+            nbe.findController().checkAndUpdateController(this.color, state.getValue(FACING));
 
             if (!NameplateBlockEntity.hasSupport(nbe)) {
                 level.destroyBlock(selfPos, true);
@@ -228,9 +230,11 @@ public class NameplateBlock extends HorizontalDirectionalBlock implements IBE<Na
     }
 
     @Override
-    public BlockState updateShape(final BlockState pState, final Direction pDirection, final BlockState pNeighborState, final LevelAccessor pLevel, final BlockPos pPos, final BlockPos pNeighborPos) {
-        final Position posState = this.getPositionState(pLevel, pPos, pState.getValue(FACING));
-        return super.updateShape(pState, pDirection, pNeighborState, pLevel, pPos, pNeighborPos).setValue(POSITION, posState);
+    protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks,
+                                    final BlockPos pos, final Direction direction, final BlockPos neighbourPos,
+                                    final BlockState neighbourState, final RandomSource random) {
+        final Position posState = this.getPositionState(level, pos, state.getValue(FACING));
+        return super.updateShape(state, level, ticks, pos, direction, neighbourPos, neighbourState, random).setValue(POSITION, posState);
     }
 
     @Override

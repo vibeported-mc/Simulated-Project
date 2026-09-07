@@ -180,12 +180,6 @@ public class NavTableBlock extends DirectionalBlock implements IBE<NavTableBlock
     }
 
     @Override
-    public void onRemove(final BlockState state, final Level level, final BlockPos pos, final BlockState newState, final boolean movedByPiston) {
-        this.withBlockEntityDo(level, pos, NavTableBlockEntity::dropHeldItem);
-        IBE.onRemove(state, level, pos, newState);
-    }
-
-    @Override
     public VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
         return SimBlockShapes.NAV_TABLE.get(state.getValue(FACING));
     }

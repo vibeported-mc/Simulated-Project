@@ -95,7 +95,8 @@ public class SwivelBearingPlateBlock extends DirectionalKineticBlock implements 
         return InteractionResult.PASS;
     }
     @Override
-    public ItemStack getCloneItemStack(final LevelReader level, final BlockPos pos, final BlockState state) {
+    public ItemStack getCloneItemStack(final LevelReader level, final BlockPos pos, final BlockState state,
+            final boolean includeData, final Player player) {
         return SimBlocks.SWIVEL_BEARING.asStack();
     }
 

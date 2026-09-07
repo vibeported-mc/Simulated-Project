@@ -153,7 +153,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
     }
 
     @Override
-    protected int getAnalogOutputSignal(final BlockState state, final Level level, final BlockPos pos) {
+    protected int getAnalogOutputSignal(final BlockState state, final Level level, final BlockPos pos, final Direction direction) {
         final BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof final LinkedTypewriterBlockEntity typewriter) {
             return typewriter.isInUse() ? 15 : 0;
@@ -177,8 +177,9 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
     }
 
     @Override
-    public ItemStack getCloneItemStack(final LevelReader level, final BlockPos pos, final BlockState state) {
-        final ItemStack itemStack = super.getCloneItemStack(level, pos, state);
+    public ItemStack getCloneItemStack(final LevelReader level, final BlockPos pos, final BlockState state,
+            final boolean includeData, final Player player) {
+        final ItemStack itemStack = super.getCloneItemStack(level, pos, state, includeData, player);
         final BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null) {
             BlockItem.setBlockEntityData(itemStack, blockEntity.getType(), blockEntity.saveWithoutMetadata(level.registryAccess()));
@@ -198,7 +199,7 @@ public class LinkedTypewriterBlock extends HorizontalDirectionalBlock implements
         if (blockEntity != null && !level.isClientSide() && player.isCreative() &&
                 blockEntity instanceof final LinkedTypewriterBlockEntity linkedTypewriterBlockEntity && (!linkedTypewriterBlockEntity.getTypewriterEntries().getKeyMap().isEmpty() || linkedTypewriterBlockEntity.components().has(DataComponents.CUSTOM_NAME))) {
 
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), this.getCloneItemStack(level, pos, state));
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), this.getCloneItemStack(level, pos, state, true, null));
         }
         return super.playerWillDestroy(level, pos, state, player);
     }

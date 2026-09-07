@@ -34,6 +34,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -116,8 +117,7 @@ public class HotAirBurnerBlock extends Block implements IBE<HotAirBurnerBlockEnt
     }
 
     @Override
-    public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block blockIn, final BlockPos fromPos,
-                                final boolean isMoving) {
+    public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block blockIn, final @Nullable Orientation orientation, final boolean isMoving) {
         if (level.isClientSide())
             return;
         this.withBlockEntityDo(level, pos, HotAirBurnerBlockEntity::updateSignal);

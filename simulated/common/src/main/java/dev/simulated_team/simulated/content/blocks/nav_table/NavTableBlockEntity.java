@@ -358,6 +358,14 @@ public class NavTableBlockEntity extends SmartBlockEntity implements Clearable {
     }
 
     @Override
+    public void preRemoveSideEffects(final BlockPos pos, final BlockState state) {
+        // 26.2 port: was NavTableBlock#onRemove. Dropping what a block entity holds is the block
+        // entity's own business now -- this runs while it still exists, just before it is discarded.
+        this.dropHeldItem();
+        super.preRemoveSideEffects(pos, state);
+    }
+
+    @Override
     public void clearContent() {
         this.inventory.clearContent();
     }

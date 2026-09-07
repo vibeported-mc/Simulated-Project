@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -103,16 +104,16 @@ public class HandleBlock extends AbstractDirectionalAxisBlock implements IBE<Han
     }
 
     @Override
-    public void neighborChanged(final BlockState state, final Level worldIn, final BlockPos pos, final Block blockIn, final BlockPos fromPos,
-                                final boolean isMoving) {
+    public void neighborChanged(final BlockState state, final Level worldIn, final BlockPos pos, final Block blockIn, final @Nullable Orientation orientation, final boolean isMoving) {
         if (worldIn.isClientSide())
             return;
 
-        final Direction blockFacing = state.getValue(FACING);
-        if (fromPos.equals(pos.relative(blockFacing.getOpposite()))) {
-            if (!this.canSurvive(state, worldIn, pos)) {
-                worldIn.destroyBlock(pos, true);
-            }
+        // 26.2 port: the update no longer says which position it came from -- an Orientation
+        // describes the direction a redstone update travelled, and is null for the rest. The check
+        // this replaces only asked whether the block the handle is mounted on had changed, and
+        // canSurvive re-reads that block anyway, so it is asked unconditionally now.
+        if (!this.canSurvive(state, worldIn, pos)) {
+            worldIn.destroyBlock(pos, true);
         }
     }
 
@@ -127,7 +128,7 @@ public class HandleBlock extends AbstractDirectionalAxisBlock implements IBE<Han
     }
 
     @Override
-    protected int getAnalogOutputSignal(final BlockState state, final Level level, final BlockPos pos) {
+    protected int getAnalogOutputSignal(final BlockState state, final Level level, final BlockPos pos, final Direction direction) {
         if (level.getBlockEntity(pos) instanceof final HandleBlockEntity be) {
             return be.hasPlayer() ? 15 : 0;
         }

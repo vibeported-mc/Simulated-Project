@@ -108,6 +108,16 @@ public class ThrottleLeverBlockEntity extends SmartBlockEntity implements IHaveG
         return this.state;
     }
 
+    public void preRemoveSideEffects(final BlockPos pos, final BlockState state) {
+        // 26.2 port: was ThrottleLeverBlock#onRemove, which read this block entity and then updated
+        // the neighbours. affectNeighborsAfterRemoval runs after the block entity has been discarded,
+        // so it cannot read the lever's position any more; this hook runs while it still can.
+        if (this.state != 0 && this.level != null)
+            ThrottleLeverBlock.updateNeighbors(state, this.level, pos);
+        super.preRemoveSideEffects(pos, state);
+    }
+
+    @Override
     public void setSignal(final int signal) {
         this.state = this.getBlockState().getValue(ThrottleLeverBlock.INVERTED) ? 15 - signal : signal;
         this.lastChange = 2;

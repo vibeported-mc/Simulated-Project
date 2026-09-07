@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 public class SymmetricSailBlock extends RotatedPillarBlock implements IWrenchable, BlockSubLevelLiftProvider, SpecialBlockItemRequirement {
-    private static final int placementHelperId = PlacementHelpers.register(new SymmetricSailPlacementHelper(SymmetricSailBlock::checkItem, SymmetricSailBlock::checkState));
+    private static final IPlacementHelper PLACEMENT_HELPER = PlacementHelpers.register(new SymmetricSailPlacementHelper(SymmetricSailBlock::checkItem, SymmetricSailBlock::checkState));
 
     protected final DyeColor color;
 
@@ -136,9 +136,8 @@ public class SymmetricSailBlock extends RotatedPillarBlock implements IWrenchabl
             return InteractionResult.SUCCESS;
         }
 
-        final IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
-        if (placementHelper.matchesItem(heldItem)) {
-            placementHelper.getOffset(player, level, blockState, blockPos, blockHitResult).placeInWorld(level, (BlockItem) heldItem.getItem(), player, interactionHand, blockHitResult);
+                if (PLACEMENT_HELPER.matchesItem(heldItem)) {
+            PLACEMENT_HELPER.getOffset(player, level, blockState, blockPos, blockHitResult).placeInWorld(level, (BlockItem) heldItem.getItem(), player, interactionHand, blockHitResult);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.TRY_WITH_EMPTY_HAND;
@@ -191,7 +190,8 @@ public class SymmetricSailBlock extends RotatedPillarBlock implements IWrenchabl
     }
 
     @Override
-    public ItemStack getCloneItemStack(final LevelReader level, final BlockPos pos, final BlockState state) {
+    public ItemStack getCloneItemStack(final LevelReader level, final BlockPos pos, final BlockState state,
+            final boolean includeData, final Player player) {
         return SimBlocks.WHITE_SYMMETRIC_SAIL.asStack();
     }
 

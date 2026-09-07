@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -72,25 +73,35 @@ public class DockingConnectorBlock extends WrenchableDirectionalBlock implements
     }
 
     @Override
-    public void onRemove(final @NotNull BlockState state, final @NotNull Level level, final @NotNull BlockPos pos, final @NotNull BlockState newState, final boolean isMoving) {
-        final boolean blockChanged = !state.is(newState.getBlock());
+    public void affectNeighborsAfterRemoval(final @NotNull BlockState state, final @NotNull ServerLevel level, final @NotNull BlockPos pos, final boolean movedByPiston) {
+        // 26.2 port: was onRemove, which saw the replacing state and so could catch a connector that
+        // merely turned. This hook only runs when the block itself changes, so the turning case moved
+        // to onPlace, which is the one that still gets the old state. Dropping the inventory belongs
+        // to the block entity now, in DockingConnectorBlockEntity#preRemoveSideEffects.
+        removePairedConnector(state, level, pos, movedByPiston);
+    }
 
-        // Remove the paired connector even if the block doesn't change
-        if (state.getValue(POWERED) && (blockChanged || state.getValue(FACING) != newState.getValue(FACING))) {
-            final BlockPos pairedConnectorPos = pos.relative(state.getValue(FACING));
-            if (level.getBlockState(pairedConnectorPos).is(SimBlocks.PAIRED_DOCKING_CONNECTOR)) {
-                level.removeBlock(pairedConnectorPos, isMoving);
-            }
+    @Override
+    public void onPlace(final @NotNull BlockState state, final @NotNull Level level, final @NotNull BlockPos pos, final @NotNull BlockState oldState, final boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+
+        if (oldState.is(this) && oldState.getValue(FACING) != state.getValue(FACING)) {
+            removePairedConnector(oldState, level, pos, movedByPiston);
         }
+    }
 
-        if (blockChanged) {
-            level.getBlockEntity(pos, SimBlockEntityTypes.DOCKING_CONNECTOR.get()).ifPresent(connector -> Containers.dropContents(level, pos, connector.inventory));
-            super.onRemove(state, level, pos, newState, isMoving);
+    private static void removePairedConnector(final BlockState state, final Level level, final BlockPos pos, final boolean movedByPiston) {
+        if (!state.getValue(POWERED)) {
+            return;
+        }
+        final BlockPos pairedConnectorPos = pos.relative(state.getValue(FACING));
+        if (level.getBlockState(pairedConnectorPos).is(SimBlocks.PAIRED_DOCKING_CONNECTOR)) {
+            level.removeBlock(pairedConnectorPos, movedByPiston);
         }
     }
 
     @Override
-    public void neighborChanged(final @NotNull BlockState state, final Level level, final @NotNull BlockPos pos, final @NotNull Block block, final @NotNull BlockPos fromPos, final boolean isMoving) {
+    public void neighborChanged(final @NotNull BlockState state, final Level level, final @NotNull BlockPos pos, final @NotNull Block block, final @Nullable Orientation orientation, final boolean isMoving) {
         if (level.isClientSide()) {
             return;
         }
@@ -135,7 +146,7 @@ public class DockingConnectorBlock extends WrenchableDirectionalBlock implements
     }
 
     @Override
-    public int getAnalogOutputSignal(final BlockState pState, final Level pLevel, final BlockPos pPos) {
+    public int getAnalogOutputSignal(final BlockState pState, final Level pLevel, final BlockPos pPos, final Direction direction) {
         final DockingConnectorBlockEntity be = this.getBlockEntity(pLevel, pPos);
 
         if (!be.isExtended())

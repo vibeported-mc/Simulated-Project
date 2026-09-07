@@ -47,27 +47,6 @@ public class WheelMountBlock extends HorizontalKineticBlock implements IBE<Wheel
     }
 
     @Override
-    public void onRemove(final BlockState state, final Level level, final BlockPos pos, final BlockState newState, final boolean isMoving) {
-        if (state.hasBlockEntity() && state.getBlock() != newState.getBlock()) {
-            final WheelMountBlockEntity be = (WheelMountBlockEntity) level.getBlockEntity(pos);
-
-            if (be != null && !be.getHeldItem().isEmpty()) {
-                final Direction facing = state.getValue(WheelMountBlock.HORIZONTAL_FACING);
-
-                BlockPos dropPos = pos;
-
-                if (facing != null) {
-                    dropPos = dropPos.relative(facing);
-                }
-
-                Containers.dropItemStack(level, dropPos.getX(), dropPos.getY(), dropPos.getZ(), be.getHeldItem());
-            }
-
-            level.removeBlockEntity(pos);
-        }
-    }
-
-    @Override
     public boolean hasShaftTowards(final LevelReader world, final BlockPos pos, final BlockState state, final Direction face) {
         return face == state.getValue(HORIZONTAL_FACING).getOpposite();
     }

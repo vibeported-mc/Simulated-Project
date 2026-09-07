@@ -150,7 +150,8 @@ public class EnvelopeBlock extends CasingBlock implements Envelope, SpecialBlock
     }
 
     @Override
-    public ItemStack getCloneItemStack(final LevelReader levelReader, final BlockPos blockPos, final BlockState blockState) {
+    public ItemStack getCloneItemStack(final LevelReader levelReader, final BlockPos blockPos, final BlockState blockState,
+            final boolean includeData, final Player player) {
         return AeroBlocks.DYED_ENVELOPE_BLOCKS.get(this.color).asStack();
     }
 

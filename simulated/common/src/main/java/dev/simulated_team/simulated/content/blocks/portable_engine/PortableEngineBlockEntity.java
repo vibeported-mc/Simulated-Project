@@ -25,6 +25,8 @@ import net.createmod.catnip.api.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import dev.simulated_team.simulated.index.SimBlocks;
+import net.minecraft.world.Containers;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
@@ -93,6 +95,19 @@ public class PortableEngineBlockEntity extends GeneratingKineticBlockEntity impl
         super(typeIn, pos, state);
 
         this.inventory = new PortableEngineInventory(this);
+    }
+
+    @Override
+    public void preRemoveSideEffects(final BlockPos pos, final BlockState state) {
+        // 26.2 port: was PortableEngineBlock#onRemove. Dropping what a block entity holds belongs to
+        // the block entity now. The old guard skipped the drop when one portable engine replaced
+        // another; the replacing state is already in the level by the time this runs, so the same
+        // question is still askable.
+        if (this.level != null && !SimBlocks.PORTABLE_ENGINES.contains(this.level.getBlockState(pos).getBlock())
+                && !this.inventory.isEmpty()) {
+            Containers.dropItemStack(this.level, pos.getX(), pos.getY(), pos.getZ(), this.inventory.getItem(0));
+        }
+        super.preRemoveSideEffects(pos, state);
     }
 
     @Override

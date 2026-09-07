@@ -62,18 +62,6 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
     }
 
     @Override
-    public void onRemove(final BlockState state, final Level level, final BlockPos pos, final BlockState newState, final boolean isMoving) {
-        if (state.hasBlockEntity() && !SimBlocks.PORTABLE_ENGINES.contains(newState.getBlock())) {
-            final PortableEngineBlockEntity be = (PortableEngineBlockEntity) level.getBlockEntity(pos);
-
-            if (be != null && !be.inventory.isEmpty())
-                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), be.inventory.getItem(0));
-
-            level.removeBlockEntity(pos);
-        }
-    }
-
-    @Override
     public boolean hasShaftTowards(final LevelReader world, final BlockPos pos, final BlockState state, final Direction face) {
         return face == state.getValue(HORIZONTAL_FACING);
     }
@@ -186,7 +174,7 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
     }
 
     @Override
-    public int getAnalogOutputSignal(final BlockState pState, final Level pLevel, final BlockPos pPos) {
+    public int getAnalogOutputSignal(final BlockState pState, final Level pLevel, final BlockPos pPos, final Direction direction) {
         final PortableEngineBlockEntity be = this.getBlockEntity(pLevel, pPos);
         final int power = 0;
 

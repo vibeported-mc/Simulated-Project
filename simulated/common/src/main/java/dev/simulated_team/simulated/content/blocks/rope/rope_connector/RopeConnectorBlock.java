@@ -65,11 +65,6 @@ public class RopeConnectorBlock extends AbstractDirectionalAxisBlock implements 
     }
 
     @Override
-    public void onRemove(final BlockState pState, final Level pLevel, final BlockPos pPos, final BlockState pNewState, final boolean pIsMoving) {
-        IBE.onRemove(pState, pLevel, pPos, pNewState);
-    }
-
-    @Override
     public Class<RopeConnectorBlockEntity> getBlockEntityClass() {
         return RopeConnectorBlockEntity.class;
     }

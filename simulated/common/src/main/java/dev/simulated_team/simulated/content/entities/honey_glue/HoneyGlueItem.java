@@ -3,6 +3,8 @@ package dev.simulated_team.simulated.content.entities.honey_glue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -16,7 +18,7 @@ public class HoneyGlueItem extends Item {
     }
 
     @Override
-    public boolean canAttackBlock(final BlockState pState, final Level pLevel, final BlockPos pPos, final Player pPlayer) {
+    public boolean canDestroyBlock(final ItemStack itemStack, final BlockState state, final Level level, final BlockPos pos, final LivingEntity user) {
         return false;
     }
 }

@@ -35,6 +35,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.createmod.catnip.api.math.AngleHelper;
 import net.createmod.catnip.api.math.VecHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
@@ -104,6 +105,18 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
             blockEntity.applyBatchedForces();
         }
         queuedWheelMounts.clear();
+    }
+
+    @Override
+    public void preRemoveSideEffects(final BlockPos pos, final BlockState state) {
+        // 26.2 port: was WheelMountBlock#onRemove. Dropping what a block entity holds belongs to the
+        // block entity now, and this runs while it still exists. The wheel drops in front of the
+        // mount rather than inside it, as before.
+        if (this.level != null && !this.getHeldItem().isEmpty()) {
+            final BlockPos dropPos = pos.relative(state.getValue(WheelMountBlock.HORIZONTAL_FACING));
+            Containers.dropItemStack(this.level, dropPos.getX(), dropPos.getY(), dropPos.getZ(), this.getHeldItem());
+        }
+        super.preRemoveSideEffects(pos, state);
     }
 
     @Override

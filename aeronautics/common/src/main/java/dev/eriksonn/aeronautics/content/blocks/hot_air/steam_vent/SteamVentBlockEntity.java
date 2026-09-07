@@ -224,6 +224,15 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
                 pos.getZ() >= minZ && pos.getZ() < maxZ;
     }
 
+    public void preRemoveSideEffects(final BlockPos pos, final BlockState state) {
+        // 26.2 port: was the first line of SteamVentBlock#onRemove. The block's removal hook runs
+        // after this block entity has been discarded, so the signal is cleared here, while it is
+        // still reachable and its neighbours can still see the change.
+        this.rawSignalStrength = 0;
+        super.preRemoveSideEffects(pos, state);
+    }
+
+    @Override
     public void signalSync() {
         final FluidTankBlockEntity fluidTank = this.source.get();
         if (fluidTank != null) {

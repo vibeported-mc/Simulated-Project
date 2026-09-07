@@ -3,6 +3,8 @@ package dev.simulated_team.simulated.content.blocks.docking_connector;
 import com.mojang.serialization.MapCodec;
 import dev.simulated_team.simulated.index.SimBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -56,14 +58,16 @@ public class PairedDockingConnectorBlock extends DirectionalBlock {
     }
 
     @Override
-    protected @NotNull BlockState updateShape(final BlockState state, final @NotNull Direction direction, final @NotNull BlockState neighborState, final @NotNull LevelAccessor level, final @NotNull BlockPos pos, final @NotNull BlockPos neighborPos) {
+    @NotNull protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks,
+                                    final BlockPos pos, final Direction direction, final BlockPos neighbourPos,
+                                    final BlockState neighbourState, final RandomSource random) {
         final Direction facing = state.getValue(FACING);
         if (facing != direction) {
-            return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+            return super.updateShape(state, level, ticks, pos, direction, neighbourPos, neighbourState, random);
         }
 
-        if (neighborState.is(SimBlocks.DOCKING_CONNECTOR) && neighborState.getValue(BlockStateProperties.FACING) == facing.getOpposite()) {
-            return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+        if (neighbourState.is(SimBlocks.DOCKING_CONNECTOR) && neighbourState.getValue(BlockStateProperties.FACING) == facing.getOpposite()) {
+            return super.updateShape(state, level, ticks, pos, direction, neighbourPos, neighbourState, random);
         }
 
         return Blocks.AIR.defaultBlockState();
@@ -119,7 +123,8 @@ public class PairedDockingConnectorBlock extends DirectionalBlock {
     }
 
     @Override
-    public @NotNull ItemStack getCloneItemStack(final @NotNull LevelReader level, final @NotNull BlockPos pos, final @NotNull BlockState state) {
+    public @NotNull ItemStack getCloneItemStack(final @NotNull LevelReader level, final @NotNull BlockPos pos, final @NotNull BlockState state,
+            final boolean includeData, final Player player) {
         return SimBlocks.DOCKING_CONNECTOR.asStack();
     }
 

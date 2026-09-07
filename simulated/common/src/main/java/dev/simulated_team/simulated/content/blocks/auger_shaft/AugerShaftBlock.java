@@ -21,6 +21,8 @@ import net.createmod.catnip.api.placement.PlacementHelpers;
 import net.createmod.catnip.api.placement.PlacementOffset;
 import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
@@ -39,6 +41,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -58,7 +61,7 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 
 public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<AugerShaftBlockEntity> {
 
-    public static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
+    public static final IPlacementHelper PLACEMENT_HELPER = PlacementHelpers.register(new PlacementHelper());
 
     public static final EnumProperty<BarrelSection> SECTION = EnumProperty.create("section", BarrelSection.class);
     public static final BooleanProperty COG = BooleanProperty.create("cog");
@@ -109,9 +112,8 @@ public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<Au
 
     @Override
     protected InteractionResult useItemOn(final ItemStack heldItem, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
-        final IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
-        if (helper.matchesItem(heldItem))
-            return helper.getOffset(player, level, blockState, blockPos, blockHitResult)
+                if (PLACEMENT_HELPER.matchesItem(heldItem))
+            return PLACEMENT_HELPER.getOffset(player, level, blockState, blockPos, blockHitResult)
                     .placeInWorld(level, (BlockItem) heldItem.getItem(), player, interactionHand, blockHitResult);
 
         if (!(blockState.getBlock() instanceof AugerCogBlock)) {
@@ -172,7 +174,9 @@ public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<Au
     }
 
     @Override
-    public BlockState updateShape(final BlockState state, final Direction dir, final BlockState neighborState, final LevelAccessor level, final BlockPos pos, final BlockPos neighborPos) {
+    protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks,
+                                    final BlockPos pos, final Direction direction, final BlockPos neighbourPos,
+                                    final BlockState neighbourState, final RandomSource random) {
         //gather axis information
         final Direction.Axis axis = state.getValue(AXIS);
         final Direction directionPos = Direction.get(Direction.AxisDirection.POSITIVE, axis);
@@ -199,18 +203,18 @@ public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<Au
 
         BlockState mutState = state.setValue(SECTION, section);
 
-        final boolean isFunnel = neighborState.getBlock() instanceof AbstractFunnelBlock;
-        final boolean hasHorizontalFacing = neighborState.hasProperty(HORIZONTAL_FACING);
-        final boolean hasFacing = neighborState.hasProperty(FACING);
-        if ((isFunnel && ((hasHorizontalFacing && neighborState.getValue(HORIZONTAL_FACING) == dir) ||
-                (hasFacing && neighborState.getValue(FACING) == dir))) ||
-                (dir.getAxis().isVertical() && neighborState.getBlock() instanceof ChuteBlock)) {
-            mutState = mutState.setValue(PROPERTY_BY_DIRECTION.get(dir), true);
+        final boolean isFunnel = neighbourState.getBlock() instanceof AbstractFunnelBlock;
+        final boolean hasHorizontalFacing = neighbourState.hasProperty(HORIZONTAL_FACING);
+        final boolean hasFacing = neighbourState.hasProperty(FACING);
+        if ((isFunnel && ((hasHorizontalFacing && neighbourState.getValue(HORIZONTAL_FACING) == direction) ||
+                (hasFacing && neighbourState.getValue(FACING) == direction))) ||
+                (direction.getAxis().isVertical() && neighbourState.getBlock() instanceof ChuteBlock)) {
+            mutState = mutState.setValue(PROPERTY_BY_DIRECTION.get(direction), true);
         } else {
-            mutState = mutState.setValue(PROPERTY_BY_DIRECTION.get(dir), false);
+            mutState = mutState.setValue(PROPERTY_BY_DIRECTION.get(direction), false);
         }
 
-        return super.updateShape(mutState, dir, neighborState, level, pos, neighborPos);
+        return super.updateShape(mutState, level, ticks, pos, direction, neighbourPos, neighbourState, random);
     }
 
     @Override
@@ -229,10 +233,10 @@ public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<Au
     }
 
     @Override
-    protected void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block neighborBlock, final BlockPos neighborPos, final boolean movedByPiston) {
+    protected void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block neighborBlock, final @Nullable Orientation orientation, final boolean movedByPiston) {
 //        this.withBlockEntityDo(level, pos, (be) -> be.stopped = false);
 
-        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
+        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
     }
 
     @Override
@@ -267,7 +271,7 @@ public class AugerShaftBlock extends RotatedPillarKineticBlock implements IBE<Au
         }
     }
 
-    @MethodsReturnNonnullByDefault
+
     private static class PlacementHelper extends PoleHelper<Direction.Axis> {
         private PlacementHelper() {
             super(state -> state.getBlock() instanceof AugerShaftBlock, state -> state.getValue(AXIS), AXIS);

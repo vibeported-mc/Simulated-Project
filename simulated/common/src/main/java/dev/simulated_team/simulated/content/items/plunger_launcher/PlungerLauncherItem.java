@@ -172,7 +172,7 @@ public class PlungerLauncherItem extends Item implements CustomArmPoseItem {
     }
 
     @Override
-    public boolean canAttackBlock(final BlockState state, final Level level, final BlockPos pos, final Player player) {
+    public boolean canDestroyBlock(final ItemStack itemStack, final BlockState state, final Level level, final BlockPos pos, final LivingEntity user) {
         return false;
     }
 

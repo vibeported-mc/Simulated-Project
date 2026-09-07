@@ -14,6 +14,8 @@ import dev.simulated_team.simulated.index.SimBlockShapes;
 import dev.simulated_team.simulated.index.SimItems;
 import dev.simulated_team.simulated.util.SimColors;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.util.RandomSource;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
@@ -48,13 +50,9 @@ public class SpringBlock extends WrenchableDirectionalBlock implements IBE<Sprin
     }
 
     @Override
-    public ItemStack getCloneItemStack(final LevelReader levelReader, final BlockPos blockPos, final BlockState blockState) {
+    public ItemStack getCloneItemStack(final LevelReader levelReader, final BlockPos blockPos, final BlockState blockState,
+            final boolean includeData, final Player player) {
         return SimItems.SPRING.asStack();
-    }
-
-    @Override
-    public void onRemove(final BlockState pState, final Level pLevel, final BlockPos pPos, final BlockState pNewState, final boolean pMovedByPiston) {
-        IBE.onRemove(pState, pLevel, pPos, pNewState);
     }
 
     @Override
@@ -63,8 +61,10 @@ public class SpringBlock extends WrenchableDirectionalBlock implements IBE<Sprin
     }
 
     @Override
-    public BlockState updateShape(final BlockState pState, final Direction pFacing, final BlockState pFacingState, final LevelAccessor pLevel, final BlockPos pCurrentPos, final BlockPos pFacingPos) {
-        return pState.getValue(FACING).getOpposite() == pFacing && !pState.canSurvive(pLevel, pCurrentPos) ? Blocks.AIR.defaultBlockState() : super.updateShape(pState, pFacing, pFacingState, pLevel, pCurrentPos, pFacingPos);
+    protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks,
+                                    final BlockPos pos, final Direction direction, final BlockPos neighbourPos,
+                                    final BlockState neighbourState, final RandomSource random) {
+        return state.getValue(FACING).getOpposite() == direction && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, level, ticks, pos, direction, neighbourPos, neighbourState, random);
     }
 
     public static boolean canAttach(final LevelReader pReader, final BlockPos pPos, final Direction pDirection) {

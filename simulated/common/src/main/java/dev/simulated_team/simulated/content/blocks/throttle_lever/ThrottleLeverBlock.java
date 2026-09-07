@@ -131,18 +131,7 @@ public class ThrottleLeverBlock extends FaceAttachedHorizontalDirectionalBlock i
     }
 
     @Override
-    public void onRemove(final BlockState state, final Level level, final BlockPos pos, final BlockState newState, final boolean isMoving) {
-        if (isMoving || state.getBlock() == newState.getBlock())
-            return;
-        this.withBlockEntityDo(level, pos, be -> {
-            if (be.state != 0)
-                updateNeighbors(state, level, pos);
-            level.removeBlockEntity(pos);
-        });
-    }
-
     @SuppressWarnings("deprecation")
-    @Override
     public VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
         if (state.getValue(FACE) != AttachFace.WALL && state.getValue(FACING).getAxis() == Direction.Axis.X)
             return SimBlockShapes.THROTTLE_LEVER_SWAP.get(getConnectedDirection(state));
