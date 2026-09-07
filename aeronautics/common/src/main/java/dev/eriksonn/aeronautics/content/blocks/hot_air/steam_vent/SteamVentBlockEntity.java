@@ -301,8 +301,8 @@ public class SteamVentBlockEntity extends SmartBlockEntity implements BlockEntit
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(tag, registries, clientPacket);
 
-        this.signalStrength = tag.getInt("SignalStrength");
-        this.rawSignalStrength = tag.getInt("RawSignalStrength");
+        this.signalStrength = tag.getIntOr("SignalStrength", 0);
+        this.rawSignalStrength = tag.getIntOr("RawSignalStrength", 0);
         if (clientPacket) {
             this.ticksSinceSync = 0;
             this.clientBalloonInfo = ClientBalloonInfo.readFromNBT(tag);

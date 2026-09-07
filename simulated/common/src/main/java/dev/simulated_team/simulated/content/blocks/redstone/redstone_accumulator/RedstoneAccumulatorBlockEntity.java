@@ -162,7 +162,7 @@ public class RedstoneAccumulatorBlockEntity extends SmartBlockEntity implements 
             return true;
         } else {
             final BlockState blockState = this.getBlockState();
-            if (blockState.getValue(RedstoneAccumulatorBlock.INVERTED) != tag.getBoolean("Inverted")) {
+            if (blockState.getValue(RedstoneAccumulatorBlock.INVERTED) != tag.getBooleanOr("Inverted", false)) {
                 this.level.setBlockAndUpdate(this.worldPosition, blockState.cycle(RedstoneAccumulatorBlock.INVERTED));
             }
 

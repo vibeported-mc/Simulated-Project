@@ -159,7 +159,7 @@ public class VelocitySensorBlockEntity extends SmartBlockEntity implements IHave
         super.read(tag, registries, clientPacket);
 
         this.adjustedVelocity = tag.getFloatOr("AdjustedVelocity", 0.0f);
-        this.signedRedstoneStrength = Mth.clamp(-15, 15, tag.getInt("SignedRedstoneStrength"));
+        this.signedRedstoneStrength = Mth.clamp(-15, 15, tag.getIntOr("SignedRedstoneStrength", 0));
     }
 
     public Vector3dc getCurrentNormal() {

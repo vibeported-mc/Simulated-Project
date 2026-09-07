@@ -147,7 +147,7 @@ public abstract class BasePropellerBlockEntity extends KineticBlockEntity implem
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(compound, registries, clientPacket);
 
-        this.rotationSpeed = compound.getFloat("RotationSpeed");
+        this.rotationSpeed = compound.getFloatOr("RotationSpeed", 0.0f);
     }
 
     /**

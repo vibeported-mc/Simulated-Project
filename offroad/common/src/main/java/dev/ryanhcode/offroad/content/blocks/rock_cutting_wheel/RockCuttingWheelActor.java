@@ -116,7 +116,7 @@ public class RockCuttingWheelActor implements MovementBehaviour {
                     final Vec3 contraptionProjectedPos = context.contraption.entity.toGlobalVector(centerPos, 1);
                     final Vec3 sublevelProjected = Sable.HELPER.projectOutOfSubLevel(context.world, contraptionProjectedPos);
 
-                    bhbe.updatePosition(context.data.getInt("Index"), sublevelProjected);
+                    bhbe.updatePosition(context.data.getIntOr("Index", 0), sublevelProjected);
                 }
             } else {
                 final LerpedFloat lerpingObject = (LerpedFloat) context.temporaryData;

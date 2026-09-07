@@ -100,7 +100,7 @@ public class LaserPointerBlockEntity extends AbstractLaserBlockEntity implements
 
     @Override
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
-        this.laserColor = tag.contains("LaserColor") ? tag.getInt("LaserColor") : SimColors.MEDIA_OURPLE;
+        this.laserColor = tag.contains("LaserColor") ? tag.getIntOr("LaserColor", 0) : SimColors.MEDIA_OURPLE;
         this.bestPower = tag.getIntOr("BestPower", 0);
         this.rainbow = tag.getBooleanOr("Rainbow", false);
 

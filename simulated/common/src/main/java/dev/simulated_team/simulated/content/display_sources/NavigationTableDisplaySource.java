@@ -19,7 +19,7 @@ public class NavigationTableDisplaySource extends SingleLineDisplaySource {
 			return EMPTY_LINE.copy();
 		}
 
-		switch (context.sourceConfig().getInt("NavTableSelection")) {
+		switch (context.sourceConfig().getIntOr("NavTableSelection", 0)) {
 			case 0 -> {
 				final NavigationTarget navigationTarget = be.getNavTableItem();
 				if(navigationTarget == null) return EMPTY_LINE.copy();

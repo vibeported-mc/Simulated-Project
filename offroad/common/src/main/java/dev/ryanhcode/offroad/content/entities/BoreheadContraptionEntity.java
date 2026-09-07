@@ -101,7 +101,7 @@ public class BoreheadContraptionEntity extends ControlledContraptionEntity {
         //this is so previous saved worlds can still load, as before this change if you had a borehead bearing it was not saved under the correct type
         if (compound.contains("Contraption")) {
             final CompoundTag contTag = compound.getCompound("Contraption");
-            if (contTag.contains("Type") && contTag.getString("Type").equals(AllContraptionTypes.BEARING.key().location().toString())) {
+            if (contTag.contains("Type") && contTag.getStringOr("Type", "").equals(AllContraptionTypes.BEARING.key().location().toString())) {
                 compound.getCompound("Contraption")
                         .putString("Type", OffroadContraptionTypes.BOREHEAD_CONTRAPTION_TYPE.get().holder.key().location().toString());
             }

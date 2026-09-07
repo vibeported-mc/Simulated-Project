@@ -54,7 +54,7 @@ public class SingleBattery {
     }
 
     public void read(final CompoundTag tag) {
-        this.energy = Mth.clamp(tag.getInt("Energy"), 0, this.maxEnergy);
+        this.energy = Mth.clamp(tag.getIntOr("Energy", 0), 0, this.maxEnergy);
     }
 
     public CompoundTag write() {

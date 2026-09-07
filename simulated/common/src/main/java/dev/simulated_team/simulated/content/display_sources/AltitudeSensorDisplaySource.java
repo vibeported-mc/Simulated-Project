@@ -17,7 +17,7 @@ public class AltitudeSensorDisplaySource extends NumericSingleLineDisplaySource 
             return ZERO.copy();
         }
 
-        switch (context.sourceConfig().getInt("AltitudeSensorSelection")) {
+        switch (context.sourceConfig().getIntOr("AltitudeSensorSelection", 0)) {
             case 0 -> {
                 assert be.hasLevel();
                 final float airPressure = (float) be.getAirPressure() * 100.0f;

@@ -661,7 +661,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
             this.setPlatePos(blockPos);
         }
 
-        this.sequencedAngleLimit = compound.contains("SequencedAngleLimit") ? compound.getDouble("SequencedAngleLimit") : -1;
+        this.sequencedAngleLimit = compound.contains("SequencedAngleLimit") ? compound.getDoubleOr("SequencedAngleLimit", 0.0) : -1;
         this.lastException = AssemblyException.read(compound, registries);
     }
 

@@ -152,6 +152,6 @@ public abstract class BoilerDataMixin {
 
 	@Inject(method = "read", at = @At("TAIL"))
 	private void aeronautics$readVentData(final CompoundTag nbt, final int boilerSize, final CallbackInfo ci) {
-		this.aeronautics$attachedVents = nbt.getInt("SimVents");
+		this.aeronautics$attachedVents = nbt.getIntOr("SimVents", 0);
 	}
 }

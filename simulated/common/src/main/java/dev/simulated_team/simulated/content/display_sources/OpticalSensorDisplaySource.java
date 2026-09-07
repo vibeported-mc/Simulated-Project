@@ -16,7 +16,7 @@ public class OpticalSensorDisplaySource extends NumericSingleLineDisplaySource {
             return ZERO.copy();
         }
 
-        switch (context.sourceConfig().getInt("OpticalSensorSelection")) {
+        switch (context.sourceConfig().getIntOr("OpticalSensorSelection", 0)) {
             case 0 -> {
                 return be.hasHit() ? be.getHitBlock().getName() : SimLang.text("No Block Detected").component();
             }

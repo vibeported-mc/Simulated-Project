@@ -24,7 +24,7 @@ public class LevititeBlendTicker {
 	public LevititeBlendTicker(final CompoundTag toDeserialize, final Level level) {
 		this.level = level;
 		this.pos = toDeserialize.read("pos", BlockPos.CODEC).get();
-		this.context = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().get(Identifier.parse(toDeserialize.getString("context")));
+		this.context = AeroRegistries.LEVITITE_CRYSTAL_PROPAGATION_CONTEXT.asVanillaRegistry().get(Identifier.parse(toDeserialize.getStringOr("context", "")));
 
 		this.deserialize(toDeserialize);
 	}
@@ -124,11 +124,11 @@ public class LevititeBlendTicker {
 	}
 
 	public void deserialize(final CompoundTag tag) {
-		this.age = tag.getInt("age");
-		this.attempts = tag.getInt("attempts");
+		this.age = tag.getIntOr("age", 0);
+		this.attempts = tag.getIntOr("attempts", 0);
 
-		this.requiresCatalyst = tag.getBoolean("requiresCatalyst");
+		this.requiresCatalyst = tag.getBooleanOr("requiresCatalyst", false);
 
-		this.isDormant = tag.getBoolean("isDormant");
+		this.isDormant = tag.getBooleanOr("isDormant", false);
 	}
 }

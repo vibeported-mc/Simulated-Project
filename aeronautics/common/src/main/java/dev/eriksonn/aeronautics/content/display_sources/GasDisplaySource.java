@@ -26,7 +26,7 @@ public class GasDisplaySource extends NumericSingleLineDisplaySource {
             return noBalloon();
         }
 
-        switch (displayLinkContext.sourceConfig().getInt("GasDataSelection")) {
+        switch (displayLinkContext.sourceConfig().getIntOr("GasDataSelection", 0)) {
             case 0 -> { // volume
                 final int totalBar = 15;
                 final int capacity = info.getCapacity();

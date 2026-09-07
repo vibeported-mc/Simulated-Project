@@ -227,8 +227,8 @@ public class HotAirBurnerBlockEntity extends SmartBlockEntity
 
     @Override
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
-        this.powered = tag.getBoolean("IsPowered");
-        this.signalStrength = tag.getInt("SignalStrength");
+        this.powered = tag.getBooleanOr("IsPowered", false);
+        this.signalStrength = tag.getIntOr("SignalStrength", 0);
 
         if (clientPacket) {
             this.ticksSinceSync = 0;

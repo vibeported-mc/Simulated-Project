@@ -243,11 +243,11 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
     @Override
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
         if (!this.wasMoved) {
-            this.lastGeneratedSpeed = compound.getFloat("LastGenerated");
+            this.lastGeneratedSpeed = compound.getFloatOr("LastGenerated", 0.0f);
         }
 
-        this.setRotationSpeed(compound.getFloat("RotationSpeed"));
-        this.disassemblySlowdown = compound.getBoolean("DisassemblySlowdown");
+        this.setRotationSpeed(compound.getFloatOr("RotationSpeed", 0.0f));
+        this.disassemblySlowdown = compound.getBooleanOr("DisassemblySlowdown", false);
         if (this.disassemblySlowdown) {
             this.slowdownController.deserializeFromNBT(compound);
         }

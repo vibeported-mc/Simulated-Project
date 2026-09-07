@@ -60,7 +60,7 @@ public class GyroscopicPropellerBearingBlockEntity extends PropellerBearingBlock
 
     @Override
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
-        this.powered = compound.getBoolean("IsPowered");
+        this.powered = compound.getBooleanOr("IsPowered", false);
 
         super.read(compound, registries, clientPacket);
     }

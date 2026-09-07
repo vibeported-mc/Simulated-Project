@@ -204,7 +204,7 @@ public class OpticalSensorBlockEntity extends AbstractLaserBlockEntity implement
     @Override
     protected void read(final CompoundTag tag, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(tag, registries, clientPacket);
-        this.opacity = Math.clamp(tag.contains("Opacity") ? tag.getFloat("Opacity") : 1, 0, 1);
+        this.opacity = Math.clamp(tag.contains("Opacity") ? tag.getFloatOr("Opacity", 0.0f) : 1, 0, 1);
     }
 
     @Override

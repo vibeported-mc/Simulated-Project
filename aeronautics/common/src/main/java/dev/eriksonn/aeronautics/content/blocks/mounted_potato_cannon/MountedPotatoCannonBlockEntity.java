@@ -308,14 +308,14 @@ public class MountedPotatoCannonBlockEntity extends KineticBlockEntity implement
 
 		this.inventory.read(registries, compound.getCompound("inventory"));
 		this.inventory.updateCachedType(registries, this.inventory.slot.getStack());
-		if (clientPacket && compound.getBoolean("NeedsUpdate")) {
+		if (clientPacket && compound.getBooleanOr("NeedsUpdate", false)) {
 			this.resetAndUpdate();
 		}
 
-		this.chargeTimer = compound.getFloat("ChargeTimer");
-		this.barrelTimer = compound.getInt("BarrelTimer");
-		this.itemRotationId = compound.getInt("ItemRotationID");
-		this.itemTimer = compound.getInt("ItemTimer");
+		this.chargeTimer = compound.getFloatOr("ChargeTimer", 0.0f);
+		this.barrelTimer = compound.getIntOr("BarrelTimer", 0);
+		this.itemRotationId = compound.getIntOr("ItemRotationID", 0);
+		this.itemTimer = compound.getIntOr("ItemTimer", 0);
 		this.currentState = NBTHelper.readEnum(compound, "State", State.class);
 	}
 

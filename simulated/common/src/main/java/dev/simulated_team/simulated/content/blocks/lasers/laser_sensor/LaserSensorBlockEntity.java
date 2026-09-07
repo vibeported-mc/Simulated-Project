@@ -105,7 +105,7 @@ public class LaserSensorBlockEntity extends SmartBlockEntity implements Clearabl
         super.read(tag, registries, clientPacket);
 
         this.currentPower = tag.getIntOr("CurrentPower", 0);
-        this.updateCooldown = Math.clamp(tag.getInt("UpdateCooldown"), 0, MAX_COOLDOWN);
+        this.updateCooldown = Math.clamp(tag.getIntOr("UpdateCooldown", 0), 0, MAX_COOLDOWN);
     }
 
     @Override

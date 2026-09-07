@@ -284,15 +284,15 @@ public interface BlockEntityLiftingGasProvider {
 
         public static ClientBalloonInfo readFromNBT(final CompoundTag tag) {
             return new ClientBalloonInfo(
-                    tag.getInt("Volume"),
-                    tag.getDouble("Filled"),
-                    tag.getDouble("Target"),
-                    tag.getDouble("Lift"),
-                    tag.getDouble("Delta"),
+                    tag.getIntOr("Volume", 0),
+                    tag.getDoubleOr("Filled", 0.0),
+                    tag.getDoubleOr("Target", 0.0),
+                    tag.getDoubleOr("Lift", 0.0),
+                    tag.getDoubleOr("Delta", 0.0),
                     new Vec3(
-                            tag.getDouble("CenterX"),
-                            tag.getDouble("CenterY"),
-                            tag.getDouble("CenterZ")
+                            tag.getDoubleOr("CenterX", 0.0),
+                            tag.getDoubleOr("CenterY", 0.0),
+                            tag.getDoubleOr("CenterZ", 0.0)
                     ));
         }
     }

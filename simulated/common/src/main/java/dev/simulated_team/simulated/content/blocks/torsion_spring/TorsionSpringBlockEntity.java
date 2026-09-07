@@ -143,7 +143,7 @@ public class TorsionSpringBlockEntity extends KineticBlockEntity implements Extr
     @Override
     protected void read(final CompoundTag compound, final HolderLookup.Provider registries, final boolean clientPacket) {
         super.read(compound, registries, clientPacket);
-        this.sequencedAngleLimit = compound.contains("SequencedAngleLimit") ? compound.getDouble("SequencedAngleLimit") : -1;
+        this.sequencedAngleLimit = compound.contains("SequencedAngleLimit") ? compound.getDoubleOr("SequencedAngleLimit", 0.0) : -1;
     }
 
     public static class Output extends GeneratingKineticBlockEntity implements ExtraKineticsBlockEntity {
@@ -374,7 +374,7 @@ public class TorsionSpringBlockEntity extends KineticBlockEntity implements Extr
             this.angle = compound.getDoubleOr("Angle", 0.0);
             this.targetAngle = compound.getDoubleOr("TargetAngle", 0.0);
             this.lastSpringSpeed = compound.getFloatOr("LastSpringSpeed", 0.0f);
-            this.sequencedAngleLimit = compound.contains("SequencedAngleLimit") ? compound.getDouble("SequencedAngleLimit") : -1;
+            this.sequencedAngleLimit = compound.contains("SequencedAngleLimit") ? compound.getDoubleOr("SequencedAngleLimit", 0.0) : -1;
             this.rotationProgressTicks = compound.getIntOr("RotationProgressTicks", 0);
             this.rotationDurationTicks = compound.getIntOr("RotationDurationTicks", 0);
             this.generatedSpeed = compound.getFloatOr("GeneratedSpeed", 0.0f);

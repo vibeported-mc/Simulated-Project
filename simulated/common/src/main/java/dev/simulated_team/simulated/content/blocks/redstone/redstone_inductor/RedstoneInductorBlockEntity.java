@@ -157,7 +157,7 @@ public class RedstoneInductorBlockEntity extends SmartBlockEntity implements IHa
             return true;
         } else {
             final BlockState blockState = this.getBlockState();
-            if (blockState.getValue(RedstoneInductorBlock.INVERTED) != tag.getBoolean("Inverted")) {
+            if (blockState.getValue(RedstoneInductorBlock.INVERTED) != tag.getBooleanOr("Inverted", false)) {
                 this.level.setBlockAndUpdate(this.worldPosition, blockState.cycle(RedstoneInductorBlock.INVERTED));
             }
 

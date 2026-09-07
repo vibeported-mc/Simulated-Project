@@ -500,9 +500,9 @@ public class WheelMountBlockEntity extends KineticBlockEntity implements BlockEn
 
         if (clientPacket) {
             if (tag.contains("SteeringSignalStrength")) {
-                this.clientSteeringSignal = tag.getInt("SteeringSignalStrength");
-                this.clientSteeringSignalLeft = tag.getInt("SteeringSignalStrengthLeft");
-                this.clientSteeringSignalRight = tag.getInt("SteeringSignalStrengthRight");
+                this.clientSteeringSignal = tag.getIntOr("SteeringSignalStrength", 0);
+                this.clientSteeringSignalLeft = tag.getIntOr("SteeringSignalStrengthLeft", 0);
+                this.clientSteeringSignalRight = tag.getIntOr("SteeringSignalStrengthRight", 0);
             }
             this.onStackChanged();
         }
