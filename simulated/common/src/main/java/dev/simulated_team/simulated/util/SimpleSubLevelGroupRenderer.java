@@ -1,50 +1,46 @@
 package dev.simulated_team.simulated.util;
 
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.api.entity.EntitySubLevelUtil;
 import dev.ryanhcode.sable.companion.math.BoundingBox3d;
-import dev.ryanhcode.sable.mixinhelpers.sublevel_render.vanilla.VanillaSubLevelBlockEntityRenderer;
-import dev.ryanhcode.sable.mixinterface.BlockEntityRenderDispatcherExtension;
-import dev.ryanhcode.sable.neoforge.mixinhelper.compatibility.flywheel.SubLevelEmbedding;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
-import dev.ryanhcode.sable.sublevel.render.SubLevelRenderData;
-import dev.ryanhcode.sable.sublevel.render.dispatcher.SubLevelRenderDispatcher;
-import dev.ryanhcode.sable.sublevel.render.dispatcher.VanillaSubLevelRenderDispatcher;
-import dev.ryanhcode.sable.sublevel.render.vanilla.VanillaSingleSubLevelRenderData;
-import dev.simulated_team.simulated.mixin_interface.diagram.LightTextureExtension;
-import dev.simulated_team.simulated.mixin_interface.diagram.VisualManagerExtension;
-import dev.simulated_team.simulated.mixin_interface.diagram.VisualizationManagerExtension;
-import foundry.veil.api.client.render.CameraMatrices;
-import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
-import foundry.veil.impl.client.render.perspective.LevelPerspectiveCamera;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.*;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3d;
 
 import java.util.Collection;
-import java.util.List;
-import net.minecraft.util.LightCoordsUtil;
-import net.minecraft.client.renderer.rendertype.RenderType;
 
+/**
+ * <h2>26.2 note — the rendering half of this class is parked</h2>
+ *
+ * <p>{@link #renderGroup} drew a chosen chain of sub-levels into an {@link AdvancedFbo} under a
+ * chosen camera, by driving the chunk pass by hand: walking {@code RenderType.chunkBufferLayers()},
+ * calling {@code setupRenderState}, fetching {@code RenderSystem.getShader()}, uploading its default
+ * uniforms and applying it. Every one of those is gone in 26.2 — the layers are a closed
+ * {@code ChunkSectionLayer} enum, {@code ShaderInstance} was deleted, and render state moved into
+ * pipeline objects.
+ *
+ * <p>Underneath, Sable's default dispatcher no longer draws sub-level terrain itself: it contributes
+ * the sections to <em>vanilla's own</em> chunk draw list, with the sub-level's pose folded into each
+ * section's model-view uniform. That path belongs to the main frame and cannot be pointed at another
+ * framebuffer, camera, or subset of sub-levels.
+ *
+ * <p>Two features rested on this — the contraption diagram and the End Sea's sky-light shadow map —
+ * and both are parked with it. {@code SIMULATED-26.2-OPEN-QUESTIONS.md} records the three ways out.
+ *
+ * <p>{@link #getRenderedChain} is untouched. It is pure graph-walking with no rendering in it, and
+ * callers that only want to know which sub-levels travel together still work.
+ */
 public class SimpleSubLevelGroupRenderer {
-    private static final LevelPerspectiveCamera CAMERA = new LevelPerspectiveCamera();
-    private static final Matrix4f TRANSFORM = new Matrix4f();
-    private static final Matrix4f BACKUP_PROJECTION = new Matrix4f();
-    private static final CameraMatrices BACKUP_CAMERA_MATRICES = new CameraMatrices();
+
+    /**
+     * Read by the diagram's lighting override, which is itself parked — see
+     * {@code SIMULATED-26.2-OPEN-QUESTIONS.md} §2. Kept so the flag's meaning survives for whoever
+     * restores the feature.
+     */
     public static boolean RENDERING_SIMPLE = false;
 
     /**
@@ -77,166 +73,11 @@ public class SimpleSubLevelGroupRenderer {
         return visited;
     }
 
+    /** Parked — see the class javadoc. */
     public static void renderChain(final SubLevel subLevel, final AdvancedFbo fbo, final Matrix4f modelView, final Matrix4f projectionMat, final Vector3d cameraPosition, final Quaternionf orientation, final float partialTicks) {
-        final ClientSubLevel clientSubLevel = (ClientSubLevel) subLevel;
-        final ClientLevel level = clientSubLevel.getLevel();
-        final Collection<ClientSubLevel> subLevels = SimpleSubLevelGroupRenderer.getRenderedChain(clientSubLevel);
-
-        renderGroup(level, subLevels, fbo, modelView, projectionMat, cameraPosition, orientation, partialTicks, true);
     }
 
+    /** Parked — see the class javadoc. */
     public static void renderGroup(final ClientLevel level, final Collection<ClientSubLevel> subLevels, final AdvancedFbo fbo, final Matrix4f modelView, final Matrix4f projectionMat, final Vector3d cameraPosition, final Quaternionf orientation, final float partialTicks, final boolean renderPlayers) {
-        // Finish anything previously being rendered for safety
-        final MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-        bufferSource.endBatch();
-
-        if (subLevels.isEmpty()) {
-            AdvancedFbo.unbind();
-            return;
-        }
-
-        final Minecraft minecraft = Minecraft.getInstance();
-        final GameRenderer gameRenderer = minecraft.gameRenderer;
-        final LightCoordsUtil lightTexture = gameRenderer.lightTexture();
-        final VanillaSubLevelBlockEntityRenderer beRenderer = new VanillaSubLevelBlockEntityRenderer(minecraft.getBlockEntityRenderDispatcher(), minecraft.renderBuffers(), new Long2ObjectOpenHashMap<>());
-
-        CAMERA.setup(cameraPosition, null, minecraft.level, orientation, 0f);
-
-        final PoseStack poseStack = new PoseStack();
-        poseStack.mulPose(TRANSFORM.set(modelView));
-        poseStack.mulPose(CAMERA.rotation());
-
-        BACKUP_PROJECTION.set(RenderSystem.getProjectionMatrix());
-        gameRenderer.resetProjectionMatrix(TRANSFORM.set(projectionMat));
-
-        final CameraMatrices matrices = VeilRenderSystem.renderer().getCameraMatrices();
-        matrices.backup(BACKUP_CAMERA_MATRICES);
-
-        final Matrix4fStack matrix4fstack = RenderSystem.getModelViewStack();
-        matrix4fstack.pushMatrix();
-        matrix4fstack.identity();
-        matrix4fstack.mul(poseStack.last().pose());
-        RenderSystem.applyModelViewMatrix();
-
-        final AdvancedFbo drawFbo = VeilRenderSystem.renderer().getDynamicBufferManger().getDynamicFbo(fbo);
-        drawFbo.bind(true);
-
-        try {
-            Lighting.setupNetherLevel();
-            ((LightTextureExtension) lightTexture).simulated$makeDiagramLightTexture(0.65f);
-
-            SimpleSubLevelGroupRenderer.RENDERING_SIMPLE = true;
-            for (final RenderType layer : RenderType.chunkBufferLayers()) {
-                layer.setupRenderState();
-                final ShaderInstance shader = RenderSystem.getShader();
-                shader.setDefaultUniforms(VertexFormat.Mode.QUADS, RenderSystem.getModelViewMatrix(), projectionMat, minecraft.getWindow());
-                shader.apply();
-                SubLevelRenderDispatcher.get().renderSectionLayer(subLevels, layer, shader, cameraPosition.x, cameraPosition.y, cameraPosition.z, RenderSystem.getModelViewMatrix(), projectionMat, partialTicks);
-
-                // single block sub-levels
-                final VertexConsumer consumer = bufferSource.getBuffer(layer);
-
-                for (final ClientSubLevel sublevel : subLevels) {
-                    final SubLevelRenderData data = sublevel.getRenderData();
-
-                    if (!(data instanceof final VanillaSingleSubLevelRenderData singleRenderData)) {
-                        continue;
-                    }
-
-                    singleRenderData.renderSingleBlock(layer, consumer, modelView, cameraPosition.x, cameraPosition.y, cameraPosition.z);
-                }
-
-                bufferSource.endBatch(layer);
-                shader.clear();
-                layer.clearRenderState();
-            }
-            ((LightTextureExtension) lightTexture).simulated$makeDiagramLightTexture(1.0f);
-            SimpleSubLevelGroupRenderer.RENDERING_SIMPLE = false;
-
-            final VisualizationManager visualizationManager = VisualizationManager.get(level);
-
-            // Render block-entities with visuals normally
-            if (visualizationManager instanceof final VisualizationManagerExtension extension) {
-                extension.sable$setDrawingDiagram(true);
-
-                for (final ClientSubLevel beSubLevel : subLevels) {
-                    final BlockEntityRenderDispatcherExtension dispatcher = (BlockEntityRenderDispatcherExtension) beRenderer.getBlockEntityRenderDispatcher();
-
-                    final SubLevelEmbedding embeddingInfo = ((VisualManagerExtension) visualizationManager.blockEntities()).sable$getBEEmbeddingInfo(beSubLevel);
-
-                    if (embeddingInfo == null) {
-                        continue;
-                    }
-
-                    final Vector3d chunkOffset = new Vector3d();
-                    final Matrix4f transformation = new Matrix4f();
-                    final Matrix4f transformationInverse = new Matrix4f();
-
-                    final SubLevelRenderData data = beSubLevel.getRenderData();
-
-                    beSubLevel.renderPose().rotationPoint().negate(chunkOffset.zero());
-                    data.getTransformation(cameraPosition.x, cameraPosition.y, cameraPosition.z, transformation);
-
-                    final Vector3f c = transformation.invert(transformationInverse).transformPosition(new Vector3f());
-                    dispatcher.sable$setCameraPosition(new Vec3(c.x - chunkOffset.x(), c.y - chunkOffset.y(), c.z - chunkOffset.z()));
-
-                    final PoseStack beMatrices = new PoseStack();
-                    beMatrices.pushPose();
-                    beMatrices.mulPose(transformation);
-                    beRenderer.renderBlockEntities(embeddingInfo.blockEntities(), beMatrices, partialTicks, -chunkOffset.x, -chunkOffset.y, -chunkOffset.z);
-                    beMatrices.popPose();
-
-                    dispatcher.sable$setCameraPosition(null);
-                }
-            }
-
-            // Render normal block-entities
-            SubLevelRenderDispatcher.get().renderBlockEntities(subLevels, beRenderer, cameraPosition.x, cameraPosition.y, cameraPosition.z, partialTicks);
-
-            for (final ClientSubLevel entitySubLevel : subLevels) {
-                final List<Entity> entities = level.getEntitiesOfClass(Entity.class, entitySubLevel.getPlot().getBoundingBox().toAABB().inflate(16.0));
-
-                final PoseStack entityPoseStack = new PoseStack();
-                entityPoseStack.pushPose();
-                entityPoseStack.mulPose(TRANSFORM.set(modelView));
-
-                for (final Entity entity : entities) {
-                    if (Sable.HELPER.getContaining(entity) != entitySubLevel && Sable.HELPER.getTrackingOrVehicleSubLevel(entity) != entitySubLevel) {
-                        continue;
-                    }
-
-                    if (!renderPlayers && entity instanceof Player) {
-                        continue;
-                    }
-
-                    final float partialTick = minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(!level.tickRateManager().isEntityFrozen(entity));
-
-                    minecraft.levelRenderer.renderEntity(entity, cameraPosition.x, cameraPosition.y, cameraPosition.z, partialTick, entityPoseStack, bufferSource);
-                }
-                entityPoseStack.popPose();
-            }
-
-            if (visualizationManager instanceof final VisualizationManagerExtension extension) {
-                extension.sable$setDrawingDiagram(false);
-            }
-
-            bufferSource.endBatch();
-        } finally {
-            if (level.effects().constantAmbientLight()) {
-                Lighting.setupNetherLevel();
-            } else {
-                Lighting.setupLevel();
-            }
-
-            matrices.restore(BACKUP_CAMERA_MATRICES);
-
-            matrix4fstack.popMatrix();
-            RenderSystem.applyModelViewMatrix();
-
-            gameRenderer.resetProjectionMatrix(BACKUP_PROJECTION);
-            AdvancedFbo.unbind();
-
-            lightTexture.updateLightTexture(partialTicks);
-        }
     }
 }

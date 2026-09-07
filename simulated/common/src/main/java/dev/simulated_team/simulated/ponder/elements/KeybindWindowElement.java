@@ -12,6 +12,7 @@ import net.createmod.ponder.api.client.scene.PonderScene;
 import net.createmod.ponder.impl.client.element.InputWindowElement;
 import net.createmod.ponder.impl.client.gui.PonderUI;
 import net.minecraft.client.gui.Font;
+import org.joml.Matrix3x2fStack;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -132,13 +133,12 @@ public class KeybindWindowElement extends InputWindowElement {
             height = 24;
         }
 
-        final PoseStack poseStack = graphics.pose();
-        poseStack.pushPose();
-        poseStack.translate(sceneToScreen.x + xFade, sceneToScreen.y + yFade, 400);
+        final Matrix3x2fStack poseStack = graphics.pose();
+        poseStack.pushMatrix();
+        poseStack.translate(sceneToScreen.x + xFade, sceneToScreen.y + yFade);
 
         PonderUI.renderSpeechBox(graphics, 0, 0, width, height, false, this.direction, true);
 
-        poseStack.translate(0, 0, 100);
 
         if (hasText) {
             graphics.text(font, text, 2, (int) ((height - font.lineHeight) / 2f + 2),
@@ -146,11 +146,11 @@ public class KeybindWindowElement extends InputWindowElement {
         }
 
         if (hasIcon) {
-            poseStack.pushPose();
-            poseStack.translate(keyWidth, 0, 0);
-            poseStack.scale(1.5f, 1.5f, 1.5f);
+            poseStack.pushMatrix();
+            poseStack.translate(keyWidth, 0);
+            poseStack.scale(1.5f, 1.5f);
             this.icon.render(graphics, 0, 0);
-            poseStack.popPose();
+            poseStack.popMatrix();
         }
 
         if (hasItem) {
@@ -161,7 +161,7 @@ public class KeybindWindowElement extends InputWindowElement {
             RenderSystem.disableDepthTest();
         }
 
-        poseStack.popPose();
+        poseStack.popMatrix();
     }
 
 }

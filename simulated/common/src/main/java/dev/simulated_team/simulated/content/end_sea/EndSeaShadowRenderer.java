@@ -1,16 +1,11 @@
 package dev.simulated_team.simulated.content.end_sea;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 import dev.ryanhcode.sable.Sable;
-import dev.ryanhcode.sable.companion.math.BoundingBox3d;
-import dev.ryanhcode.sable.companion.math.BoundingBox3dc;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
-import dev.ryanhcode.sable.sublevel.ClientSubLevel;
-import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.void_anchor.VoidAnchorBlockEntity;
 import dev.simulated_team.simulated.util.SimpleSubLevelGroupRenderer;
+import foundry.veil.api.client.render.CachedBufferSource;
 import foundry.veil.api.client.render.MatrixStack;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
@@ -22,19 +17,33 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
+import org.joml.Quaternionf;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
 
 import java.lang.Math;
-import java.util.List;
 
+/**
+ * <h2>26.2 note — the shadow map itself is parked</h2>
+ *
+ * <p>This drew every sub-level in the level into an off-screen depth buffer, from below, so the sea
+ * could cast their shadows onto itself. The draw went through
+ * {@link SimpleSubLevelGroupRenderer#renderGroup}, which cannot be ported — see
+ * {@code SIMULATED-26.2-OPEN-QUESTIONS.md} §1.
+ *
+ * <p>Everything <em>around</em> that draw is kept, deliberately. The shadow camera position is still
+ * computed and still published through {@link #getLastRenderOrigin}, because {@code EndSeaRenderer}
+ * builds the sea's UVs from it and would drift without it; the framebuffer is still bound and
+ * cleared, so the sea samples an empty shadow texture rather than a stale one. The sea therefore
+ * draws correctly, with no shadows in it.
+ */
 public class EndSeaShadowRenderer {
     public static final float SHADOW_VOLUME_RADIUS = 256f / 2f;
     private static final Matrix4f PROJECTION_MAT = new Matrix4f();
@@ -46,7 +55,7 @@ public class EndSeaShadowRenderer {
         return true;
     }
 
-    public static void renderShadowMap(final VeilRenderLevelStageEvent.Stage stage, final LevelRenderer levelRenderer, final MultiBufferSource.BufferSource bufferSource, final MatrixStack matrixStack, final Matrix4fc frustumMatrix, final Matrix4fc projectionMatrix, final int renderTick, final DeltaTracker deltaTracker, final Camera camera, final Frustum frustum) {
+    public static void renderShadowMap(final VeilRenderLevelStageEvent.Stage stage, final LevelRenderer levelRenderer, final CachedBufferSource bufferSource, final MatrixStack matrixStack, final Matrix4fc frustumMatrix, final Matrix4fc projectionMatrix, final int renderTick, final DeltaTracker deltaTracker, final Camera camera, final Frustum frustum) {
         if (!EndSeaShadowRenderer.isEnabled() ||
                 stage != VeilRenderLevelStageEvent.Stage.AFTER_LEVEL) {
             return;
@@ -71,7 +80,7 @@ public class EndSeaShadowRenderer {
         PROJECTION_MAT.identity().ortho(-SHADOW_VOLUME_RADIUS, SHADOW_VOLUME_RADIUS, -SHADOW_VOLUME_RADIUS, SHADOW_VOLUME_RADIUS, zNear, SHADOW_VOLUME_RADIUS);
 
         // account for the smaller screen size
-        final Vec3 cameraPosition = camera.getPosition();
+        final Vec3 cameraPosition = camera.position();
         final Vec3 shadowCameraPosition = new Vec3(cameraPosition.x, physics.startY() - SHADOW_VOLUME_RADIUS, cameraPosition.z);
 
         SHADOW_CAMERA_POSITION.set(JOMLConversion.toJOML(shadowCameraPosition));
@@ -79,18 +88,11 @@ public class EndSeaShadowRenderer {
         isRenderingShadowMap = true;
 
         final Quaternionf orientation = new Quaternionf().rotateX(Mth.DEG_TO_RAD * -90);
-        final BoundingBox3dc bounds = new BoundingBox3d(-30_000_000, -10_000, -30_000_000, 30_000_000, 10_000, 30_000_000);
-
-        final List<ClientSubLevel> clientSubLevelGroup = new ObjectArrayList<>();
-        final Iterable<SubLevel> intersecting = Sable.HELPER.getAllIntersecting(level, bounds);
-
-        for (final SubLevel subLevel : intersecting) {
-            clientSubLevelGroup.add((ClientSubLevel) subLevel);
-        }
 
         fbo.bind(true);
         fbo.clear();
-        SimpleSubLevelGroupRenderer.renderGroup(level, clientSubLevelGroup, fbo, modelView, PROJECTION_MAT, SHADOW_CAMERA_POSITION, orientation, SHADOW_VOLUME_RADIUS / 16f, false);
+        // Parked: the sub-level group render that filled this buffer. The buffer is still bound and
+        // cleared so the sea samples an empty shadow map rather than last frame's.
         isRenderingShadowMap = false;
 
         final PostProcessingManager post = VeilRenderSystem.renderer().getPostProcessingManager();
@@ -102,46 +104,18 @@ public class EndSeaShadowRenderer {
         }
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>Parked, and it was already unreachable: nothing has called this since before the port, so
+     * the crack quads over void anchors were not being drawn on 1.21.1 either. It drew through
+     * {@code Tesselator} plus {@code BufferUploader.drawWithShader} and a {@code ShaderInstance},
+     * none of which exist. Restoring it means writing the quads into the buffer source this stage
+     * hands over, the way the physics staff's beam does.
+     *
+     * <p>The list is still drained, so anchors registered each frame by {@code VoidAnchorRenderer}
+     * do not accumulate.
+     */
     public static void renderVoidAnchors(final Camera camera) {
-        if (voidAnchors.isEmpty()) {
-            return;
-        }
-
-        final Minecraft minecraft = Minecraft.getInstance();
-
-        RenderSystem.setShaderTexture(0, Simulated.path("textures/effects/cracks.png"));
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        final ShaderInstance shader = RenderSystem.getShader();
-        if (shader == null) {
-            return;
-        }
-
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
-
-        shader.setDefaultUniforms(VertexFormat.Mode.QUADS, RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), minecraft.getWindow());
-        shader.apply();
-
-        final BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        final Vector3d pos = new Vector3d();
-        final Vec3 cameraPos = camera.getPosition();
-
-        for (final Vector3dc voidAnchor : voidAnchors) {
-            // render quad
-            final float size = 60;
-
-            voidAnchor.sub(cameraPos.x, cameraPos.y, cameraPos.z, pos);
-            final Matrix4f pose = new Matrix4f().translate((float) pos.x, (float) pos.y, (float) pos.z);
-            builder.addVertex(pose, -size, 0, -size).setUv(0.0f, 0.0f).setColor(0.5f, 0, 0, 1);
-            builder.addVertex(pose, size, 0, -size).setUv(1.0f, 0.0f).setColor(0.5f, 0, 0, 1);
-            builder.addVertex(pose, size, 0, size).setUv(1.0f, 1.0f).setColor(0.5f, 0, 0, 1);
-            builder.addVertex(pose, -size, 0, size).setUv(0.0f, 1.0f).setColor(0.5f, 0, 0, 1);
-        }
-        BufferUploader.drawWithShader(builder.buildOrThrow());
-        RenderSystem.disableDepthTest();
-        shader.clear();
-
         voidAnchors.clear();
     }
 

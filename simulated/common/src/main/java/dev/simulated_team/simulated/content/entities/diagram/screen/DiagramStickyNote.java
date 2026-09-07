@@ -12,6 +12,7 @@ import dev.simulated_team.simulated.index.SimSoundEvents;
 import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import net.minecraft.client.Minecraft;
+import org.joml.Matrix3x2fStack;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -181,17 +182,17 @@ public class DiagramStickyNote extends DiagramButton {
 
     @Override
     protected void renderWidget(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
-        final PoseStack ps = guiGraphics.pose();
-        ps.pushPose();
+        final Matrix3x2fStack ps = guiGraphics.pose();
+        ps.pushMatrix();
 
         final float currentX = this.renderXStart + this.lerpedOffset(partialTicks);
         final int currentY = this.getY();
-        ps.translate(currentX, currentY, 0);
+        ps.translate(currentX, currentY);
         SimGUITextures.DIAGRAM_STICKY_NOTE.render(guiGraphics, 0, 0);
 
         if (this.active) {
-            ps.pushPose();
-            ps.translate(SUBLEVEL_RENDER_X_OFFSET, SUBLEVEL_RENDER_Y_OFFSET, 0);
+            ps.pushMatrix();
+            ps.translate(SUBLEVEL_RENDER_X_OFFSET, SUBLEVEL_RENDER_Y_OFFSET);
             if (!VeilLevelPerspectiveRenderer.isRenderingPerspective() && this.fbo != null) {
                 this.populateFBO(partialTicks);
                 DiagramScreen.renderFBO(guiGraphics, this.finalFbo, SUBLEVEL_RENDER_WIDTH_PIXELS, SUBLEVEL_RENDER_HEIGHT_PIXELS);
@@ -212,11 +213,11 @@ public class DiagramStickyNote extends DiagramButton {
             bufferSource.endBatch();
 
             this.renderCustomCOM(guiGraphics, ps);
-            ps.popPose();
+            ps.popMatrix();
 
         }
 
-        ps.popPose();
+        ps.popMatrix();
 
     }
 
