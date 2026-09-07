@@ -11,6 +11,7 @@ import dev.simulated_team.simulated.client.BlockPropertiesTooltip;
 import dev.simulated_team.simulated.content.blocks.nav_table.navigation_target.NavigationTarget;
 import dev.simulated_team.simulated.index.SimDataComponents;
 import dev.simulated_team.simulated.index.SimRegistries;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -118,7 +119,7 @@ public class SimulatedRegistrate extends CreateRegistrate {
         return this.simple(this.self(), name, SimRegistries.Keys.PROPERTY_TOOLTIP, tooltipFunction);
     }
 
-    public static void onAddDefaultComponents(BiConsumer<ItemLike, Consumer<DataComponentPatch.Builder>> modify) {
+    public static void onAddDefaultComponents(BiConsumer<ItemLike, Consumer<DataComponentMap.Builder>> modify) {
         for (Map.Entry<Identifier, Supplier<ItemLike>> entry : NAVIGATION_TARGET_ITEMS.entrySet()) {
             NavigationTarget target = SimRegistries.NAVIGATION_TARGET.getValue(entry.getKey());
             ItemLike item = entry.getValue().get();

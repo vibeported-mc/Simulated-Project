@@ -7,6 +7,7 @@ import dev.ryanhcode.offroad.handlers.client.MultiMiningClientHandler;
 import dev.ryanhcode.offroad.handlers.server.MultiMiningServerManager;
 import dev.ryanhcode.offroad.index.OffroadDataComponents;
 import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ItemLike;
@@ -17,7 +18,7 @@ import java.util.function.Consumer;
 
 public class OffroadCommonEvents {
 
-    public static void modifyDefaultComponents(final BiConsumer<ItemLike, Consumer<DataComponentPatch.Builder>> modify) {
+    public static void modifyDefaultComponents(final BiConsumer<ItemLike, Consumer<DataComponentMap.Builder>> modify) {
         modify.accept(AllBlocks.FLYWHEEL, builder -> { builder.set(OffroadDataComponents.TIRE, TireLike.FLYWHEEL); });
         modify.accept(AllBlocks.LARGE_WATER_WHEEL, builder -> { builder.set(OffroadDataComponents.TIRE, TireLike.LARGE_WATER_WHEEL); });
         modify.accept(AllBlocks.CRUSHING_WHEEL, builder -> { builder.set(OffroadDataComponents.TIRE, TireLike.CRUSHING_WHEEL); });

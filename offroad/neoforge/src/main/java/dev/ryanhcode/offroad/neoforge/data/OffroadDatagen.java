@@ -18,19 +18,31 @@ import java.util.concurrent.CompletableFuture;
 
 public class OffroadDatagen {
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>26.2 fires a separate event per side instead of handing one event a pair of include flags,
+     * and providers are added to the event rather than to the generator. The event is also raised
+     * per mod, so there is no mod set to filter on -- but it is raised twice, once per side, so the
+     * tag generators guard against being added a second time.
+     */
+    private static boolean addedGenerators;
+
     public static void gatherDataHighPriority(final GatherDataEvent event) {
-        if (event.getMods().contains(Offroad.MOD_ID)) {
-            OffroadTags.addGenerators();
-        }
+        if (addedGenerators)
+            return;
+        addedGenerators = true;
+        OffroadTags.addGenerators();
     }
 
-    public static void gatherData(final GatherDataEvent event) {
-        final DataGenerator generator = event.getGenerator();
-        final PackOutput output = generator.getPackOutput();
+    public static void gatherData(final GatherDataEvent.Server event) {
+        final PackOutput output = event.getGenerator().getPackOutput();
         final CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-        generator.addProvider(event.includeServer(), new OffroadAdvancements(output, lookupProvider));
-        event.addProvider(OffroadSoundEvents.REGISTRY.getProvider(output));
+        event.addProvider(new OffroadAdvancements(output, lookupProvider));
+    }
+
+    public static void gatherData(final GatherDataEvent.Client event) {
+        event.addProvider(OffroadSoundEvents.REGISTRY.getProvider(event.getGenerator().getPackOutput()));
     }
 
     public static void registerEvent(final RegisterEvent event) {

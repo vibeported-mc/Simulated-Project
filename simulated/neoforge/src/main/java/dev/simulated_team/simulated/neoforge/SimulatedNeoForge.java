@@ -8,7 +8,6 @@ import dev.simulated_team.simulated.index.neoforge.SimParticleTypesImpl;
 import dev.simulated_team.simulated.neoforge.events.SimNeoForgeCommonEvents;
 import dev.simulated_team.simulated.neoforge.service.NeoForgeSimConfigService;
 import dev.simulated_team.simulated.neoforge.service.NeoForgeSimEntityDataSerialization;
-import dev.simulated_team.simulated.neoforge.service.compat.NeoForgeSimPeripheralService;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -45,9 +44,8 @@ public final class SimulatedNeoForge {
 
         NeoForgeSimStats.register(modEventBus);
 
-        if (ModList.get().isLoaded("computercraft")) {
-            modEventBus.register(NeoForgeSimPeripheralService.class);
-        }
+        // 26.2 port: ComputerCraft has no 26.2 build, so its peripheral service is excluded from
+        // this module's sources in build.gradle -- the registration that named it goes with it.
 
         Simulated.init();
         NeoForgeSimConfigService.register(ModLoadingContext.get(), modContainer);

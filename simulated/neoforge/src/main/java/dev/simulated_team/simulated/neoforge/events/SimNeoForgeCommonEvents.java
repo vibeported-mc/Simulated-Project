@@ -42,7 +42,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -93,9 +93,14 @@ public class SimNeoForgeCommonEvents {
 		EndSeaPhysicsData.syncDataPacket(packet -> event.getRelevantPlayers().forEach(player -> player.connection.send(packet)));
 	}
 
+	/**
+	 * <h2>26.2 note</h2>
+	 * <p>{@code AddReloadListenerEvent} became {@code AddServerReloadListenersEvent}, and a listener
+	 * is registered under an identifier so that other mods can order themselves against it.
+	 */
 	@SubscribeEvent
-	public static void addReloadListeners(final AddReloadListenerEvent event) {
-		event.addListener(EndSeaPhysicsData.ReloadListener.INSTANCE);
+	public static void addReloadListeners(final AddServerReloadListenersEvent event) {
+		event.addListener(EndSeaPhysicsData.ReloadListener.ID, EndSeaPhysicsData.ReloadListener.INSTANCE);
 	}
 
 	@SubscribeEvent
@@ -163,25 +168,44 @@ public class SimNeoForgeCommonEvents {
 			}
 		}
 
+		/**
+		 * <h2>26.2 note</h2>
+		 * <p>26.2 fires a separate event per side instead of handing one event a pair of include
+		 * flags, and providers are added to the event rather than to the generator. The event is also
+		 * raised per mod, so there is no mod set to filter on -- but it is raised twice, once per
+		 * side, so the tag generators guard against being added a second time.
+		 */
+		private static boolean addedGenerators;
+
 		@SubscribeEvent(priority = EventPriority.HIGHEST)
-		public static void gatherDataHighPriority(final GatherDataEvent event) {
-			if (event.getMods().contains(Simulated.MOD_ID))
-				SimTags.addGenerators();
+		public static void gatherDataHighPriority(final GatherDataEvent.Server event) {
+			addGenerators();
+		}
+
+		@SubscribeEvent(priority = EventPriority.HIGHEST)
+		public static void gatherDataHighPriority(final GatherDataEvent.Client event) {
+			addGenerators();
+		}
+
+		private static void addGenerators() {
+			if (addedGenerators)
+				return;
+			addedGenerators = true;
+			SimTags.addGenerators();
 		}
 
 		@SubscribeEvent
-		public static void gatherData(final GatherDataEvent event) {
-			final DataGenerator generator = event.getGenerator();
-
-			final PackOutput output = generator.getPackOutput();
+		public static void gatherData(final GatherDataEvent.Server event) {
+			final PackOutput output = event.getGenerator().getPackOutput();
 			final CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-			if (event.includeClient()) {
-				event.addProvider(SimSoundEvents.REGISTRY.getProvider(output));
-			}
+			event.addProvider(new SimAdvancements(output, lookupProvider));
+			event.addProvider(SimProcessingRecipeGen.registerAll(output, lookupProvider));
+		}
 
-			generator.addProvider(event.includeServer(), new SimAdvancements(output, lookupProvider));
-			generator.addProvider(event.includeServer(), SimProcessingRecipeGen.registerAll(output, lookupProvider));
+		@SubscribeEvent
+		public static void gatherData(final GatherDataEvent.Client event) {
+			event.addProvider(SimSoundEvents.REGISTRY.getProvider(event.getGenerator().getPackOutput()));
 		}
 
 		@SubscribeEvent

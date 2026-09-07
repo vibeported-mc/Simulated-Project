@@ -41,11 +41,10 @@ public class OffroadNeoForge {
         modBus.addListener((ModifyDefaultComponentsEvent event) -> OffroadCommonEvents.modifyDefaultComponents(event::modify));
         NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post event) -> OffroadCommonEvents.tickLevelEvent(event.getLevel()));
 
-        modBus.addListener((final GatherDataEvent event) -> {
-            if (event.getMods().contains(Offroad.MOD_ID)) {
-                OffroadTags.addGenerators();
-            }
-        });
+        modBus.addListener((final GatherDataEvent.Server e) -> OffroadDatagen.gatherDataHighPriority(e));
+        modBus.addListener((final GatherDataEvent.Client e) -> OffroadDatagen.gatherDataHighPriority(e));
+        modBus.addListener((final GatherDataEvent.Server e) -> OffroadDatagen.gatherData(e));
+        modBus.addListener((final GatherDataEvent.Client e) -> OffroadDatagen.gatherData(e));
 
         Offroad.getRegistrate().registerEventListeners(modBus);
     }

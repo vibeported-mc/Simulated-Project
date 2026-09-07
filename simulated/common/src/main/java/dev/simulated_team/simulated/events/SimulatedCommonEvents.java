@@ -25,6 +25,7 @@ import dev.simulated_team.simulated.index.SimTags;
 import dev.simulated_team.simulated.index.SimWorldPresets;
 import dev.simulated_team.simulated.mixin_interface.PrimaryLevelDataExtension;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
@@ -147,7 +148,7 @@ public class SimulatedCommonEvents {
         SableEventPlatform.INSTANCE.onSubLevelContainerReady(SimulatedCommonEvents::onContainerReady);
     }
 
-    public static void modifyDefaultComponents(final BiConsumer<ItemLike, Consumer<DataComponentPatch.Builder>> modify) {
+    public static void modifyDefaultComponents(final BiConsumer<ItemLike, Consumer<DataComponentMap.Builder>> modify) {
         final Identifier basePunchStrengthId = Simulated.path("base_punch_strength");
         final Identifier basePunchCooldownId = Simulated.path("base_punch_cooldown");
 

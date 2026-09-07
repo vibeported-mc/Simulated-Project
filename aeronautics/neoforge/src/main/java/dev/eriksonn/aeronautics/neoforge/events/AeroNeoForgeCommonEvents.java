@@ -56,25 +56,49 @@ public class AeroNeoForgeCommonEvents {
 			}
 		}
 
+		/**
+		 * <h2>26.2 note</h2>
+		 * <p>26.2 fires a separate event per side instead of handing one event a pair of include
+		 * flags, and providers are added to the event rather than to the generator. The event is also
+		 * raised per mod, so there is no mod set to filter on -- but it is raised twice, once per
+		 * side, so the tag generators guard against being added a second time.
+		 */
+		private static boolean addedGenerators;
+
 		@SubscribeEvent(priority = EventPriority.HIGH)
-		public static void gatherDataHighPriority(GatherDataEvent event) {
-			if(event.getMods().contains(Aeronautics.MOD_ID)) {
-				AeroTags.addGenerators();
-			}
+		public static void gatherDataHighPriority(GatherDataEvent.Server event) {
+			addGenerators();
+		}
+
+		@SubscribeEvent(priority = EventPriority.HIGH)
+		public static void gatherDataHighPriority(GatherDataEvent.Client event) {
+			addGenerators();
+		}
+
+		private static void addGenerators() {
+			if (addedGenerators)
+				return;
+			addedGenerators = true;
+			AeroTags.addGenerators();
 		}
 
 		@SubscribeEvent
-		public static void gatherData(GatherDataEvent event) {
-			final DataGenerator generator = event.getGenerator();
-			final PackOutput output = generator.getPackOutput();
+		public static void gatherData(GatherDataEvent.Server event) {
+			final PackOutput output = event.getGenerator().getPackOutput();
 			final CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-			generator.addProvider(event.includeServer(), new AeroAdvancements(output, lookupProvider));
-			generator.addProvider(event.includeServer(), AeroProcessingRecipeGen.registerAll(output, lookupProvider));
+			event.addProvider(new AeroAdvancements(output, lookupProvider));
+			event.addProvider(AeroProcessingRecipeGen.registerAll(output, lookupProvider));
+		}
+
+		@SubscribeEvent
+		public static void gatherData(GatherDataEvent.Client event) {
+			final PackOutput output = event.getGenerator().getPackOutput();
+
 			event.addProvider(AeroSoundEvents.REGISTRY.getProvider(output));
 			// 26.2: an armour material names an equipment asset, and the layers it draws are written
-			// out as data rather than handed to the item's constructor as a texture.
-			generator.addProvider(event.includeClient(), new AeroEquipmentAssets(output));
+			// out as data rather than handed to the item constructor as a texture.
+			event.addProvider(new AeroEquipmentAssets(output));
 		}
 
 		@SubscribeEvent
