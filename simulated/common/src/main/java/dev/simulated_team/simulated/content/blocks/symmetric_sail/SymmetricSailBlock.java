@@ -157,27 +157,16 @@ public class SymmetricSailBlock extends RotatedPillarBlock implements IWrenchabl
         return SimBlockShapes.SYMMETRIC_SAIL.get(pState.getValue(AXIS));
     }
 
-    @Override
-    public void fallOn(final Level level, final BlockState state, final BlockPos pos, final Entity entity, final float fallDistance) {
-        super.fallOn(level, state, pos, entity, 0);
-    }
-
-    @Override
-    public void updateEntityAfterFallOn(final BlockGetter level, final Entity entity) {
-        if (entity.isSuppressingBounce()) {
-            super.updateEntityAfterFallOn(level, entity);
-        } else {
-            this.bounce(entity);
-        }
-    }
-
-    private void bounce(final Entity pEntity) {
-        final Vec3 Vec3 = pEntity.getDeltaMovement();
-        if (Vec3.y < 0.0D) {
-            final double d0 = pEntity instanceof LivingEntity ? 1.0D : 0.8D;
-            pEntity.setDeltaMovement(Vec3.x, -Vec3.y * (double) 0.26F * d0, Vec3.z);
-        }
-    }
+    /**
+     * <h2>26.2 note</h2>
+     * <p>The sail used to break a fall and bounce the entity, through {@code fallOn} plus
+     * {@code updateEntityAfterFallOn}. Neither hook exists: bouncing is a {@code bounceRestitution}
+     * on the block's properties, which {@code Entity} reads while resolving the collision -- and it
+     * already applies the 0.8 scale for non-living entities and honours
+     * {@code isSuppressingBounce}, both of which this class did by hand.
+     *
+     * <p>The restitution is named where the block is registered, in {@code SimBlocks}.
+     */
 
     @Override
     public float sable$getLiftScalar() {

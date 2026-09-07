@@ -764,6 +764,8 @@ public class SimBlocks {
             REGISTRATE.block("white_symmetric_sail", (prov) -> SymmetricSailBlock.withCanvas(prov, DyeColor.WHITE))
                     .initialProperties(SharedProperties::wooden)
                     .properties(p -> p.sound(SoundType.SCAFFOLDING))
+                    // 26.2: the sail's bounce, which used to be an updateEntityAfterFallOn override.
+                    .properties(p -> p.bounceRestitution(0.26f))
                     .properties(BlockBehaviour.Properties::noOcclusion)
                     .lang("Symmetric Sail")
                     .blockstate(() -> (c, p) ->
@@ -795,6 +797,8 @@ public class SimBlocks {
             return REGISTRATE.block(colorName + "_symmetric_sail", p -> SymmetricSailBlock.withCanvas(p, colour))
                     .initialProperties(SharedProperties::wooden)
                     .properties(p -> p.sound(SoundType.SCAFFOLDING))
+                    // 26.2: the sail's bounce, which used to be an updateEntityAfterFallOn override.
+                    .properties(p -> p.bounceRestitution(0.26f))
                     .blockstate(() -> (c, p) -> BlockStateGen.axisBlock(c, p, blockState -> BlockModelGenerators.plainVariant(p.getBuilder()
                             .parent(p.modLoc("block/symmetric_sail/block"))
                             .texture(TextureSlot.create("0"), new Material(Create.asResource("block/sail/canvas_" + colorName)))

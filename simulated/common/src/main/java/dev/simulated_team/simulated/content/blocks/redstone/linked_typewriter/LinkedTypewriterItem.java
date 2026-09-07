@@ -6,6 +6,10 @@ import com.simibubi.create.foundation.utility.RaycastHelper;
 import dev.simulated_team.simulated.content.blocks.redstone.AbstractLinkedReceiverBlockEntity;
 import dev.simulated_team.simulated.mixin.accessor.RedstoneLinkBlockEntityAccessor;
 import net.createmod.catnip.api.data.Couple;
+import java.util.function.Consumer;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -81,14 +85,15 @@ public class LinkedTypewriterItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(final ItemStack stack, final TooltipContext context, final List<Component> tooltipComponents, final TooltipFlag tooltipFlag) {
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-        if (stack.has(DataComponents.BLOCK_ENTITY_DATA)) {
-            final CompoundTag tag = stack.get(DataComponents.BLOCK_ENTITY_DATA).copyTag();
-            if (tag.contains("Keys")) {
-                final int keyCount = tag.getListOrEmpty("Keys").size();
-                tooltipComponents.add(Component.translatable("simulated.linked_typewriter.key_count", keyCount).withStyle(ChatFormatting.GOLD));
-            }
+    public void appendHoverText(final ItemStack stack, final TooltipContext context, final TooltipDisplay display,
+                                final Consumer<Component> tooltipComponents, final TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, display, tooltipComponents, tooltipFlag);
+        // 26.2: block entity data is a TypedEntityData, which carries the block entity type
+        // alongside the tag; contains() asks the same question copyTag().contains() did.
+        final TypedEntityData<BlockEntityType<?>> data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
+        if (data != null && data.contains("Keys")) {
+            final int keyCount = data.copyTag().getListOrEmpty("Keys").size();
+            tooltipComponents.accept(Component.translatable("simulated.linked_typewriter.key_count", keyCount).withStyle(ChatFormatting.GOLD));
         }
     }
 }
