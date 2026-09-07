@@ -1,7 +1,5 @@
 package dev.simulated_team.simulated.mixin.hold_interaction;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.GameProfile;
 import dev.simulated_team.simulated.util.hold_interaction.HoldInteractionManager;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -11,6 +9,7 @@ import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LocalPlayer.class)
@@ -26,8 +25,24 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
         }
     }
 
-    @WrapOperation(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/Input;shiftKeyDown:Z"))
-    private boolean simulated$shhhhDontTellTheServer(final Input instance, final Operation<Boolean> original) {
-        return original.call(instance) && HoldInteractionManager.canCrouch();
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code Input} is an immutable record of seven booleans rather than a mutable object with a
+     * {@code shiftKeyDown} field, so there is no field access to wrap. The input is sent to the
+     * server as a whole, in one {@code ServerboundPlayerInputPacket}, which is the same moment this
+     * was reaching for -- so the packet's argument is what gets the crouch cleared out of it.
+     *
+     * <p>{@code lastSentInput} still records the unmodified input, so the "has it changed" test on
+     * the next tick stays consistent with what the player is actually pressing.
+     */
+    @ModifyArg(method = "tick",
+            at = @At(value = "NEW", target = "(Lnet/minecraft/world/entity/player/Input;)Lnet/minecraft/network/protocol/game/ServerboundPlayerInputPacket;"))
+    private Input simulated$shhhhDontTellTheServer(final Input input) {
+        if (input.shift() && !HoldInteractionManager.canCrouch()) {
+            return new Input(input.forward(), input.backward(), input.left(), input.right(), input.jump(), false,
+                    input.sprint());
+        }
+
+        return input;
     }
 }

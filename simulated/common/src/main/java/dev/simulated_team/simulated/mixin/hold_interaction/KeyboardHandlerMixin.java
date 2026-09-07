@@ -4,6 +4,7 @@ import dev.simulated_team.simulated.events.SimulatedCommonClientEvents;
 import dev.simulated_team.simulated.util.SimDistUtil;
 import dev.simulated_team.simulated.util.click_interactions.InteractCallback;
 import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,11 +17,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class KeyboardHandlerMixin {
     @Shadow @Final private Minecraft minecraft;
 
-    @Inject(method = "keyPress", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;", ordinal = 0, opcode = 180/*GETFIELD*/), cancellable = true)
-    private void simulated$preOnPress(final long windowPointer, final int key, final int scanCode, final int action, final int modifiers, final CallbackInfo ci) {
+    /**
+     * <h2>26.2 note</h2>
+     * <p>Two changes met here. {@code keyPress} takes a {@code KeyEvent} rather than the four raw
+     * ints, so the key, scan code and modifiers are read off it. And the screen is no longer a field
+     * on {@code Minecraft} -- it is {@code Gui.screen()} -- so the injection point moved from that
+     * field read to the call that replaced it, which is the same place in the method: after the
+     * debug-key handling and before anything dispatches the press.
+     */
+    @Inject(method = "keyPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;screen()Lnet/minecraft/client/gui/screens/Screen;", ordinal = 0), cancellable = true)
+    private void simulated$preOnPress(final long windowPointer, final int action, final KeyEvent event, final CallbackInfo ci) {
         if (this.minecraft.gui.screen() == null) {
             if (SimDistUtil.getClientPlayer() != null && !SimDistUtil.getClientPlayer().isSpectator()) {
-                final InteractCallback.Result status = SimulatedCommonClientEvents.onBeforeMouseInput(InteractCallback.Input.key(key, scanCode), modifiers, action);
+                final InteractCallback.Result status = SimulatedCommonClientEvents.onBeforeMouseInput(
+                        InteractCallback.Input.key(event.key(), event.scancode()), event.modifiers(), action);
                 if (status.cancelled()) {
                     ci.cancel();
                 }
