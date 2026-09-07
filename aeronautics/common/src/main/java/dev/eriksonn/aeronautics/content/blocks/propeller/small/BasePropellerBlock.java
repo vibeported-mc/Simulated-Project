@@ -70,7 +70,7 @@ public abstract class BasePropellerBlock extends DirectionalKineticBlock impleme
         final Vec3 diff = context.getClickLocation().subtract(context.getClickedPos().getCenter());
 
         final Direction facing = state.getValue(FACING);
-        final Vec3i normal = facing.getNormal();
+        final Vec3i normal = facing.getUnitVec3i();
 
         // dot product to make wrenching the propeller bit more forgiving
         if (context.getClickedFace() == facing || diff.dot(new Vec3(normal.getX(), normal.getY(), normal.getZ())) > 0.0) {

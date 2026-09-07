@@ -349,7 +349,7 @@ public class PropellerActorBehaviour extends BlockEntityBehaviour implements IHa
         if (this.particleSmoothing > 0)
             count = Math.log(count / this.particleSmoothing + 1) * this.particleSmoothing;
 
-        return Math.min((int) (count + this.getWorld().random.nextFloat()), this.maxParticleAmount);
+        return Math.min((int) (count + this.getWorld().getRandom().nextFloat()), this.maxParticleAmount);
     }
 
     public void setThrustDirection(final Vector3dc thrustDirection) {

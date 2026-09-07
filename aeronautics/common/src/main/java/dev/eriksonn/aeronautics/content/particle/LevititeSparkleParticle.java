@@ -1,5 +1,6 @@
 package dev.eriksonn.aeronautics.content.particle;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
@@ -12,11 +13,11 @@ public class LevititeSparkleParticle extends SimpleAnimatedParticle {
                                       final double x, final double y, final double z,
                                       final double dx, final double dy, final double dz,
                                       final SpriteSet sprite, final int color) {
-        super(level, x, y, z, sprite, level.random.nextFloat() * 0.5f);
+        super(level, x, y, z, sprite, level.getRandom().nextFloat() * 0.5f);
         this.hasPhysics = false;
         this.lifetime = 16;
         this.quadSize *= 0.75f;
-        this.selectSprite(level.random.nextInt(2));
+        this.selectSprite(level.getRandom().nextInt(2));
         this.age++;
         this.setColor(color);
     }
@@ -38,7 +39,7 @@ public class LevititeSparkleParticle extends SimpleAnimatedParticle {
         final int previousIndex = ((this.age - 1) * 4) / (this.lifetime + 1);
         final int index = ((this.age) * 4) / (this.lifetime + 1);
         if (previousIndex != index) {
-            this.selectSprite(index * 2 + this.level.random.nextInt(2));
+            this.selectSprite(index * 2 + this.level.getRandom().nextInt(2));
         }
 
         this.move(this.xd, this.yd, this.zd);
@@ -53,7 +54,8 @@ public class LevititeSparkleParticle extends SimpleAnimatedParticle {
 
         @Override
         public @Nullable Particle createParticle(final LevititeSparkleParticleData levititeSparkleParticleData, final ClientLevel level,
-                                                 final double x, final double y, final double z, final double dx, final double dy, final double dz) {
+                                                 final double x, final double y, final double z, final double dx, final double dy, final double dz,
+                                                 final RandomSource random) {
             return new LevititeSparkleParticle(
                     level,
                     x, y, z, dx, dy, dz,

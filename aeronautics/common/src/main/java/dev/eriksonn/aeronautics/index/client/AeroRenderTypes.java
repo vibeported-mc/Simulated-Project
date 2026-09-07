@@ -1,79 +1,68 @@
 package dev.eriksonn.aeronautics.index.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import dev.eriksonn.aeronautics.Aeronautics;
-import dev.eriksonn.aeronautics.content.blocks.levitite.LevititeShaderManager;
 import foundry.veil.api.client.render.VeilRenderBridge;
-import net.minecraft.client.renderer.RenderStateShard;
+import foundry.veil.api.client.render.rendertype.VeilRenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
 
-import static org.lwjgl.opengl.GL11C.glDisable;
-import static org.lwjgl.opengl.GL11C.glEnable;
-import static org.lwjgl.opengl.GL30C.GL_RASTERIZER_DISCARD;
-
-public class AeroRenderTypes extends RenderType {
+/**
+ * Aeronautics' levitite render types.
+ *
+ * <h2>26.2 note</h2>
+ * <p>This could not stay a subclass of {@code RenderType}, and it could not stay built from
+ * {@code CompositeState}. 26.2 splits a render type's state in two -- GPU state is an immutable
+ * {@code RenderPipeline}, everything else is a {@code RenderSetup} -- and assembles the type with
+ * {@code RenderType.create(name, setup)}. Veil's builder carries both halves, so the layer list
+ * below reads the same way it always did.
+ *
+ * <h3>Two things did not survive, and both are recorded in AERONAUTICS-26.2-OPEN-QUESTIONS.md</h3>
+ *
+ * <p><b>The patches layer.</b> Levitite draws with {@code GL_PATCHES} and carries tessellation
+ * control and evaluation stages. A 26.2 {@code RenderPipeline} names its topology from
+ * {@code PrimitiveTopology}, a closed enum with no patches constant, so there is nowhere to put
+ * either. Veil's {@code PatchesLayer} is still parked for the same reason. The type below draws
+ * quads; the vertex and fragment stages of the levitite program still run, the tessellation stages
+ * do not.
+ *
+ * <p><b>The enabled/disabled shader swap.</b> {@code LevititeShaderState} chose, per frame, between
+ * Veil's levitite program and a depth-only vanilla state, so that a machine without tessellation
+ * drew the geometry invisibly here and got its visible pass elsewhere. A pipeline is immutable and
+ * a shader is two identifiers baked into it, so nothing can be swapped inside a render type any
+ * more. {@link dev.eriksonn.aeronautics.content.blocks.levitite.LevititeShaderManager#isEnabled()}
+ * is still the gate -- it has to be asked at the call sites instead.
+ */
+public final class AeroRenderTypes {
 
     public static final Identifier LEVITITE_SHADER = Aeronautics.path("levitite/levitite");
-    private static final ShaderStateShard LEVITITE_SHADER_SHARD = new LevititeShaderState(VeilRenderBridge.shaderState(LEVITITE_SHADER), new OutputStateShard("disabled", () -> {
-        RENDERTYPE_SOLID_SHADER.setupRenderState();
-        RenderSystem.colorMask(false, false, false, false);
-        RenderSystem.depthMask(false);
-    }, () -> {
-        RENDERTYPE_SOLID_SHADER.clearRenderState();
-        RenderSystem.colorMask(true, true, true, true);
-        RenderSystem.depthMask(true);
-    }));
 
     private static final RenderType LEVITITE = RenderType.create(
             Aeronautics.MOD_ID + ":levitite",
-            DefaultVertexFormat.BLOCK,
-            VertexFormat.Mode.QUADS,
-            TRANSIENT_BUFFER_SIZE,
-            false,
-            true,
-            VeilRenderBridge.create(
-                            RenderType.CompositeState.builder()
-                                    .setShaderState(LEVITITE_SHADER_SHARD)
-                                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                                    .setCullState(CULL)
-                                    .setTextureState(RenderStateShard.BLOCK_SHEET)
-                                    .setLightmapState(LightmapStateShard.LIGHTMAP)
-                    )
-                    .addLayer(VeilRenderBridge.patchState(4))
-                    .create(false)
-    );
+            VeilRenderBridge.createRenderType(Aeronautics.MOD_ID + ":levitite", DefaultVertexFormat.BLOCK)
+                    .vertexShader(LEVITITE_SHADER)
+                    .fragmentShader(LEVITITE_SHADER)
+                    .snippet(VeilRenderPipelines.translucentBlend())
+                    .snippet(VeilRenderPipelines.cull())
+                    .texture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
+                    .useLightmap()
+                    .sortOnUpload()
+                    .create(false));
 
     private static final RenderType LEVITITE_GHOSTS = RenderType.create(
             Aeronautics.MOD_ID + ":levitite_ghosts",
-            DefaultVertexFormat.BLOCK,
-            VertexFormat.Mode.QUADS,
-            TRANSIENT_BUFFER_SIZE,
-            false,
-            true,
-            VeilRenderBridge.create(
-                            RenderType.CompositeState.builder()
-                                    .setShaderState(LEVITITE_SHADER_SHARD)
-                                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                                    .setCullState(NO_CULL)
-                                    .setTextureState(RenderStateShard.BLOCK_SHEET)
-                                    .setLightmapState(LightmapStateShard.LIGHTMAP)
-                    )
-                    .addLayer(VeilRenderBridge.patchState(4))
-                    .create(false)
-    );
+            VeilRenderBridge.createRenderType(Aeronautics.MOD_ID + ":levitite_ghosts", DefaultVertexFormat.BLOCK)
+                    .vertexShader(LEVITITE_SHADER)
+                    .fragmentShader(LEVITITE_SHADER)
+                    .snippet(VeilRenderPipelines.translucentBlend())
+                    .snippet(VeilRenderPipelines.noCull())
+                    .texture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
+                    .useLightmap()
+                    .sortOnUpload()
+                    .create(false));
 
-    public AeroRenderTypes(final String name,
-                           final VertexFormat format,
-                           final VertexFormat.Mode mode,
-                           final int bufferSize,
-                           final boolean affectsCrumbling,
-                           final boolean sortOnUpload,
-                           final Runnable setupState,
-                           final Runnable clearState) {
-        super(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
+    private AeroRenderTypes() {
     }
 
     public static RenderType levitite() {
@@ -82,39 +71,5 @@ public class AeroRenderTypes extends RenderType {
 
     public static RenderType levititeGhosts() {
         return LEVITITE_GHOSTS;
-    }
-
-    private static class LevititeShaderState extends RenderStateShard.ShaderStateShard {
-
-        private final RenderStateShard enabled;
-        private final RenderStateShard disabled;
-
-        public LevititeShaderState(RenderStateShard enabled, RenderStateShard disabled) {
-            this.enabled = enabled;
-            this.disabled = disabled;
-        }
-
-        @Override
-        public void setupRenderState() {
-            if (LevititeShaderManager.isEnabled()) {
-                this.enabled.setupRenderState();
-            } else {
-                this.disabled.setupRenderState();
-            }
-        }
-
-        @Override
-        public void clearRenderState() {
-            if (LevititeShaderManager.isEnabled()) {
-                this.enabled.clearRenderState();
-            } else {
-                this.disabled.clearRenderState();
-            }
-        }
-
-        @Override
-        public String toString() {
-            return LevititeShaderManager.isEnabled() ? this.enabled.toString() : this.disabled.toString();
-        }
     }
 }

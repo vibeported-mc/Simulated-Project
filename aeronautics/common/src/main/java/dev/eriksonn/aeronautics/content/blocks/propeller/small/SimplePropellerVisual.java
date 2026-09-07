@@ -33,7 +33,7 @@ public abstract class SimplePropellerVisual<T extends BasePropellerBlockEntity> 
         super(context, blockEntity, partialTick, Direction.SOUTH, blockEntity.getBlockState().getValue(BlockStateProperties.FACING).getOpposite(), Models.partial(AllPartialModels.SHAFT_HALF));
         final Direction facing = this.blockState.getValue(BlockStateProperties.FACING);
 
-        final Vec3i normal = facing.getNormal();
+        final Vec3i normal = facing.getUnitVec3i();
         final Vec3 normalPos = new Vec3(normal.getX(), normal.getY(), normal.getZ());
         final Vector3f pos = Vec3.atLowerCornerOf(this.getVisualPosition()).add(normalPos.scale(3 / 16f)).toVector3f();
 

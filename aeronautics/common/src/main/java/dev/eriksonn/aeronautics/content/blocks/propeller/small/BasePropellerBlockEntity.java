@@ -47,7 +47,7 @@ public abstract class BasePropellerBlockEntity extends KineticBlockEntity implem
      */
     public PropellerActorBehaviour createBehavior() {
         final PropellerActorBehaviour prop = new PropellerActorBehaviour(this, this);
-        prop.setThrustDirection(JOMLConversion.toJOML(Vec3.atLowerCornerOf(this.getBlockDirection().getNormal())));
+        prop.setThrustDirection(JOMLConversion.toJOML(Vec3.atLowerCornerOf(this.getBlockDirection().getUnitVec3i())));
 
         prop.setParticleAmountUpdater(() -> 0.12 * Math.abs(this.rotationSpeed));
         prop.setParticleCountProperties(5, 2);

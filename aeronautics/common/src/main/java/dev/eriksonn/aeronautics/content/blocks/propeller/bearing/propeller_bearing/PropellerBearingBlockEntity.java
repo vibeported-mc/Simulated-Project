@@ -178,7 +178,7 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
     @Override
     public void tick() {
         this.prevAngle = this.angle;
-        final Vec3i normal = this.getBlockState().getValue(BlockStateProperties.FACING).getNormal();
+        final Vec3i normal = this.getBlockState().getValue(BlockStateProperties.FACING).getUnitVec3i();
         this.facingDirection.set(normal.getX(), normal.getY(), normal.getZ());
 
 //        SubLevelHelper.getContaining(this.level, this.getBlockPos());
@@ -426,7 +426,7 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
 
         if (this.movedContraption != null) {
             final Map<BlockPos, StructureTemplate.StructureBlockInfo> Blocks = this.movedContraption.getContraption().getBlocks();
-            final Vec3i direction = this.getBlockState().getValue(PropellerBearingBlock.FACING).getNormal();
+            final Vec3i direction = this.getBlockState().getValue(PropellerBearingBlock.FACING).getUnitVec3i();
             final HashMap<Integer, Pair<Integer, Integer>> layerHashMap = new HashMap<>();
 
             for (final Map.Entry<BlockPos, StructureTemplate.StructureBlockInfo> entry : Blocks.entrySet()) {

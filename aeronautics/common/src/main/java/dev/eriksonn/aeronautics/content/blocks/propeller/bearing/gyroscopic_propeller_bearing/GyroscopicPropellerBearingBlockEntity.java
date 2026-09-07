@@ -225,7 +225,7 @@ public class GyroscopicPropellerBearingBlockEntity extends PropellerBearingBlock
 
         @Override
         public Vec3 getLocalOffset(final LevelAccessor level, final BlockPos pos, final BlockState state) {
-            return super.getLocalOffset(level, pos, state).add(Vec3.atLowerCornerOf((state.getValue(BlockStateProperties.FACING)).getNormal()).scale(-0.125));
+            return super.getLocalOffset(level, pos, state).add(Vec3.atLowerCornerOf((state.getValue(BlockStateProperties.FACING)).getUnitVec3i()).scale(-0.125));
         }
     }
 }

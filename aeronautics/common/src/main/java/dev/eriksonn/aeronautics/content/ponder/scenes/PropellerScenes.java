@@ -60,7 +60,7 @@ public class PropellerScenes {
         final List<ElementLink<WorldSectionElement>> sails = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
             final Direction dir = Direction.fromYRot(i * 90);
-            final Vec3i pos = dir.getNormal().offset(0, 2, 0);
+            final Vec3i pos = dir.getUnitVec3i().offset(0, 2, 0);
             final ElementLink<WorldSectionElement> currentSail = world.showIndependentSection(select.position(propellerPos.offset(pos)), dir.getOpposite());
             sails.add(currentSail);
 
@@ -112,8 +112,8 @@ public class PropellerScenes {
         for (i = 0; i < 4; i++) {
             final Direction dir = Direction.fromYRot(i * 90);
             final BlockPos base = propellerPos.offset(0, 1, 0);
-            final Vec3i pos1 = dir.getNormal();
-            final Vec3i pos2 = dir.getNormal().cross(new Vec3i(0, -1, 0));
+            final Vec3i pos1 = dir.getUnitVec3i();
+            final Vec3i pos2 = dir.getUnitVec3i().cross(new Vec3i(0, -1, 0));
             final ElementLink<WorldSectionElement> currentSupport = world.showIndependentSection(select.fromTo(
                             base.offset(pos1),
                             base.offset(pos1.multiply(2))),
@@ -164,8 +164,8 @@ public class PropellerScenes {
         for (i = 0; i < 4; i++) {
             final Direction dir = Direction.fromYRot(i * 90);
             final BlockPos base = propellerPos.offset(0, 2, 0);
-            final Vec3i pos1 = dir.getNormal();
-            final Vec3i pos2 = dir.getNormal().cross(new Vec3i(0, -1, 0));
+            final Vec3i pos1 = dir.getUnitVec3i();
+            final Vec3i pos2 = dir.getUnitVec3i().cross(new Vec3i(0, -1, 0));
 
 
             final ElementLink<WorldSectionElement> currentSail = world.showIndependentSection(select.fromTo(

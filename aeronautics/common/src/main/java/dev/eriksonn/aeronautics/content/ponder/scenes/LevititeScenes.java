@@ -288,7 +288,7 @@ public class LevititeScenes {
                     if((bit & clayIndex) > 0) {
                         boolean remove = true;
                         for (int i = 0; i < 4; i++) {
-                            Vec3i dir = Direction.from2DDataValue(i).getNormal();
+                            Vec3i dir = Direction.from2DDataValue(i).getUnitVec3i();
                             int x2 = x + dir.getX() - 1;
                             int y2 = y + dir.getZ() - 1;
                             if (x2 >= 0 && y2 >= 0 && x2 < 5 && y2 < 5 && source[x2 + y2 * 5] >= 0) {

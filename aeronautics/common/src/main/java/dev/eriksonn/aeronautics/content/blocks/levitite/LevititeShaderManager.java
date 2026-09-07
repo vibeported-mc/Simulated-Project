@@ -9,8 +9,10 @@ import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.util.SableMathUtils;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ShaderInstance;
+import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import foundry.veil.api.client.render.shader.uniform.ShaderUniform;
 import org.joml.Matrix3f;
+import org.joml.Matrix3fc;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
@@ -69,28 +71,28 @@ public class LevititeShaderManager {
         enabled = false;
     }
 
-    public static void prepareShaderForWorld(ShaderInstance shader, double camX, double camY, double camZ) {
+    public static void prepareShaderForWorld(ShaderProgram shader, double camX, double camY, double camZ) {
         camX = camX % 10000;
         camY = camY % 10000;
         camZ = camZ % 10000;
         setMaterialProperties(shader);
-        shader.safeGetUniform("offset").set(-(float) camX, -(float) camY, -(float) camZ);
-        shader.safeGetUniform("currentOrientation").set(matrix.identity());
-        shader.safeGetUniform("sublevelPosition").set(0f, 0f, 0f);
-        shader.safeGetUniform("linearVelocity").set(0f, 0f, 0f);
-        shader.safeGetUniform("angularVelocity").set(0f, 0f, 0f);
-        shader.safeGetUniform("onSublevel").set(0);
-        shader.safeGetUniform("gravityStrength").set(0);
+        setVector(shader, "offset", -(float) camX, -(float) camY, -(float) camZ);
+        setMatrix(shader, "currentOrientation", matrix.identity());
+        setVector(shader, "sublevelPosition", 0f, 0f, 0f);
+        setVector(shader, "linearVelocity", 0f, 0f, 0f);
+        setVector(shader, "angularVelocity", 0f, 0f, 0f);
+        setInt(shader, "onSublevel", 0);
+        setFloat(shader, "gravityStrength", 0);
         enabled = true;
     }
 
-    public static void setMaterialProperties(ShaderInstance shader) {
+    public static void setMaterialProperties(ShaderProgram shader) {
         FloatingBlockMaterial material = PhysicsBlockPropertyHelper.getFloatingMaterial(AeroBlocks.LEVITITE.getDefaultState());
         if (material == null)
             return;
-        shader.safeGetUniform("materialTransitionSpeed").set((float) material.transitionSpeed());
-        shader.safeGetUniform("materialMatrixSlow").set(getGravityMatrix(gravityVector2, (float) material.slowVerticalFriction(), (float) material.slowHorizontalFriction(), matrix));
-        shader.safeGetUniform("materialMatrixFast").set(getGravityMatrix(gravityVector2, (float) material.fastVerticalFriction(), (float) material.fastHorizontalFriction(), matrix));
+        setFloat(shader, "materialTransitionSpeed", (float) material.transitionSpeed());
+        setMatrix(shader, "materialMatrixSlow", getGravityMatrix(gravityVector2, (float) material.slowVerticalFriction(), (float) material.slowHorizontalFriction(), matrix));
+        setMatrix(shader, "materialMatrixFast", getGravityMatrix(gravityVector2, (float) material.fastVerticalFriction(), (float) material.fastHorizontalFriction(), matrix));
     }
 
     private static Matrix3f getGravityMatrix(final Vector3f g, final float verticalDrag, final float horizontalDrag, Matrix3f target) {
@@ -138,7 +140,7 @@ public class LevititeShaderManager {
         return (smoothedAngularVelocity.lengthSquared() > 1E-6 || smoothedLinearVelocity.lengthSquared() > 1E-6) && gravityVector1.lengthSquared() > 0.001;
     }
 
-    public void prepareShaderForSublevel(ClientSubLevel subLevel, ShaderInstance shader, double camX, double camY, double camZ) {
+    public void prepareShaderForSublevel(ClientSubLevel subLevel, ShaderProgram shader, double camX, double camY, double camZ) {
         final float pt = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
 
         Pose3dc currentPose = subLevel.renderPose(pt);
@@ -155,13 +157,48 @@ public class LevititeShaderManager {
         currentOrientation.transformInverse(gravityVector1);
         gravityVector2.set(gravityVector1);
 
-        shader.safeGetUniform("offset").set((float) offset.x, (float) offset.y, (float) offset.z);
-        shader.safeGetUniform("linearVelocity").set((float) linearVelocity.x * 20, (float) linearVelocity.y * 20, (float) linearVelocity.z * 20);
-        shader.safeGetUniform("angularVelocity").set((float) angularVelocity.x * 20, (float) angularVelocity.y * 20, (float) angularVelocity.z * 20);
-        shader.safeGetUniform("sublevelPosition").set((float) currentPos.x % 10000, (float) currentPos.y % 10000, (float) currentPos.z % 10000);
-        shader.safeGetUniform("currentOrientation").set(matrix.set(currentOrientation));
-        shader.safeGetUniform("onSublevel").set(1);
-        shader.safeGetUniform("gravityStrength").set((float) gravityVector1.length());
+        setVector(shader, "offset", (float) offset.x, (float) offset.y, (float) offset.z);
+        setVector(shader, "linearVelocity", (float) linearVelocity.x * 20, (float) linearVelocity.y * 20, (float) linearVelocity.z * 20);
+        setVector(shader, "angularVelocity", (float) angularVelocity.x * 20, (float) angularVelocity.y * 20, (float) angularVelocity.z * 20);
+        setVector(shader, "sublevelPosition", (float) currentPos.x % 10000, (float) currentPos.y % 10000, (float) currentPos.z % 10000);
+        setMatrix(shader, "currentOrientation", matrix.set(currentOrientation));
+        setInt(shader, "onSublevel", 1);
+        setFloat(shader, "gravityStrength", (float) gravityVector1.length());
+    }
+
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code ShaderInstance} is gone, and with it {@code safeGetUniform}, which handed back a
+     * dummy uniform when a shader did not declare one. Veil's {@code ShaderProgram} returns null
+     * instead, so the null check that made the old call safe lives here rather than inside the
+     * engine.
+     */
+    private static void setVector(final ShaderProgram shader, final String name, final float x, final float y, final float z) {
+        final ShaderUniform uniform = shader.getUniform(name);
+        if (uniform != null) {
+            uniform.setVector(x, y, z);
+        }
+    }
+
+    private static void setFloat(final ShaderProgram shader, final String name, final float value) {
+        final ShaderUniform uniform = shader.getUniform(name);
+        if (uniform != null) {
+            uniform.setFloat(value);
+        }
+    }
+
+    private static void setInt(final ShaderProgram shader, final String name, final int value) {
+        final ShaderUniform uniform = shader.getUniform(name);
+        if (uniform != null) {
+            uniform.setInt(value);
+        }
+    }
+
+    private static void setMatrix(final ShaderProgram shader, final String name, final Matrix3fc value) {
+        final ShaderUniform uniform = shader.getUniform(name);
+        if (uniform != null) {
+            uniform.setMatrix(value);
+        }
     }
 
     public static boolean isEnabled() {

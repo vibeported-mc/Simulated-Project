@@ -50,7 +50,7 @@ public class EnvelopeEncasedShaftBlock extends EncasedShaftBlock implements Enve
 
         if (color != null) {
             if (!level.isClientSide())
-                level.playSound(null, blockPos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0f, 1.1f - level.random.nextFloat() * .2f);
+                level.playSound(null, blockPos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0f, 1.1f - level.getRandom().nextFloat() * .2f);
 
             EnvelopeBlock.applyDye(blockState, level, blockPos, color);
             return InteractionResult.SUCCESS;

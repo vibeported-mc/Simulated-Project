@@ -1,9 +1,10 @@
 package dev.eriksonn.aeronautics.content.particle;
 
 import com.simibubi.create.AllTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -20,7 +21,7 @@ public class PropellerAirParticle extends SimpleAnimatedParticle {
 
     protected PropellerAirParticle(final ClientLevel world, final double x, final double y, final double z, final double dx, final double dy,
                                    final double dz, final SpriteSet sprite, final boolean enableCollision, final boolean isVirtual) {
-        super(world, x, y, z, sprite, world.random.nextFloat() * .5f);
+        super(world, x, y, z, sprite, world.getRandom().nextFloat() * .5f);
         this.quadSize *= 0.75F;
         this.lifetime = lifeTime;
         this.bbWidth = this.bbHeight = 0.01f;
@@ -39,8 +40,14 @@ public class PropellerAirParticle extends SimpleAnimatedParticle {
         this.setAlpha(.25f);
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    /**
+     * <h2>26.2 note</h2>
+     * <p>A particle names the layer it belongs in; the group it batches with comes from the base
+     * class, and ParticleRenderType's sheet constants are gone.
+     */
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
     private void dissipate() {
@@ -80,7 +87,7 @@ public class PropellerAirParticle extends SimpleAnimatedParticle {
             }
             if (this.hasPhysics && (pX != 0.0D || pY != 0.0D || pZ != 0.0D)) {
                 if (!this.level.getBlockState(new BlockPos((int) (Math.floor(this.x + pX)), (int) (Math.floor(this.y + pY)), (int) (Math.floor(this.z + pZ)))).is(AllTags.AllBlockTags.FAN_TRANSPARENT.tag)) {
-                    final Vec3 vec3 = Entity.collideBoundingBox(null, new Vec3(pX, pY, pZ), this.getBoundingBox(), this.level, List.of());
+                    final Vec3 vec3 = Entity.collideBoundingBox((Entity) null, new Vec3(pX, pY, pZ), this.getBoundingBox(), this.level, List.of());
                     //Vec3 Vec3 = Entity.collideBoundingBox((Entity) null, new Vec3(pX, pY, pZ), this.getBoundingBox(), this.level, ISelectionContext.empty(), new ReuseableStream<>(Stream.empty()));
                     pX = vec3.x;
                     pY = vec3.y;
@@ -113,9 +120,10 @@ public class PropellerAirParticle extends SimpleAnimatedParticle {
         }
     }
 
-    public int getLightColor(final float partialTick) {
-        final BlockPos blockpos = new BlockPos((int) this.x, (int) this.y, (int) this.z);
-        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightColor(this.level, blockpos) : 0;
+    @Override
+    public int getLightCoords(final float partialTick) {
+        final BlockPos blockpos = BlockPos.containing(this.x, this.y, this.z);
+        return this.level.isLoaded(blockpos) ? LightCoordsUtil.getLightCoords(this.level, blockpos) : 0;
     }
 
     private void selectSprite(final int index) {
@@ -129,8 +137,9 @@ public class PropellerAirParticle extends SimpleAnimatedParticle {
             this.spriteSet = animatedSprite;
         }
 
+        @Override
         public Particle createParticle(final PropellerAirParticleData data, final ClientLevel worldIn, final double x, final double y, final double z,
-                                       final double xSpeed, final double ySpeed, final double zSpeed) {
+                                       final double xSpeed, final double ySpeed, final double zSpeed, final RandomSource random) {
             return new PropellerAirParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet, data.enableCollision,data.isVirtual);
         }
     }

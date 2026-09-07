@@ -2,13 +2,14 @@
 package dev.eriksonn.aeronautics.content.particle;
 
 import dev.ryanhcode.sable.api.particle.ParticleSubLevelKickable;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 
-public class HotAirEmberParticle extends TextureSheetParticle implements ParticleSubLevelKickable {
+public class HotAirEmberParticle extends SingleQuadParticle implements ParticleSubLevelKickable {
     private final boolean isSoul;
 
     protected HotAirEmberParticle(final ClientLevel level, final double x, final double y, final double z, final double xSpeed, final double ySpeed, final double zSpeed, final boolean isSoul) {
@@ -32,8 +33,14 @@ public class HotAirEmberParticle extends TextureSheetParticle implements Particl
         this.zd *= zSpeed;
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    /**
+     * <h2>26.2 note</h2>
+     * <p>A particle names the layer it belongs in; the group it batches with comes from the base
+     * class, and ParticleRenderType's sheet constants are gone.
+     */
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
 
@@ -45,9 +52,10 @@ public class HotAirEmberParticle extends TextureSheetParticle implements Particl
 
     }
 
-    public int getLightColor(final float partialTick) {
-        final BlockPos blockpos = new BlockPos((int) this.x, (int) this.y, (int) this.z);
-        return this.level.isLoaded(blockpos) ? (LevelRenderer.getLightColor(this.level, blockpos) | (15 << 4)) : 0;
+    @Override
+    public int getLightCoords(final float partialTick) {
+        final BlockPos blockpos = BlockPos.containing(this.x, this.y, this.z);
+        return this.level.isLoaded(blockpos) ? (LightCoordsUtil.getLightCoords(this.level, blockpos) | (15 << 4)) : 0;
     }
 
 
@@ -101,8 +109,9 @@ public class HotAirEmberParticle extends TextureSheetParticle implements Particl
             this.spriteSet = animatedSprite;
         }
 
+        @Override
         public Particle createParticle(final HotAirEmberParticleData data, final ClientLevel worldIn, final double x, final double y, final double z,
-                                       final double xSpeed, final double ySpeed, final double zSpeed) {
+                                       final double xSpeed, final double ySpeed, final double zSpeed, final RandomSource random) {
             final HotAirEmberParticle particle = new HotAirEmberParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, data.isSoul);
             particle.setSprite(this.spriteSet.get(0, 1));
             return particle;
