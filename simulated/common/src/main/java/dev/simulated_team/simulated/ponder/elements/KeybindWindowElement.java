@@ -1,13 +1,12 @@
 package dev.simulated_team.simulated.ponder.elements;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.createmod.catnip.api.client.gui.element.GuiGameElement;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.createmod.catnip.api.math.Pointing;
 import net.createmod.ponder.api.client.PonderPalette;
 import net.createmod.ponder.api.client.element.InputElementBuilder;
-import net.createmod.ponder.impl.client.gui.element.PonderGuiTextures;
+import net.createmod.catnip.api.client.gui.texture.CatnipGuiTextures;
 import net.createmod.ponder.api.client.scene.PonderScene;
 import net.createmod.ponder.impl.client.element.InputWindowElement;
 import net.createmod.ponder.impl.client.gui.PonderUI;
@@ -57,19 +56,19 @@ public class KeybindWindowElement extends InputWindowElement {
 
         @Override
         public Builder leftClick() {
-            KeybindWindowElement.this.icon = PonderGuiTextures.ICON_LMB;
+            KeybindWindowElement.this.icon = CatnipGuiTextures.ICON_LMB;
             return this;
         }
 
         @Override
         public Builder scroll() {
-            KeybindWindowElement.this.icon = PonderGuiTextures.ICON_SCROLL;
+            KeybindWindowElement.this.icon = CatnipGuiTextures.ICON_SCROLL;
             return this;
         }
 
         @Override
         public Builder rightClick() {
-            KeybindWindowElement.this.icon = PonderGuiTextures.ICON_RMB;
+            KeybindWindowElement.this.icon = CatnipGuiTextures.ICON_RMB;
             return this;
         }
 
@@ -157,8 +156,9 @@ public class KeybindWindowElement extends InputWindowElement {
             GuiGameElement.of(this.item)
                     .<GuiGameElement.GuiRenderBuilder>at(keyWidth + (hasIcon ? 24 : 0), 0)
                     .scale(1.5)
-                    .render(graphics);
-            RenderSystem.disableDepthTest();
+                    .submit(graphics);
+            // 26.2: RenderSystem.disableDepthTest is gone -- depth testing is pipeline state, and
+            // the item element already draws without it.
         }
 
         poseStack.popMatrix();

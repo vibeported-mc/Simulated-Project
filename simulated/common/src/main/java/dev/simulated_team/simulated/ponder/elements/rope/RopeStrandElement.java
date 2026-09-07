@@ -16,11 +16,13 @@ import net.createmod.ponder.api.client.element.AnimatedSceneElement;
 import net.createmod.ponder.api.client.level.PonderLevel;
 import net.createmod.ponder.api.client.scene.PonderScene;
 import net.createmod.ponder.impl.client.element.AnimatedSceneElementBase;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.LightCoordsUtil;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.Camera;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -75,11 +77,11 @@ public class RopeStrandElement extends AnimatedSceneElementBase implements Anima
     }
 
     @Override
-    protected void renderLast(final PonderLevel world, final MultiBufferSource buffer, final GuiGraphicsExtractor graphics, final float fade, final float pt) {
+    protected void renderLast(final PonderLevel world, final SubmitNodeCollector queue, final Camera camera,
+                              final CameraRenderState cameraRenderState, final PoseStack ps, final float fade, final float pt) {
         final SuperByteBuffer middle = CachedBufferer.partialFacing(SimPartialModels.ROPE, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
         final SuperByteBuffer knot = CachedBufferer.partialFacing(SimPartialModels.ROPE_KNOT, AllBlocks.ROPE.getDefaultState(), Direction.NORTH);
-        final VertexConsumer vb = buffer.getBuffer(RenderType.solid());
-        final PoseStack ps = graphics.pose();
+        final RenderType renderType = RenderTypes.solidMovingBlock();
 
         final PonderRopePose currentPose = new PonderRopePose();
         currentPose.set(this.lastPose);
@@ -107,7 +109,6 @@ public class RopeStrandElement extends AnimatedSceneElementBase implements Anima
         final ObjectArrayList<RopeStrandRenderer.RopeRenderPoint> renderPoints = buildRenderPoints(pt, points);
 
         ps.pushPose();
-        this.applyFade(ps, pt);
         ps.translate(currentPose.start.x, currentPose.start.y, currentPose.start.z);
         for (int i = 1; i < renderPoints.size(); i++) {
             final RopeStrandRenderer.RopeRenderPoint renderPoint0 = renderPoints.get(i - 1);
@@ -125,21 +126,18 @@ public class RopeStrandElement extends AnimatedSceneElementBase implements Anima
             final BlockPos pos = BlockPos.containing(globalRenderPos.x, globalRenderPos.y, globalRenderPos.z);
             final int worldLight = LightCoordsUtil.FULL_BRIGHT;
 
-            knot.light(worldLight)
-                    .renderInto(ps, vb);
+            knot.light(worldLight).extractRenderState().submit(ps, renderType, queue);
 
             ps.pushPose();
             ps.translate(0.0, 0.5, 0.0);
             ps.scale(1.0f, (float) length, 1.0f);
 
-            middle.light(worldLight)
-                    .renderInto(ps, vb);
+            middle.light(worldLight).extractRenderState().submit(ps, renderType, queue);
             ps.popPose();
 
             if(renderPoint1 == renderPoints.getLast()) {
                 ps.translate(0, length, 0);
-                knot.light(worldLight)
-                        .renderInto(ps, vb);
+                knot.light(worldLight).extractRenderState().submit(ps, renderType, queue);
             }
 
             ps.popPose();
