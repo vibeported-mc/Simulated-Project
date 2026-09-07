@@ -99,7 +99,7 @@ public class SimulatedRegistrate extends CreateRegistrate {
     }
 
     public void addExtraItem(final Identifier item) {
-        TAB_ITEMS.add(() -> BuiltInRegistries.ITEM.get(item));
+        TAB_ITEMS.add(() -> BuiltInRegistries.ITEM.getValue(item));
         ITEM_TO_SECTION.put(item, this.currentSection);
     }
 

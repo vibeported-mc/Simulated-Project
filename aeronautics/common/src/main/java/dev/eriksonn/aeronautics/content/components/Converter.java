@@ -51,14 +51,14 @@ public record Converter(ItemStack item, int ticks, Optional<Identifier> sound, O
 
 			if(converter.sound().isPresent()) {
 				Identifier soundLocation = converter.sound().get();
-				SoundEvent sound = BuiltInRegistries.SOUND_EVENT.get(soundLocation);
+				SoundEvent sound = BuiltInRegistries.SOUND_EVENT.getValue(soundLocation);
 				if(sound != null) {
 					level.playSound(entity, entity.blockPosition(), sound, SoundSource.AMBIENT, 5.0f, 1.0f);
 				}
 			}
 
 			if(converter.particle().isPresent() && level instanceof ServerLevel serverLevel) {
-				ParticleType<?> particle = BuiltInRegistries.PARTICLE_TYPE.get(converter.particle().get());
+				ParticleType<?> particle = BuiltInRegistries.PARTICLE_TYPE.getValue(converter.particle().get());
 
 				if(particle instanceof ParticleOptions particleOptions) {
 					Vec3 pos = entity.position();

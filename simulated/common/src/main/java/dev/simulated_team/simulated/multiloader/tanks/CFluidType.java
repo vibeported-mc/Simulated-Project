@@ -37,7 +37,7 @@ public record CFluidType(Fluid fluid, DataComponentPatch data) {
     }
 
     public static CFluidType read(final CompoundTag tag) {
-        final Fluid fluid = BuiltInRegistries.FLUID.get(Identifier.parse(tag.getStringOr("Fluid", "")));
+        final Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(tag.getStringOr("Fluid", "")));
         DataComponentPatch data = DataComponentPatch.EMPTY;
         if (tag.contains("data")) {
             final DataResult<Pair<DataComponentPatch, Tag>> result = DataComponentPatch.CODEC.decode(NbtOps.INSTANCE, tag.getCompound("data"));

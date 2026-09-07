@@ -59,7 +59,7 @@ public record SearchAlias(List<String> terms, List<ExtraCodecs.TagOrElementLocat
         for (ExtraCodecs.TagOrElementLocation result : this.results()) {
             if(result.tag()) {
                 TagKey<Item> tag = TagKey.create(Registries.ITEM, result.id());
-                BuiltInRegistries.ITEM.getTag(tag).ifPresent(set -> {
+                BuiltInRegistries.ITEM.get(tag).ifPresent(set -> {
                     for (Holder<Item> holder : set) {
                         if(holder.isBound()) {
                             list.add(holder.value().getDefaultInstance());
@@ -67,7 +67,7 @@ public record SearchAlias(List<String> terms, List<ExtraCodecs.TagOrElementLocat
                     }
                 });
             } else {
-                Item item = BuiltInRegistries.ITEM.get(result.id());
+                Item item = BuiltInRegistries.ITEM.getValue(result.id());
                 list.add(item.getDefaultInstance());
             }
         }

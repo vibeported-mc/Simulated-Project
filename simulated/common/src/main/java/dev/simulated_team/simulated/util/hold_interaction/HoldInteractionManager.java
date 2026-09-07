@@ -67,6 +67,6 @@ public class HoldInteractionManager {
     }
 
     public static boolean unblockedShift() {
-        return ((LocalPlayer) SimDistUtil.getClientPlayer()).input.shiftKeyDown;
+        return ((LocalPlayer) SimDistUtil.getClientPlayer()).input.keyPresses.shift();
     }
 }

@@ -93,10 +93,10 @@ public class ClientHandleHandler extends BlockHoldInteraction {
 
         final boolean crouchingOrFlying = this.movingSubLevel || player.getAbilities().flying;
         if (!crouchingOrFlying) {
-            if (player.input.up) {
+            if (player.input.keyPresses.forward()) {
                 this.deltaRange(player, -0.5f);
             }
-            if (player.input.down) {
+            if (player.input.keyPresses.backward()) {
                 this.deltaRange(player, 0.5f);
             }
 

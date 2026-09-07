@@ -176,7 +176,7 @@ public class AltitudeSensorScreen extends AbstractSimiScreen {
         final float mouseProgress = (float) Mth.clamp(1.0 - (mouseY - barTop) / barHeight, 0.0f, 1.0f);
 
         final float change;
-        if (hasControlDown()) {
+        if (Minecraft.getInstance().hasControlDown()) {
             change = this.draggingLeft ? mouseProgress - this.lowSignal : mouseProgress - this.highSignal;
         } else {
             change = 0;

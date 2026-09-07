@@ -122,8 +122,8 @@ public class KeyWidget extends AbstractSimiWidget {
             freq.render(pGuiGraphics, this.getX() + freqX, this.getY() - yOffset - bgHeight + 4);
 
             final Couple<RedstoneLinkNetworkHandler.Frequency> coupled = keyboardEntry.getAsCouple();
-            pGuiGraphics.renderItem(coupled.getFirst().getStack(), this.getX() + freqX + 1, this.getY() - yOffset - bgHeight + 5);
-            pGuiGraphics.renderItem(coupled.getSecond().getStack(), this.getX() + freqX + 19, this.getY() - yOffset - bgHeight + 5);
+            pGuiGraphics.item(coupled.getFirst().getStack(), this.getX() + freqX + 1, this.getY() - yOffset - bgHeight + 5);
+            pGuiGraphics.item(coupled.getSecond().getStack(), this.getX() + freqX + 19, this.getY() - yOffset - bgHeight + 5);
 
             pGuiGraphics.text(Minecraft.getInstance().font, keyName.getString(), this.getX() + textX - 1, this.getY() - yOffset - textHeight - 2, DyeColor.BLACK.getTextColor(), false);
         }

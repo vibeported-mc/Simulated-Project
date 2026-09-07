@@ -457,7 +457,7 @@ public class SpringBlockEntity extends SmartBlockEntity implements BlockEntitySu
         final boolean isPlacingFromSchematic = schematicContext != null && schematicContext.getType() == SubLevelSchematicSerializationContext.Type.PLACE;
         SubLevelSchematicSerializationContext.SchematicMapping mapping = null;
 
-        if (tag.hasUUID("GoalSubLevel")) {
+        if (tag.read("GoalSubLevel", UUIDUtil.CODEC).isPresent()) {
             UUID subLevelID = tag.read("GoalSubLevel", UUIDUtil.CODEC).orElseThrow();
 
             if (isPlacingFromSchematic) {

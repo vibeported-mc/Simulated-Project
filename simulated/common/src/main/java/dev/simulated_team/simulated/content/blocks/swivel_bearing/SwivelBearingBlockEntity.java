@@ -642,7 +642,7 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
 
         SubLevelSchematicSerializationContext.SchematicMapping mapping = null;
 
-        if (compound.hasUUID("SubLevelID")) {
+        if (compound.read("SubLevelID", UUIDUtil.CODEC).isPresent()) {
             UUID subLevelID = compound.read("SubLevelID", UUIDUtil.CODEC).orElseThrow();
 
             if (schematicContext != null) {
