@@ -33,7 +33,7 @@ public class SimDataComponents {
     public static final DataComponentType<NavigationTarget> TARGET = register("target", builder -> builder
             .persistent(SimRegistries.NAVIGATION_TARGET.byNameCodec())
             .networkSynchronized(Identifier.STREAM_CODEC
-                    .map(SimRegistries.NAVIGATION_TARGET::get, SimRegistries.NAVIGATION_TARGET::getKey))
+                    .map(SimRegistries.NAVIGATION_TARGET::getValue, SimRegistries.NAVIGATION_TARGET::getKey))
     );
 
     public static final DataComponentType<Float> BOUNCINESS = register("bounciness", builder -> builder

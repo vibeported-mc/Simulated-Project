@@ -14,7 +14,7 @@ import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import net.minecraft.client.Minecraft;
 import org.joml.Matrix3x2fStack;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.Direction;
@@ -209,9 +209,9 @@ public class DiagramStickyNote extends DiagramButton {
                     SUBLEVEL_RENDER_WIDTH_PIXELS,
                     SUBLEVEL_RENDER_HEIGHT_PIXELS);
 
-            final MultiBufferSource.BufferSource bufferSource = guiGraphics.bufferSource();
-            bufferSource.endBatch();
-
+            // 26.2 port: this flushed the GUI buffer source so the centre-of-mass marker landed on
+            // top of the note's framebuffer. GUI drawing is collected as render states now and
+            // replayed in submission order, so the ordering holds without a flush.
             this.renderCustomCOM(guiGraphics, ps);
             ps.popMatrix();
 
@@ -258,9 +258,9 @@ public class DiagramStickyNote extends DiagramButton {
 
     }
 
-    private void renderCustomCOM(final GuiGraphicsExtractor guiGraphics, final PoseStack stack) {
+    private void renderCustomCOM(final GuiGraphicsExtractor guiGraphics, final Matrix3x2fStack stack) {
         if (this.parent.config.displayCenterOfMass()) {
-            stack.pushPose();
+            stack.pushMatrix();
             final Vector3d centerOfMass = new Vector3d(this.parent.subLevel.logicalPose().rotationPoint());
             final Vector2d screenCoords = DiagramScreen.getScreenCoords(centerOfMass, NOTE_ORIENTATION, NOTE_LOCAL_CAM_POS, NOTE_PROJ_MAT, SUBLEVEL_RENDER_WIDTH_PIXELS, SUBLEVEL_RENDER_HEIGHT_PIXELS);
 
@@ -269,23 +269,24 @@ public class DiagramStickyNote extends DiagramButton {
             final double comOffsetY = (screenCoords.y) - 8;
 
             if (comOffsetY > 0 && comOffsetX > 0 && comOffsetY < SUBLEVEL_RENDER_HEIGHT_PIXELS && comOffsetX < SUBLEVEL_RENDER_WIDTH_PIXELS) {
-                stack.translate(comOffsetX, comOffsetY, 0);
-                guiGraphics.blit(tex.location, 0, 0, 5, tex.startX, tex.startY, tex.width, tex.height, tex.texWidth, tex.texHeight);
+                stack.translate((float) comOffsetX, (float) comOffsetY);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, tex.location, 0, 0, tex.startX, tex.startY, tex.width, tex.height, tex.texWidth, tex.texHeight);
             } else {
                 final float centerX = SUBLEVEL_RENDER_WIDTH_PIXELS / 2f;
                 final float centerY = SUBLEVEL_RENDER_HEIGHT_PIXELS / 2f;
 
+                // 26.2 port: a rotation about the screen's Z axis is an angle on the 2D stack, so
+                // Flywheel's TransformStack is not needed to express it.
                 final Vector2d target = new Vector2d(screenCoords.x() - centerX, screenCoords.y - centerY).normalize();
-                TransformStack.of(stack)
-                        .translate(centerX, centerY, 0)
-                        .rotate((float) Math.atan2(target.x, -target.y), Direction.Axis.Z)
-                        .translate(-8, -8, 0)
-                        .translate(0, -40, 0);
+                stack.translate(centerX, centerY);
+                stack.rotate((float) Math.atan2(target.x, -target.y));
+                stack.translate(-8, -8);
+                stack.translate(0, -40);
 
                 tex = SimGUITextures.DIAGRAM_ICON_COM_ARROW;
-                guiGraphics.blit(tex.location, 0, 0, 5, tex.startX, tex.startY, tex.width, tex.height, tex.texWidth, tex.texHeight);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, tex.location, 0, 0, tex.startX, tex.startY, tex.width, tex.height, tex.texWidth, tex.texHeight);
             }
-            stack.popPose();
+            stack.popMatrix();
         }
     }
 }

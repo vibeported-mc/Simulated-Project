@@ -680,7 +680,7 @@ public class DiagramScreen extends AbstractSimiScreen {
         super.renderWindowForeground(graphics, mouseX, mouseY, partialTicks);
     }
 
-    private void renderMagnificationHighlight(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final PoseStack ps) {
+    private void renderMagnificationHighlight(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final Matrix3x2fStack ps) {
         final boolean initiallyWithinNote = this.note.contains(MAGNIFYING_CENTER.x, MAGNIFYING_CENTER.y);
 
         this.updateMagnificationBox(mouseX, mouseY);
@@ -786,7 +786,7 @@ public class DiagramScreen extends AbstractSimiScreen {
             final Map<ForceGroup, List<ForceClusterFinder.Cluster>> clusters = new HashMap<>();
 
             for (final Identifier groupId : this.config.enabledForceGroups()) {
-                final ForceGroup group = ForceGroups.REGISTRY.get(groupId);
+                final ForceGroup group = ForceGroups.REGISTRY.getValue(groupId);
                 assert group != null;
 
                 final List<QueuedForceGroup.PointForce> forces = this.serverData.forces().get(group);
@@ -802,7 +802,7 @@ public class DiagramScreen extends AbstractSimiScreen {
             }
 
             for (final Identifier groupId : this.config.enabledForceGroups()) {
-                final ForceGroup group = ForceGroups.REGISTRY.get(groupId);
+                final ForceGroup group = ForceGroups.REGISTRY.getValue(groupId);
                 assert group != null;
 
                 final List<ForceClusterFinder.Cluster> cluster = clusters.get(group);

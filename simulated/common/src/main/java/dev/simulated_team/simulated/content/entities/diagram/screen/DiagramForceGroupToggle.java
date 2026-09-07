@@ -13,6 +13,7 @@ import org.joml.Matrix3x2fStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -61,8 +62,8 @@ public class DiagramForceGroupToggle extends AbstractWidget {
     }
 
     @Override
-    public void onClick(final double mouseX, final double mouseY) {
-        super.onClick(mouseX, mouseY);
+    public void onClick(final MouseButtonEvent event, final boolean doubleClick) {
+        super.onClick(event, doubleClick);
         this.toggleActive();
     }
 
@@ -88,7 +89,7 @@ public class DiagramForceGroupToggle extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
+    protected void extractWidgetRenderState(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float partialTicks) {
         final Font font = Minecraft.getInstance().font;
         final boolean isEnabled = this.isEnabled();
         final int groupColor = (255 << 24) | this.group.color();

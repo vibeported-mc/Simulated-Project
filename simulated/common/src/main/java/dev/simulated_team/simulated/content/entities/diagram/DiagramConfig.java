@@ -46,7 +46,7 @@ public class DiagramConfig {
         final ObjectList<Identifier> enabledForceGroups = new ObjectArrayList<>();
 
         for (final Identifier groupId : ForceGroups.REGISTRY.keySet()) {
-            if (ForceGroups.REGISTRY.get(groupId).defaultDisplayed())
+            if (ForceGroups.REGISTRY.getValue(groupId).defaultDisplayed())
                 enabledForceGroups.add(groupId);
         }
 
