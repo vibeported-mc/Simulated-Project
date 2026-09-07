@@ -87,6 +87,29 @@ Sable's shader more tightly than they are today, and is a conversation to have w
 
 ---
 
+## 3. The End Sea preset can no longer pre-complete the dragon fight — parked
+
+The preset used to make the End reachable without killing the dragon, by writing
+`PrimaryLevelData`'s `EndDragonFight.Data` at world creation:
+
+```java
+((PrimaryLevelDataExtension) worldData).setEndDragonFight(
+        new EndDragonFight.Data(false, true, true, false, ...));
+```
+
+That record is gone. The fight became an `EnderDragonFight extends SavedData` with its own
+`SavedDataType`, and it is no longer a field on the level data at all — so there is nothing for the
+mixin to set.
+
+**Decision (2026-09-07): parked.** The rest of both world-preset mixins is intact: game rules are
+still applied, and the preset id is still stored and read back. Only the dragon-fight line is gone.
+
+Un-parking it means creating that saved data for the End dimension when the world is made, which is
+a server-side hook at a different point in world creation than the client-side screen mixin this
+lived in.
+
+---
+
 ## 3. Smaller things noted in passing
 
 - **The docking connector's unpair-on-turn.** `onRemove` used to see the replacing state, so a
