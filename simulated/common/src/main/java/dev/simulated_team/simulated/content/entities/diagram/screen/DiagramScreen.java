@@ -386,18 +386,38 @@ public class DiagramScreen extends AbstractSimiScreen {
         AdvancedFbo.unbind();
     }
 
+    /**
+     * @return whether anything has been drawn in the given rectangle of the diagram
+     *
+     * <h2>26.2 note</h2>
+     * <p>The rectangle is clamped to the framebuffer before it is read. It was not, and the read
+     * origin is {@code minY - height}, which goes negative for any box in the upper part of the
+     * sheet. Reading outside the attachment is undefined, and the driver's answer here was to take
+     * the process down: {@code EXCEPTION_ACCESS_VIOLATION} inside {@code nvoglv64.dll}, with
+     * {@code glReadPixels} at the top of the Java frames. Greebles are placed at random positions,
+     * so it only crashed on the openings that happened to roll a box near the top edge.
+     */
     private boolean aabbInFramebuffer(final AABB aabb) {
         final int minX = (int) aabb.minX;
         final int minY = (int) (DIAGRAM_TEXTURE.height - aabb.minY);
         final int maxX = (int) aabb.maxX;
         final int maxY = (int) (DIAGRAM_TEXTURE.height - aabb.maxY);
 
-        final int width = Math.abs(maxX - minX);
-        final int height = Math.abs(maxY - minY);
+        final int x0 = Math.max(0, Math.min(minX, maxX));
+        final int y0 = Math.max(0, Math.min(minY, maxY));
+        final int x1 = Math.min(DIAGRAM_TEXTURE.width, Math.max(minX, maxX));
+        final int y1 = Math.min(DIAGRAM_TEXTURE.height, Math.max(minY, maxY));
+
+        final int width = x1 - x0;
+        final int height = y1 - y0;
+
+        if (width <= 0 || height <= 0) {
+            return false;
+        }
 
         final int length = width * height;
         final int[] buffer = new int[length];
-        glReadPixels(minX, minY - height, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        glReadPixels(x0, y0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
         for (int i = 0; i < length; i++) {
             final int color = buffer[i] >> 24;

@@ -126,3 +126,40 @@ lived in.
 - **Paused sprite animation now holds the sub-frame too.** The old wrap blocked only the frame
   counter, so an interpolating sprite kept sweeping toward the next frame while "paused" — a wobble
   rather than a hold. Holding is what the caller asks for, but it is a visible difference.
+
+## The diagram still reads coarser than it did on 1.21.1
+
+The contraption diagram renders -- terrain, block entities, entities, lighting, outline, dither and
+palette all work -- but placed side by side with 1.21.1 it still looks blockier, with less tonal
+variety across a block face.
+
+Everything measurable about it matches. Measured off the framebuffers themselves, at the point the
+post pass hands the image over:
+
+| | measured | expected |
+|---|---|---|
+| Buffer size | 256x192 | `SimGUITextures.DIAGRAM` is `256, 192` on both versions |
+| Dither cell | 1 px (mean run 1.4-1.9) | 32x32 dither tiled 8x6 over 256x192 |
+| Distinct tones per scanline | 5-7 | 8-entry palette |
+| Blit | `NEAREST`, full UVs, exact size | unchanged from 1.21.1 |
+
+Two real faults were found and fixed along the way, both from Veil only creating a sampler object
+when a shader's JSON asks for one -- with the short `"Name": "<texture>"` form it binds sampler 0 and
+inherits whatever state the texture carries. On 1.21.1 that happened to be `GL_REPEAT` and nearest;
+26.2 textures carry their own sampler state and it is neither. The dither stopped tiling, and the
+palette lookup interpolated between entries, which flattened everything into mid-greys. Both textures
+now declare `filter` explicitly in `outline_diagram.json`.
+
+What is left is unexplained. The remaining suspicion is the input to the palette rather than the
+palette itself -- the shader takes `luminosity * 1.7` through a contrast curve that saturates at
+0.352, so the amount of usable tonal range depends entirely on where the render lands underneath it,
+and that is set by lighting constants this port had to derive rather than copy (see
+`SimpleSubLevelGroupRenderer.TERRAIN_AMBIENT` and `FEATURE_AMBIENT`).
+
+**To settle it, dump 1.21.1's own `finalFbo` and diff the two 256x192 images.** The instrumentation
+is four lines -- `glReadPixels` into a `BufferedImage` after `manager.runPipeline` in
+`DiagramScreen.draw` -- and the comparison is then arithmetic rather than judgement. This was
+attempted and abandoned: a 1.21.1 worktree cannot be built on this machine, because
+`maven.parchmentmc.org` times out so the Minecraft artifacts need `--offline`, while JEI, Veil and
+sable-companion for 1.21.1 are not in the Gradle cache so the compile needs the network. Anyone with
+a working 1.21.1 checkout can do it in one run.
