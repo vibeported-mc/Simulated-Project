@@ -41,6 +41,16 @@ neoForge {
             gameDirectory = project.file('runs/client')
         }
 
+        // Boots straight into runs/client/saves/porttest rather than stopping at the title screen.
+        // Reaching a level is the acceptance gate for most of this port, and clicking through the
+        // menus by hand is not something a run can do for itself.
+        clientWorld {
+            client()
+            gameDirectory = project.file('runs/client')
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'porttest'
+        }
+
         clientAuth {
             client()
             gameDirectory = project.file('runs/client')
