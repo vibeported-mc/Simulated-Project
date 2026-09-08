@@ -47,6 +47,11 @@ public class SimulatedClient {
             registry.registerFixedBuffer(VeilRenderLevelStageEvent.Stage.AFTER_PARTICLES, SimRenderTypes.laser());
             registry.registerFixedBuffer(VeilRenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS, SimRenderTypes.lens());
             registry.registerFixedBuffer(VeilRenderLevelStageEvent.Stage.AFTER_LEVEL, SimRenderTypes.staffOverlay());
+            // The physics staff's lock markers, drawn from PhysicsStaffRenderHandler at the same
+            // stage. They were never registered, which on 1.21.1 cost nothing because the buffer
+            // source was flushed wholesale each frame; on 26.2 only registered types have their
+            // batch ended, so the markers were written and then dropped.
+            registry.registerFixedBuffer(VeilRenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS, SimRenderTypes.lock());
         });
 
         VeilEventPlatform.INSTANCE.onVeilRenderLevelStage(SimulatedCommonClientEvents::onRenderLevelStage);
