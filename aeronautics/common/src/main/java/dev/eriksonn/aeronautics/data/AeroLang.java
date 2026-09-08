@@ -8,6 +8,7 @@ import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.content.ponder.AeroPonderPlugin;
 import dev.eriksonn.aeronautics.index.AeroAdvancements;
 import dev.eriksonn.aeronautics.index.AeroSoundEvents;
+import dev.simulated_team.simulated.data.SimDatagenRegistries;
 import net.createmod.catnip.api.lang.Lang;
 import net.createmod.catnip.api.lang.LangBuilder;
 import net.createmod.catnip.api.client.lang.LangNumberFormat;
@@ -98,7 +99,11 @@ public class AeroLang {
 		AeroSoundEvents.REGISTRY.provideLang(consumer);
 
 
-		PonderIndex.addPlugin(new AeroPonderPlugin());
+		// Compiling a ponder scene builds item stacks, and an item's default components are not
+// bound during datagen unless something binds them. Create's own ponder lang does the same.
+SimDatagenRegistries.bindItemComponents();
+
+PonderIndex.addPlugin(new AeroPonderPlugin());
 		PonderIndex.getLangAccess().provideLang(Aeronautics.MOD_ID, consumer);
 	}
 

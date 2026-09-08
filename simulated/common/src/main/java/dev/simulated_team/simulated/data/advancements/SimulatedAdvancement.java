@@ -40,6 +40,15 @@ public class SimulatedAdvancement {
 
     AdvancementHolder datagenResult;
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>The builder's {@code display} is filled in when the advancement is saved rather than when it
+     * is declared. Declaring one is class initialisation, which runs during registration; naming an
+     * item there asks the item registry for a value it has not bound yet, which throws and takes the
+     * whole registration with it. Saving happens during datagen, by which point everything exists.
+     */
+    private Builder display;
+
     private final Identifier background;
     private final String lang;
 
@@ -63,10 +72,7 @@ public class SimulatedAdvancement {
             this.builder.addCriterion("0", this.builtinTrigger.createCriterion(this.builtinTrigger.instance()));
         }
 
-        // 26.2: the icon is an ItemStackTemplate, and the overload taking a stack is gone.
-        this.builder.display(t.icon.get(), Component.translatable(this.titleKey()),
-                Component.translatable(this.descriptionKey()).withStyle(s -> s.withColor(SimColors.ADVANCABLE_GOLD)),
-                id.equals("root") ? this.background : null, t.type.advancementType, t.type.toast, t.type.announce, t.type.hide);
+        this.display = t;
 
         if(t.type == TaskType.SECRET)
             this.description += SECRET_SUFFIX;
@@ -126,6 +132,12 @@ public class SimulatedAdvancement {
     }
 
     public void save(final Consumer<AdvancementHolder> t) {
+        // 26.2: the icon is an ItemStackTemplate, and the overload taking a stack is gone.
+        this.builder.display(this.display.icon.get(), Component.translatable(this.titleKey()),
+                Component.translatable(this.descriptionKey()).withStyle(st -> st.withColor(SimColors.ADVANCABLE_GOLD)),
+                this.id.equals("root") ? this.background : null, this.display.type.advancementType,
+                this.display.type.toast, this.display.type.announce, this.display.type.hide);
+
         if (this.parent != null)
             this.builder.parent(this.parent.datagenResult);
 

@@ -34,12 +34,17 @@ neoForge {
 
         // 26.2 port: datagen is split by side, so there are two runs rather than one --
         // matching the GatherDataEvent.Client / .Server split the providers were ported onto.
+        //
+        // The two runs share an output directory and datagen prunes whatever the current run does
+        // not produce, so running one side alone deletes the other side's files. Pass
+        // -PdataOut=<dir> to write somewhere else -- which is how a run is verified without
+        // rewriting the committed tree, and how the two sides are generated separately and merged.
         clientData {
             clientData()
             gameDirectory = project.file('runs/data')
             programArguments.addAll '--all',
                     '--mod', 'aeronautics',
-                    '--output', generatedResources.absolutePath,
+                    '--output', (project.hasProperty('dataOut') ? file(project.property('dataOut')) : generatedResources).absolutePath,
                     '--existing', commonResources.absolutePath
         }
 
@@ -48,7 +53,7 @@ neoForge {
             gameDirectory = project.file('runs/data')
             programArguments.addAll '--all',
                     '--mod', 'aeronautics',
-                    '--output', generatedResources.absolutePath,
+                    '--output', (project.hasProperty('dataOut') ? file(project.property('dataOut')) : generatedResources).absolutePath,
                     '--existing', commonResources.absolutePath
         }
     }

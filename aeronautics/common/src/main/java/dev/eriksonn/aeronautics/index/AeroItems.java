@@ -4,6 +4,7 @@ import com.simibubi.create.AllItems;
 import dev.simulated_team.simulated.registrate.SimulatedRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
+import dev.eriksonn.aeronautics.data.AeroJukeboxSongs;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.content.components.Levitating;
 import dev.eriksonn.aeronautics.content.items.AviatorsGogglesItem;
@@ -35,7 +36,7 @@ public class AeroItems {
 					.properties(p -> p
 							.stacksTo(1)
 							.rarity(Rarity.RARE)
-							.jukeboxPlayable(ResourceKey.create(Registries.JUKEBOX_SONG, Aeronautics.path("cloud_skipper")))
+							.jukeboxPlayable(AeroJukeboxSongs.CLOUD_SKIPPER)
 							.component(AeroDataComponents.LEVITATING, Levitating.DEFAULT)
 					)
 					.tag(AeroTags.ItemTags.MUSIC_DISCS)

@@ -1,16 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "G": {
-      "item": "create:gearbox"
-    },
-    "I": {
-      "item": "create:industrial_iron_block"
-    },
-    "S": {
-      "tag": "minecraft:wooden_slabs"
-    }
+    "G": "create:gearbox",
+    "I": "create:industrial_iron_block",
+    "S": "#minecraft:wooden_slabs"
   },
   "pattern": [
     "S",
@@ -18,7 +11,6 @@
     "I"
   ],
   "result": {
-    "count": 1,
     "id": "offroad:borehead_bearing"
   }
 }

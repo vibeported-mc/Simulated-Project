@@ -29,10 +29,7 @@
     "balloon.LevelChunkMixin",
     "custom_situational_music.MusicManagerAccessor",
     "levitite.PonderUIMixin",
-    "levitite.TerrainParticleMixin",
-    "render.iris.WorldRenderingPhaseMixin",
-    "render.sodium.DefaultMaterialsMixin",
-    "render.sodium.SodiumWorldRendererMixin"
+    "levitite.TerrainParticleMixin"
   ],
   "server": [],
   "injectors": {

@@ -8,6 +8,7 @@ import dev.ryanhcode.offroad.Offroad;
 import dev.ryanhcode.offroad.content.ponder.OffroadPonderPlugin;
 import dev.ryanhcode.offroad.index.OffroadAdvancements;
 import dev.ryanhcode.offroad.index.OffroadSoundEvents;
+import dev.simulated_team.simulated.data.SimDatagenRegistries;
 import net.createmod.catnip.api.lang.Lang;
 import net.createmod.catnip.api.lang.LangBuilder;
 import net.createmod.catnip.api.client.lang.LangNumberFormat;
@@ -94,6 +95,10 @@ public class OffroadLang {
 
         OffroadAdvancements.provideLang(consumer);
         OffroadSoundEvents.REGISTRY.provideLang(consumer);
+
+        // Compiling a ponder scene builds item stacks, and an item's default components are not
+        // bound during datagen unless something binds them. Create's own ponder lang does the same.
+        SimDatagenRegistries.bindItemComponents();
 
         PonderIndex.addPlugin(new OffroadPonderPlugin());
         PonderIndex.getLangAccess().provideLang(Offroad.MOD_ID, consumer);

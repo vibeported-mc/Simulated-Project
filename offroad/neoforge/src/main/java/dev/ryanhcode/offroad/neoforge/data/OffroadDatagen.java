@@ -1,5 +1,6 @@
 package dev.ryanhcode.offroad.neoforge.data;
 
+import dev.simulated_team.simulated.data.SimDatagenRegistries;
 import dev.ryanhcode.offroad.Offroad;
 import dev.ryanhcode.offroad.data.OffroadAdvancementTriggers;
 import dev.ryanhcode.offroad.index.OffroadAdvancements;
@@ -28,6 +29,7 @@ public class OffroadDatagen {
     private static boolean addedGenerators;
 
     public static void gatherDataHighPriority(final GatherDataEvent event) {
+        SimDatagenRegistries.set(event.getLookupProvider());
         if (addedGenerators)
             return;
         addedGenerators = true;

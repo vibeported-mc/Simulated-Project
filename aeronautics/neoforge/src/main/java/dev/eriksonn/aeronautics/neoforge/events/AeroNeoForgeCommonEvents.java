@@ -1,5 +1,7 @@
 package dev.eriksonn.aeronautics.neoforge.events;
 
+import dev.simulated_team.simulated.data.SimDatagenRegistries;
+import dev.eriksonn.aeronautics.data.AeroGeneratedEntries;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.data.AeroEquipmentAssets;
 import dev.eriksonn.aeronautics.data.AeroAdvancementTriggers;
@@ -65,13 +67,30 @@ public class AeroNeoForgeCommonEvents {
 		 */
 		private static boolean addedGenerators;
 
+		/**
+		 * <h2>26.2 note</h2>
+		 * <p>The registries datagen hands over do not contain this mod's own datapack entries -- only
+		 * what a {@code DatapackBuiltinEntriesProvider} has put there. The music disc names a jukebox
+		 * song, and binding its components resolves that reference, so anything that binds components
+		 * needs the enriched view rather than the raw one.
+		 *
+		 * <p>Both sides need it: the lang provider binds components to compile ponder scenes, and it
+		 * runs on the client, where the entries provider itself does not.
+		 */
+		private static CompletableFuture<HolderLookup.Provider> withGeneratedEntries(final GatherDataEvent event) {
+			return new AeroGeneratedEntries(event.getGenerator().getPackOutput(), event.getLookupProvider())
+					.getRegistryProvider();
+		}
+
 		@SubscribeEvent(priority = EventPriority.HIGH)
 		public static void gatherDataHighPriority(GatherDataEvent.Server event) {
+			SimDatagenRegistries.set(withGeneratedEntries(event));
 			addGenerators();
 		}
 
 		@SubscribeEvent(priority = EventPriority.HIGH)
 		public static void gatherDataHighPriority(GatherDataEvent.Client event) {
+			SimDatagenRegistries.set(withGeneratedEntries(event));
 			addGenerators();
 		}
 
@@ -87,8 +106,14 @@ public class AeroNeoForgeCommonEvents {
 			final PackOutput output = event.getGenerator().getPackOutput();
 			final CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-			event.addProvider(new AeroAdvancements(output, lookupProvider));
-			event.addProvider(AeroProcessingRecipeGen.registerAll(output, lookupProvider));
+			// The datapack entries have to be generated before anything that resolves them: the
+			// advancements and the recipes both bind item components, and the music disc names a
+			// jukebox song that only exists once this has run.
+			final AeroGeneratedEntries generatedEntries = new AeroGeneratedEntries(output, lookupProvider);
+			event.addProvider(generatedEntries);
+
+			event.addProvider(new AeroAdvancements(output, generatedEntries.getRegistryProvider()));
+			event.addProvider(AeroProcessingRecipeGen.registerAll(output, generatedEntries.getRegistryProvider()));
 		}
 
 		@SubscribeEvent

@@ -1,14 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "group": "aeronautics:envelope",
   "key": {
-    "S": {
-      "item": "minecraft:stick"
-    },
-    "W": {
-      "item": "minecraft:white_wool"
-    }
+    "S": "minecraft:stick",
+    "W": "minecraft:white_wool"
   },
   "pattern": [
     "WS",
