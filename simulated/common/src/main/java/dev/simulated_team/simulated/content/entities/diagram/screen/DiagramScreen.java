@@ -32,6 +32,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.createmod.catnip.api.client.gui.AbstractSimiScreen;
 import net.createmod.catnip.api.lang.LangBuilder;
 import net.createmod.catnip.api.theme.Color;
+import dev.simulated_team.simulated.util.SimGuiBlit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -1088,7 +1089,7 @@ public class DiagramScreen extends AbstractSimiScreen {
                                     Greeble.TextureSlice slice) implements Renderable {
         @Override
         public void extractRenderState(final GuiGraphicsExtractor guiGraphics, final int i, final int i1, final float v) {
-            guiGraphics.blit(this.texture, this.x, this.y, this.slice.x(), this.slice.y(), this.slice.width(), this.slice.height(), this.width, this.height);
+            SimGuiBlit.blit(guiGraphics, this.texture, this.x, this.y, this.slice.x(), this.slice.y(), this.slice.width(), this.slice.height(), this.width, this.height);
         }
     }
 }

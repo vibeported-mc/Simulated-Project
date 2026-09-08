@@ -8,6 +8,7 @@ import dev.simulated_team.simulated.service.SimConfigService;
 import dev.simulated_team.simulated.util.hold_interaction.BlockHoldInteraction;
 import dev.simulated_team.simulated.util.hold_interaction.HoldInteractionManager;
 import foundry.veil.api.network.VeilPacketManager;
+import dev.simulated_team.simulated.util.SimGuiBlit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
@@ -56,7 +57,7 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
         final int x = ((width1 - 223) / 2) + SimConfigService.INSTANCE.client().blockConfig.steeringWheelXOffset.get();
         final int y = 10 + SimConfigService.INSTANCE.client().blockConfig.steeringWheelYOffset.get();
 
-        guiGraphics.blit(tex, x, y, 0, 0, 223, 31, 256, 256);
+        SimGuiBlit.blit(guiGraphics, tex, x, y, 0, 0, 223, 31, 256, 256);
 
         final float offset = wrapDegrees(angleLimit) * magicOffset;
         final int activeWidth = (int) Math.abs(offset);
@@ -66,47 +67,47 @@ public class SteeringWheelHandler extends BlockHoldInteraction {
         if (Math.abs(angleLimit) <= 180) {
             final int leftDeadZoneWidth = (centerX - x) - activeWidth + 4;
             if (leftDeadZoneWidth > 0) {
-                guiGraphics.blit(tex, x, y, 0, 32, leftDeadZoneWidth, 31, 256, 256);
+                SimGuiBlit.blit(guiGraphics, tex, x, y, 0, 32, leftDeadZoneWidth, 31, 256, 256);
             }
 
             final int rightSideStart = (centerX + activeWidth) + 8;
             final int rightDeadZoneWidth = (x + 223) - rightSideStart;
             if (rightDeadZoneWidth > 0) {
-                guiGraphics.blit(tex, rightSideStart, y, (rightSideStart - x), 32, rightDeadZoneWidth, 31, 256, 256);
+                SimGuiBlit.blit(guiGraphics, tex, rightSideStart, y, (rightSideStart - x), 32, rightDeadZoneWidth, 31, 256, 256);
             }
         } else {
             if (realDegrees <= -180) {
                 final int rightSideStart = (centerX - activeWidth) + 4;
                 final int rightDeadZoneWidth = (x + 223) - rightSideStart;
                 if (rightDeadZoneWidth > 0) {
-                    guiGraphics.blit(tex, rightSideStart, y, (rightSideStart - x), 32, rightDeadZoneWidth, 31, 256, 256);
+                    SimGuiBlit.blit(guiGraphics, tex, rightSideStart, y, (rightSideStart - x), 32, rightDeadZoneWidth, 31, 256, 256);
                 }
             }
 
             if (realDegrees >= 180) {
                 final int leftDeadZoneWidth = (centerX - x) + activeWidth + 4;
                 if (leftDeadZoneWidth > 0) {
-                    guiGraphics.blit(tex, x, y, 0, 32, leftDeadZoneWidth, 31, 256, 256);
+                    SimGuiBlit.blit(guiGraphics, tex, x, y, 0, 32, leftDeadZoneWidth, 31, 256, 256);
                 }
             }
         }
 
         if (Math.abs(angleLimit) > 180) {
             if (-realDegrees >= 180) {
-                guiGraphics.blit(tex, (int)(centerX + offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
+                SimGuiBlit.blit(guiGraphics, tex, (int)(centerX + offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
             }
 
             if (-realDegrees <= -180) {
-                guiGraphics.blit(tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
+                SimGuiBlit.blit(guiGraphics, tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
             }
         } else {
-            guiGraphics.blit(tex, (int)(centerX + offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
-            guiGraphics.blit(tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
+            SimGuiBlit.blit(guiGraphics, tex, (int)(centerX + offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
+            SimGuiBlit.blit(guiGraphics, tex, (int)(centerX - offset) + 2, y + 10, 239, 0, 6, 20, 256, 256);
         }
 
         final float degrees = Math.abs(angleLimit) <= 180 ? Mth.clamp(realDegrees, -180f, 180f) : wrapDegrees(realDegrees);
         final int markerX = (int) (centerX - degrees * magicOffset) + 1;
-        guiGraphics.blit(tex, markerX, y + 11, 224, 0, 9, 18, 256, 256);
+        SimGuiBlit.blit(guiGraphics, tex, markerX, y + 11, 224, 0, 9, 18, 256, 256);
 
         final String text = (int) -realDegrees + "°";
         final int textWidth = mc.font.width(text);
