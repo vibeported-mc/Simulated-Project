@@ -1262,8 +1262,18 @@ for p in _scanned:
                 n = sel.split("(")[0].strip()
                 if ";" in n:
                     n = n.rsplit(";", 1)[1]
-                if n and "*" not in n and not n.startswith("<"):
+                if not n or n.startswith("<"):
+                    continue
+                if "*" not in n:
                     names.append(n)
+                elif n.endswith("*") and "*" not in n[:-1]:
+                    # A trailing wildcard is a prefix match. It is worth resolving rather than
+                    # skipping: simulated's "setupAnim*" matched a method whose whole parameter list
+                    # 26.2 replaced, and skipping the selector skipped the check that would have
+                    # said so. Only an unambiguous prefix is usable.
+                    matched = [k for k in sigs if k.startswith(n[:-1])]
+                    if len(matched) == 1:
+                        names.append(matched[0])
             if len(names) != 1 or names[0] not in sigs:
                 continue  # ambiguous or already reported
 

@@ -11,6 +11,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionResult;
 import dev.simulated_team.simulated.index.client.SimCustomItemRenderers;
+import dev.simulated_team.simulated.content.blocks.handle.PlayerHoldingHandleRenderer;
+import net.minecraft.client.entity.ClientAvatarEntity;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.world.entity.Avatar;
+import net.neoforged.neoforge.client.renderstate.AvatarRenderStateModifier;
+import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -105,6 +111,22 @@ public class SimNeoForgeClientEvents {
 		@SubscribeEvent
 		public static void clientSetup(final FMLClientSetupEvent event) {
 			event.enqueueWork(SimCustomItemRenderers::register);
+		}
+
+		/**
+		 * <h2>26.2 note</h2>
+		 * <p>A model's {@code setupAnim} is handed a render state and nothing else, so anything it needs
+		 * to know about the entity has to be put there while the entity is still in hand. This is the
+		 * hook NeoForge provides for that.
+		 */
+		@SubscribeEvent
+		public static void registerRenderStateModifiers(final RegisterRenderStateModifiersEvent event) {
+			event.registerAvatarEntityModifier(new AvatarRenderStateModifier() {
+				@Override
+				public <T extends Avatar & ClientAvatarEntity> void accept(final T avatar, final AvatarRenderState state) {
+					PlayerHoldingHandleRenderer.extractRenderState(avatar.getUUID(), state);
+				}
+			});
 		}
 
 		@SubscribeEvent
