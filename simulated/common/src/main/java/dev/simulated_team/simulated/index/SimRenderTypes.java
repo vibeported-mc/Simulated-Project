@@ -48,8 +48,13 @@ public final class SimRenderTypes {
             VeilRenderBridge.createRenderType("simulated/staff_overlay/staff_overlay", DefaultVertexFormat.POSITION_COLOR)
                     // The one type here that is not quads; 26.2 keeps the topology on the pipeline.
                     .primitiveTopology(PrimitiveTopology.TRIANGLE_STRIP)
-                    .vertexShader(Simulated.path("staff_overlay/staff_overlay"))
-                    .fragmentShader(Simulated.path("staff_overlay/staff_overlay"))
+                    // 26.2: the shader this named has never existed -- not here and not on 1.21.1,
+                    // where a missing Veil program merely failed to draw. A pipeline with a missing
+                    // shader is fatal, and this type is registered as a fixed buffer, so it would
+                    // have taken the game down the first time the staff drew. Vanilla's plain
+                    // position-colour shader is what the overlay wants anyway.
+                    .vertexShader(Identifier.withDefaultNamespace("core/position_color"))
+                    .fragmentShader(Identifier.withDefaultNamespace("core/position_color"))
                     .snippet(VeilRenderPipelines.translucentBlend())
                     // COLOR_WRITE: colour only, so depth writing is off.
                     .snippet(VeilRenderPipelines.noDepthWrite())
@@ -61,8 +66,8 @@ public final class SimRenderTypes {
     private static final RenderType LASER = RenderType.create(
             Simulated.MOD_ID + ":laser",
             VeilRenderBridge.createRenderType("simulated/laser", DefaultVertexFormat.POSITION_TEX_COLOR)
-                    .vertexShader(Simulated.path("laser/laser"))
-                    .fragmentShader(Simulated.path("laser/laser"))
+                    .vertexShader(Simulated.path("core/laser/laser"))
+                    .fragmentShader(Simulated.path("core/laser/laser"))
                     .snippet(VeilRenderPipelines.translucentBlend())
                     .snippet(VeilRenderPipelines.noCull())
                     .sortOnUpload()
@@ -73,8 +78,8 @@ public final class SimRenderTypes {
             VeilRenderBridge.createRenderType("simulated/laser_pointer_lens", DefaultVertexFormat.BLOCK)
                     // The old builder set a shader twice -- the vanilla cutout shader and then Veil's
                     // -- and the second won. Only the winner is named here.
-                    .vertexShader(Simulated.path("laser_pointer/lens"))
-                    .fragmentShader(Simulated.path("laser_pointer/lens"))
+                    .vertexShader(Simulated.path("core/laser_pointer/lens"))
+                    .fragmentShader(Simulated.path("core/laser_pointer/lens"))
                     .texture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
                     .useLightmap()
                     .affectsCrumbling()
@@ -112,8 +117,8 @@ public final class SimRenderTypes {
     private static final RenderType ROPE = RenderType.create(
             Simulated.MOD_ID + ":rope",
             VeilRenderBridge.createRenderType("simulated/rope", DefaultVertexFormat.BLOCK)
-                    .vertexShader(Simulated.path("rope/rope"))
-                    .fragmentShader(Simulated.path("rope/rope"))
+                    .vertexShader(Simulated.path("core/rope/rope"))
+                    .fragmentShader(Simulated.path("core/rope/rope"))
                     .texture("Sampler0", Simulated.path("textures/block/rope_particle.png"))
                     .useLightmap()
                     .snippet(VeilRenderPipelines.cull())
@@ -123,8 +128,8 @@ public final class SimRenderTypes {
     private static final Function<Identifier, RenderType> SPRING = Util.memoize((Identifier texture) ->
             RenderType.create("spring",
                     VeilRenderBridge.createRenderType("spring", SPRING_FORMAT)
-                            .vertexShader(Simulated.path("spring/spring"))
-                            .fragmentShader(Simulated.path("spring/spring"))
+                            .vertexShader(Simulated.path("core/spring/spring"))
+                            .fragmentShader(Simulated.path("core/spring/spring"))
                             .texture("Sampler0", texture)
                             .snippet(VeilRenderPipelines.noBlend())
                             .useLightmap()
@@ -146,8 +151,9 @@ public final class SimRenderTypes {
     private static final RenderType END_SEA = RenderType.create(
             Simulated.MOD_ID + ":end_sea",
             VeilRenderBridge.createRenderType("simulated/end_sea", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP)
-                    .vertexShader(Simulated.path("end_sea"))
-                    .fragmentShader(Simulated.path("end_sea"))
+                    .vertexShader(Simulated.path("core/end_sea"))
+                    .fragmentShader(Simulated.path("core/end_sea"))
+                    .texture("SkySampler", Identifier.withDefaultNamespace("textures/entity/end_portal.png"))
                     .snippet(VeilRenderPipelines.additiveBlend())
                     .snippet(VeilRenderPipelines.lequalDepthTest())
                     .snippet(VeilRenderPipelines.noDepthWrite())

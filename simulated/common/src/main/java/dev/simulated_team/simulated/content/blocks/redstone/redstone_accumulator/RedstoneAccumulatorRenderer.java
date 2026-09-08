@@ -32,7 +32,7 @@ import net.minecraft.world.phys.Vec3;
 public class RedstoneAccumulatorRenderer
         extends SmartBlockEntityRenderer<RedstoneAccumulatorBlockEntity, RedstoneAccumulatorRenderer.RedstoneAccumulatorRenderState> {
 
-    public static Identifier SHADER_NAME = Simulated.path("redstone_accumulator/diode");
+    public static Identifier SHADER_NAME = Simulated.path("core/redstone_accumulator/diode");
     public static RenderType DIODE_RENDER_TYPE = RenderType.create("redstone_accumulator_diode",
             VeilRenderBridge.createRenderType("redstone_accumulator_diode", DefaultVertexFormat.BLOCK)
                     .vertexShader(SHADER_NAME)

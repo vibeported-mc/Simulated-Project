@@ -36,7 +36,23 @@ import net.minecraft.resources.Identifier;
  */
 public final class AeroRenderTypes {
 
-    public static final Identifier LEVITITE_SHADER = Aeronautics.path("levitite/levitite");
+    /**
+     * <h2>26.2 note -- this is not the levitite shader</h2>
+     * <p>It is vanilla's ordinary block shader, and levitite draws as an ordinary block.
+     *
+     * <p>The real one cannot be a render type's shader on 26.2. It declares tessellation control and
+     * evaluation stages, which a {@code RenderPipeline} has no way to express; it samples the main
+     * framebuffer's depth, which a render type's static texture bindings cannot supply; and it reads
+     * a dozen per-draw uniforms -- the sub-level's velocity, orientation and material matrices --
+     * through a Veil shader block, which is the one thing a pipeline's engine-filled uniform buffers
+     * leave no room for.
+     *
+     * <p>Pointing the pipeline at the Veil program instead is what the port did, and it does not
+     * work: vanilla resolves a pipeline's shader under {@code assets/<namespace>/shaders/} and never
+     * finds it, so the first levitite drawn threw "Pipeline contains invalid shader program" and took
+     * the game down. Drawing plain is the honest failure. See AERONAUTICS-26.2-OPEN-QUESTIONS.md.
+     */
+    private static final Identifier LEVITITE_SHADER = Identifier.withDefaultNamespace("core/block");
 
     private static final RenderType LEVITITE = RenderType.create(
             Aeronautics.MOD_ID + ":levitite",
