@@ -13,7 +13,6 @@
     "creative_tab_sections.ItemPickerMenuMixin",
     "creative_tab_sections.SpriteContentsMixin",
     "creative_tab_sections.SpriteAnimationStateMixin",
-    "end_sea.LevelRendererMixin",
     "handle.ExtendoGripRenderHandlerMixin",
     "handle.HumanoidModelMixin",
     "handle.LocalPlayerMixin",

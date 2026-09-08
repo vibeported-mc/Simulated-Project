@@ -103,8 +103,24 @@ public class SimulatedCommonClientEvents {
         return Result.empty();
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>The End Sea used to be drawn from a mixin into {@code LevelRenderer.renderLevel}, hooked at
+     * the call to {@code renderDebug}. Neither survives: {@code renderLevel} takes a render state and
+     * a frame graph now, and the debug pass is one of many things submitted rather than a call made
+     * in sequence.
+     *
+     * <p>It draws from Veil's stage event instead, which is where its own shadow renderer already
+     * runs -- and which is the honest home for it, since the sea is an immediate draw of a Veil
+     * render type rather than geometry submitted to vanilla's collector. {@code AFTER_WEATHER} is the
+     * late stage that still has the level's depth buffer, matching where the old hook sat.
+     */
     public static void onRenderLevelStage(final VeilRenderLevelStageEvent.Stage stage, final LevelRenderer levelRenderer, final CachedBufferSource bufferSource, final MatrixStack matrixStack, final Matrix4fc matrix4fc, final Matrix4fc matrix4fc1, final int i, final DeltaTracker deltaTracker, final Camera camera, final Frustum frustum) {
         PhysicsStaffRenderHandler.renderSelectionBox(stage, levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc1, i, deltaTracker, camera, frustum);
+
+        if (stage == VeilRenderLevelStageEvent.Stage.AFTER_WEATHER) {
+            EndSeaRenderer.render(camera, Minecraft.getInstance().gameRenderer);
+        }
     }
 
     public static void onAfterKeyPress(final int key, final int scanCode, final int action, final int modifiers) {
