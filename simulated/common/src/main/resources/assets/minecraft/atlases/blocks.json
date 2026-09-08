@@ -11,6 +11,16 @@
     {
       "type": "single",
       "resource": "simulated:entity/diagram_small"
+    },
+    {
+      "type": "single",
+      "resource": "simulated:item/zapper_staff",
+      "sprite": "simulated:block/zapper_staff"
+    },
+    {
+      "type": "single",
+      "resource": "simulated:item/plungerlauncher",
+      "sprite": "simulated:block/plungerlauncher"
     }
   ]
 }

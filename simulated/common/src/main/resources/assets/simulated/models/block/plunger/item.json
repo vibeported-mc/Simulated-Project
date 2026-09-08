@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "simulated:item/plungerlauncher",
-		"particle": "simulated:item/plungerlauncher"
+		"0": "simulated:block/plungerlauncher",
+		"particle": "simulated:block/plungerlauncher"
 	},
 	"elements": [
 		{
