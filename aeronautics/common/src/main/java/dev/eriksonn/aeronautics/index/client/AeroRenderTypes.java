@@ -40,7 +40,7 @@ public final class AeroRenderTypes {
 
     private static final RenderType LEVITITE = RenderType.create(
             Aeronautics.MOD_ID + ":levitite",
-            VeilRenderBridge.createRenderType(Aeronautics.MOD_ID + ":levitite", DefaultVertexFormat.BLOCK)
+            VeilRenderBridge.createRenderType("aeronautics/levitite", DefaultVertexFormat.BLOCK)
                     .vertexShader(LEVITITE_SHADER)
                     .fragmentShader(LEVITITE_SHADER)
                     .snippet(VeilRenderPipelines.translucentBlend())
@@ -52,7 +52,7 @@ public final class AeroRenderTypes {
 
     private static final RenderType LEVITITE_GHOSTS = RenderType.create(
             Aeronautics.MOD_ID + ":levitite_ghosts",
-            VeilRenderBridge.createRenderType(Aeronautics.MOD_ID + ":levitite_ghosts", DefaultVertexFormat.BLOCK)
+            VeilRenderBridge.createRenderType("aeronautics/levitite_ghosts", DefaultVertexFormat.BLOCK)
                     .vertexShader(LEVITITE_SHADER)
                     .fragmentShader(LEVITITE_SHADER)
                     .snippet(VeilRenderPipelines.translucentBlend())

@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.index;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.GpuFormat;
@@ -44,7 +45,9 @@ public final class SimRenderTypes {
 
     private static final RenderType STAFF_OVERLAY = RenderType.create(
             Simulated.MOD_ID + ":staff_overlay/staff_overlay",
-            VeilRenderBridge.createRenderType(Simulated.MOD_ID + ":staff_overlay/staff_overlay", DefaultVertexFormat.POSITION_COLOR)
+            VeilRenderBridge.createRenderType("simulated/staff_overlay/staff_overlay", DefaultVertexFormat.POSITION_COLOR)
+                    // The one type here that is not quads; 26.2 keeps the topology on the pipeline.
+                    .primitiveTopology(PrimitiveTopology.TRIANGLE_STRIP)
                     .vertexShader(Simulated.path("staff_overlay/staff_overlay"))
                     .fragmentShader(Simulated.path("staff_overlay/staff_overlay"))
                     .snippet(VeilRenderPipelines.translucentBlend())
@@ -57,7 +60,7 @@ public final class SimRenderTypes {
 
     private static final RenderType LASER = RenderType.create(
             Simulated.MOD_ID + ":laser",
-            VeilRenderBridge.createRenderType(Simulated.MOD_ID + ":laser", DefaultVertexFormat.POSITION_TEX_COLOR)
+            VeilRenderBridge.createRenderType("simulated/laser", DefaultVertexFormat.POSITION_TEX_COLOR)
                     .vertexShader(Simulated.path("laser/laser"))
                     .fragmentShader(Simulated.path("laser/laser"))
                     .snippet(VeilRenderPipelines.translucentBlend())
@@ -67,7 +70,7 @@ public final class SimRenderTypes {
 
     private static final RenderType LENS = RenderType.create(
             Simulated.MOD_ID + ":laser_pointer_lens",
-            VeilRenderBridge.createRenderType(Simulated.MOD_ID + ":laser_pointer_lens", DefaultVertexFormat.BLOCK)
+            VeilRenderBridge.createRenderType("simulated/laser_pointer_lens", DefaultVertexFormat.BLOCK)
                     // The old builder set a shader twice -- the vanilla cutout shader and then Veil's
                     // -- and the second won. Only the winner is named here.
                     .vertexShader(Simulated.path("laser_pointer/lens"))
@@ -95,7 +98,7 @@ public final class SimRenderTypes {
 
     private static final RenderType LOCK = RenderType.create(
             Simulated.MOD_ID + ":lock",
-            VeilRenderBridge.createRenderType(Simulated.MOD_ID + ":lock", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP)
+            VeilRenderBridge.createRenderType("simulated/lock", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP)
                     // This one used a vanilla shader rather than a Veil program. 26.2's equivalent
                     // pipeline shaders live under minecraft:core, named the same way.
                     .vertexShader(Identifier.withDefaultNamespace("core/position_color_tex_lightmap"))
@@ -108,7 +111,7 @@ public final class SimRenderTypes {
 
     private static final RenderType ROPE = RenderType.create(
             Simulated.MOD_ID + ":rope",
-            VeilRenderBridge.createRenderType(Simulated.MOD_ID + ":rope", DefaultVertexFormat.BLOCK)
+            VeilRenderBridge.createRenderType("simulated/rope", DefaultVertexFormat.BLOCK)
                     .vertexShader(Simulated.path("rope/rope"))
                     .fragmentShader(Simulated.path("rope/rope"))
                     .texture("Sampler0", Simulated.path("textures/block/rope_particle.png"))
@@ -142,7 +145,7 @@ public final class SimRenderTypes {
      */
     private static final RenderType END_SEA = RenderType.create(
             Simulated.MOD_ID + ":end_sea",
-            VeilRenderBridge.createRenderType(Simulated.MOD_ID + ":end_sea", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP)
+            VeilRenderBridge.createRenderType("simulated/end_sea", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP)
                     .vertexShader(Simulated.path("end_sea"))
                     .fragmentShader(Simulated.path("end_sea"))
                     .snippet(VeilRenderPipelines.additiveBlend())

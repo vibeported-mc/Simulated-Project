@@ -66,7 +66,7 @@ public class HotAirBurnerRenderer
     private static synchronized RenderType flameType(final float palette) {
         return FLAME_TYPES.computeIfAbsent(palette, p -> RenderType.create(
                 "aeronautics:burner_flame/" + p,
-                VeilRenderBridge.createRenderType("aeronautics:burner_flame/" + p, DefaultVertexFormat.BLOCK)
+                VeilRenderBridge.createRenderType("aeronautics/burner_flame/" + p, DefaultVertexFormat.BLOCK)
                         .vertexShader(BURNER_FLAME_SHADER)
                         .fragmentShader(BURNER_FLAME_SHADER)
                         .snippet(VeilRenderPipelines.translucentBlend())
