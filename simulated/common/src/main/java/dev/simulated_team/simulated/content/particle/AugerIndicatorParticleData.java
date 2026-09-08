@@ -13,8 +13,6 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 /**
  * Stolen shamelessly from {@link com.simibubi.create.content.kinetics.base.RotationIndicatorParticleData}
@@ -81,7 +79,6 @@ public class AugerIndicatorParticleData implements ParticleOptions, ICustomParti
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public ParticleResources.SpriteParticleRegistration<AugerIndicatorParticleData> getMetaFactory() {
         return AugerIndicatorParticle.Factory::new;
     }

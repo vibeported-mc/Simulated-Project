@@ -41,6 +41,12 @@ public class AeroNeoForgeClientEvents {
     @SubscribeEvent
     public static void selectMusic(final SelectMusicEvent event) {
         final Minecraft minecraft = Minecraft.getInstance();
+        // The music manager ticks on the title screen too, where there is no level and no player.
+        // The mixin this replaces sat inside a path that only ran in-world, so it never had to say so.
+        if (minecraft.level == null || minecraft.player == null) {
+            return;
+        }
+
         final Music custom = CustomSituationalMusic.getSituationalMusic(minecraft.level, minecraft.player);
 
         if (custom != null) {
