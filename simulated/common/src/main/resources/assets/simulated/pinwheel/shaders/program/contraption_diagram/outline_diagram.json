@@ -6,7 +6,7 @@
       "type": "location",
       "location": "simulated:textures/effects/diagram_palette.png",
       "filter": {
-        "blur": false,
+        "blur": true,
         "wrapX": "clamp_to_edge",
         "wrapY": "clamp_to_edge"
       }
@@ -15,7 +15,7 @@
       "type": "location",
       "location": "simulated:textures/effects/dither.png",
       "filter": {
-        "blur": false,
+        "blur": true,
         "wrapX": "repeat",
         "wrapY": "repeat"
       }
