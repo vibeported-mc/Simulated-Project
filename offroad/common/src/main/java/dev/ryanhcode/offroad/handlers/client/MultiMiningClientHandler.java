@@ -3,7 +3,6 @@ package dev.ryanhcode.offroad.handlers.client;
 import com.simibubi.create.content.kinetics.base.BlockBreakingKineticBlockEntity;
 import dev.engine_room.flywheel.lib.util.LevelAttached;
 import dev.ryanhcode.offroad.handlers.MultiminingDataTickResult;
-import dev.ryanhcode.offroad.mixin.client.multimining_destruction_progress.ClientLevelAccessor;
 import dev.ryanhcode.offroad.mixin_interface.level_renderer.MultiMiningDestructionExtension;
 import dev.ryanhcode.sable.util.LevelAccelerator;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -100,8 +99,9 @@ public class MultiMiningClientHandler {
     }
 
     private void bulkUpdateDestructionProgress(final Level level) {
-        final LevelRenderer levelRenderer = ((ClientLevelAccessor) level).getLevelRenderer();
-        ((MultiMiningDestructionExtension) levelRenderer).offroad$manuallyAddMultiDestructionProgress(this.breakingID, this.dirtyData);
+        // 26.2: the break-progress bookkeeping is the level's rather than the renderer's, so there
+        // is no renderer to fetch -- the level the caller already has is the thing to talk to.
+        ((MultiMiningDestructionExtension) level).offroad$manuallyAddMultiDestructionProgress(this.breakingID, this.dirtyData);
     }
 
     public static class ClientBlockBreakingData {

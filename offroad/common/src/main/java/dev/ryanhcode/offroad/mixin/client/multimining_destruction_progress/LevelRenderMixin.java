@@ -8,7 +8,7 @@ import dev.ryanhcode.offroad.handlers.client.MultiMiningClientHandler;
 import dev.ryanhcode.offroad.mixin_interface.level_renderer.MultiMiningDestructionExtension;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.BlockDestructionProgress;
 import org.spongepowered.asm.mixin.Final;
@@ -19,7 +19,21 @@ import org.spongepowered.asm.mixin.Unique;
 import java.util.Map;
 import java.util.SortedSet;
 
-@Mixin(LevelRenderer.class)
+/**
+ * Lets one break animation stand for many blocks at once.
+ *
+ * <h2>26.2 note</h2>
+ * <p>All of this moved from {@code LevelRenderer} to {@code ClientLevel}: the two maps, the
+ * per-tick expiry and {@code removeProgress} are the level's bookkeeping now, and the renderer only
+ * reads {@code destructionProgress()} when it draws. So the mixin targets {@code ClientLevel}, and
+ * the accessor that fetched the renderer off the level is deleted -- the level is what the caller
+ * had in the first place.
+ *
+ * <p>{@code ticks} went with the move. Expiry is measured against the level's game time now, which
+ * is what {@code removeBlockBreakingProgress} compares {@code getUpdatedRenderTick} to, so that is
+ * what the holder is stamped with.
+ */
+@Mixin(ClientLevel.class)
 public abstract class LevelRenderMixin implements MultiMiningDestructionExtension {
 
     @Shadow
@@ -29,9 +43,6 @@ public abstract class LevelRenderMixin implements MultiMiningDestructionExtensio
     @Shadow
     @Final
     private Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress;
-
-    @Shadow
-    private int ticks;
 
     @Shadow
     protected abstract void removeProgress(BlockDestructionProgress progress);
@@ -89,7 +100,7 @@ public abstract class LevelRenderMixin implements MultiMiningDestructionExtensio
             });
 
             // update our timer to make sure we keep voided appropriately
-            mmProgress.updateTick(this.ticks);
+            mmProgress.updateTick((int) ((ClientLevel) (Object) this).getGameTime());
         }
     }
 
