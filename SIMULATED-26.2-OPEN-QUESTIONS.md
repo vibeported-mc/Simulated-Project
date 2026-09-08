@@ -110,6 +110,37 @@ lived in.
 
 ---
 
+## 3.5 Two crashes the e2e block census found, both fixed
+
+Written down because both were dedicated-server-only, both were silent on a single-player client, and
+both are shapes that will recur elsewhere in the port.
+
+**`AllIcons` is no longer loadable on a dedicated server.** On 26.2 `AllIcons` nests a
+`SubmitNodeCollector.CustomGeometryRenderer` (`AllIcons.java:203`), so the class cannot be linked
+where the client classes are absent. `SwivelBearingBlockEntity.LockingSetting` and
+`PropellerBearingBlockEntity.ThrustDirection` both named `AllIcons` constants in their enum
+constants, which put that load in the enum's `<clinit>` -- and the enum is first touched by the block
+entity's constructor, on the server. Placing a swivel bearing, a propeller bearing or a gyroscopic
+propeller bearing on a dedicated server threw `NoClassDefFoundError`.
+
+Both now resolve the icon lazily in `getIcon()`, which is what Create's own icon enums do; see
+`RollerBlockEntity.RollingMode#getIcon`. **Any other enum in this family that holds an `AllIcons` in a
+field is the same bug** -- a grep for `implements INamedIconOptions` is the way to find them, and the
+two above were the only ones at the time of writing.
+
+**`ItemAccess.forStack` now rejects the empty stack.** NeoForge 26.2 throws
+`IllegalArgumentException("Expected stack to be non-empty")` where the old `IFluidHandlerItem` lookup
+returned nothing. `NeoForgeSimFluidService.getFluidInItem` passed whatever it was given straight
+through, and `OpticalSensorBlockEntity.tick` asks it about the filter slot **once per tick** -- which
+is empty on a freshly placed sensor. Placing an optical sensor took the dedicated server down with a
+`ReportedException: Ticking block entity`. The service now answers for the empty stack itself.
+
+This is the same family of hazard as the transfer-API note in the port log: every call site that hands
+a possibly-empty `ItemStack` to a 26.2 transfer API is worth a look.
+
+**Covered by** `SimulatedRegistryTest` in Create-e2e, which places every block the three mods register
+and ticks it.
+
 ## 4. Smaller things noted in passing
 
 - **The docking connector's unpair-on-turn.** `onRemove` used to see the replacing state, so a
@@ -120,6 +151,12 @@ lived in.
   redstone update travelled, null otherwise — rather than the position it came from. The nameplate
   had two branches on "was it my clockwise neighbour"; both ended up walking the controller chain, so
   it now always takes the safe one. Worth checking a long nameplate row re-forms correctly.
+- **Three ponder structures name blocks that no longer exist.**
+  `aeronautics/ponder/propeller_bearing/size.nbt` contains `simulated:phantom_sail` and
+  `simulated:wooden_wing`; `offroad/ponder/borehead_bearing/excavating.nbt` and the orphaned
+  `offroad/ponder/borehead_bearing.nbt` contain `simulated:stirling_engine`. None of the three ids
+  exist in the source tree, and `StructureTemplate` maps an unknown id to air, so those scenes draw
+  with holes in them. The structures need re-saving by whoever owns the ponder assets.
 - **The physics staff's Iris workaround** ended every batch, because Iris would not let one render
   type be ended alone. There is no batching left to end, and no Iris 26.2 build, so it is gone. If
   Iris returns, the translucent parts of the staff are the thing to look at first.

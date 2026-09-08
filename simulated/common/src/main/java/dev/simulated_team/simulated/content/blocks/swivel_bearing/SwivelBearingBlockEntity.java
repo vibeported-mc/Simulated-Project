@@ -812,22 +812,37 @@ public class SwivelBearingBlockEntity extends KineticBlockEntity implements Extr
      * TODO: separate icon for the locked settings
      */
     public enum LockingSetting implements INamedIconOptions {
-        LOCKED_ALWAYS(AllIcons.I_CONFIG_LOCKED, "swivel_default_always_locked"),
-        LOCKED_DEFAULT(AllIcons.I_CONFIG_LOCKED, "swivel_default_locked"),
-        UNLOCKED_DEFAULT(AllIcons.I_CONFIG_UNLOCKED, "swivel_default_unlocked"),
-        UNLOCKED_ALWAYS(AllIcons.I_CONFIG_UNLOCKED, "swivel_default_always_unlocked");
+        LOCKED_ALWAYS("swivel_default_always_locked"),
+        LOCKED_DEFAULT("swivel_default_locked"),
+        UNLOCKED_DEFAULT("swivel_default_unlocked"),
+        UNLOCKED_ALWAYS("swivel_default_always_unlocked");
 
         private final String translationKey;
-        private final AllIcons icon;
 
-        LockingSetting(final AllIcons icon, final String name) {
-            this.icon = icon;
+        LockingSetting(final String name) {
             this.translationKey = Simulated.MOD_ID + ".generic." + name;
         }
 
+        /**
+         * Resolved on the way out rather than held in a field.
+         *
+         * <p>{@code AllIcons} is client-only, and on 26.2 it is no longer <em>loadable</em> on a
+         * dedicated server: it nests a {@code SubmitNodeCollector.CustomGeometryRenderer}. Naming one
+         * in an enum constant puts the load in this enum's {@code <clinit>}, which runs wherever the
+         * enum is first touched -- and that is the block entity's constructor, on the server. The
+         * result was a {@code NoClassDefFoundError} the moment a swivel bearing was placed on a
+         * dedicated server.
+         *
+         * <p>Deferring it to the call keeps the icon on the client, where it is the only place it was
+         * ever wanted. This is what Create's own icon enums do; see
+         * {@code RollerBlockEntity.RollingMode#getIcon}.
+         */
         @Override
         public AllIcons getIcon() {
-            return this.icon;
+            return switch (this) {
+                case LOCKED_ALWAYS, LOCKED_DEFAULT -> AllIcons.I_CONFIG_LOCKED;
+                case UNLOCKED_DEFAULT, UNLOCKED_ALWAYS -> AllIcons.I_CONFIG_UNLOCKED;
+            };
         }
 
         @Override

@@ -528,19 +528,34 @@ public class PropellerBearingBlockEntity extends MechanicalBearingBlockEntity im
     }
 
     public enum ThrustDirection implements INamedIconOptions {
-        RIGHT_HANDED(AllIcons.I_REFRESH, "pull_when_clockwise"), LEFT_HANDED(AllIcons.I_ROTATE_CCW, "push_when_clockwise");
+        RIGHT_HANDED("pull_when_clockwise"), LEFT_HANDED("push_when_clockwise");
 
         private final String translationKey;
-        private final AllIcons icon;
 
-        ThrustDirection(final AllIcons icon, final String name) {
-            this.icon = icon;
+        ThrustDirection(final String name) {
             this.translationKey = Aeronautics.MOD_ID + ".generic." + name;
         }
 
+        /**
+         * Resolved on the way out rather than held in a field.
+         *
+         * <p>{@code AllIcons} is client-only, and on 26.2 it is no longer <em>loadable</em> on a
+         * dedicated server: it nests a {@code SubmitNodeCollector.CustomGeometryRenderer}. Naming one
+         * in an enum constant puts the load in this enum's {@code <clinit>}, which runs wherever the
+         * enum is first touched -- and that is the block entity's constructor, on the server. The
+         * result was a {@code NoClassDefFoundError} the moment a propeller bearing was placed on a
+         * dedicated server.
+         *
+         * <p>Deferring it to the call keeps the icon on the client, where it is the only place it was
+         * ever wanted. This is what Create's own icon enums do; see
+         * {@code RollerBlockEntity.RollingMode#getIcon}.
+         */
         @Override
         public AllIcons getIcon() {
-            return this.icon;
+            return switch (this) {
+                case RIGHT_HANDED -> AllIcons.I_REFRESH;
+                case LEFT_HANDED -> AllIcons.I_ROTATE_CCW;
+            };
         }
 
         @Override
