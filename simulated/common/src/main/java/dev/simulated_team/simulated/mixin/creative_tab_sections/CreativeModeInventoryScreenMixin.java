@@ -27,7 +27,12 @@ import java.util.List;
 public class CreativeModeInventoryScreenMixin {
 	@Shadow private static CreativeModeTab selectedTab;
 
-	@Inject(method = "render", at = @At("TAIL"))
+	/**
+	 * 26.2: a screen collects itself into render states rather than drawing, so {@code render} is
+	 * {@code extractRenderState}. The signature is otherwise the same, and TAIL is still after the
+	 * screen has put everything else in.
+	 */
+	@Inject(method = "extractRenderState", at = @At("TAIL"))
 	private void simulated$render(final GuiGraphicsExtractor guiGraphics, final int mouseX, final int mouseY, final float partialTick, final CallbackInfo ci) {
 		if (selectedTab == SimTabService.INSTANCE.getCreativeTab()) {
 			SimulatedCreativeTab.renderBanners((CreativeModeInventoryScreen) (Object) this, guiGraphics, mouseX, mouseY);
