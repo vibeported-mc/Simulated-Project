@@ -57,7 +57,17 @@ import org.joml.Matrix4f;
 public class HotAirBurnerRenderer
         extends SmartBlockEntityRenderer<HotAirBurnerBlockEntity, HotAirBurnerRenderer.HotAirBurnerRenderState> {
 
-    private static final Identifier BURNER_FLAME_SHADER = Aeronautics.path("burner_flame");
+    /**
+     * <h2>26.2 note</h2>
+     * <p>A render type's shader is compiled into a vanilla {@code RenderPipeline}, which resolves the
+     * id under {@code assets/<namespace>/shaders/}. It is not a Veil program and cannot be one -- the
+     * port had this pointing at {@code pinwheel/shaders/program}, where Veil keeps its own, and every
+     * draw of the flame ended in "Pipeline contains invalid shader program".
+     */
+    private static final Identifier BURNER_FLAME_SHADER = Aeronautics.path("core/burner_flame");
+
+    /** Read by the flame's fragment shader; the .png the palette row is sampled from. */
+    private static final Identifier FIRE_PALETTE = Aeronautics.path("textures/effects/fire_palette.png");
     private static final float FLAME_SIZE = 2.0f;
 
     /** One render type per palette; the palette is the only value that could not move into a vertex. */
@@ -69,6 +79,10 @@ public class HotAirBurnerRenderer
                 VeilRenderBridge.createRenderType("aeronautics/burner_flame/" + p, DefaultVertexFormat.BLOCK)
                         .vertexShader(BURNER_FLAME_SHADER)
                         .fragmentShader(BURNER_FLAME_SHADER)
+                        .texture("FirePalette", FIRE_PALETTE)
+                        // The palette is the one value that could not move into a vertex, so it is
+                        // baked in instead -- one compiled program per palette.
+                        .shaderDefine("PALETTE", p)
                         .snippet(VeilRenderPipelines.translucentBlend())
                         .snippet(VeilRenderPipelines.noCull())
                         .useLightmap()
