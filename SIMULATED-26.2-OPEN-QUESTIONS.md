@@ -127,6 +127,47 @@ lived in.
   counter, so an interpolating sprite kept sweeping toward the next frame while "paused" — a wobble
   rather than a hold. Holding is what the caller asks for, but it is a visible difference.
 
+## The diagram's lighting is corrected against measurement, not derivation
+
+The diagram now matches 1.21.1 on terrain exactly. Both versions were dumped from their own
+framebuffer, before the paper pass, rendering the same contraption:
+
+| region | 26.2 | 1.21.1 | ratio |
+|---|---|---|---|
+| stripped oak wood | 0.240 | 0.240 | 1.00 |
+| blue seat | 0.135 | 0.133 | 0.98 |
+| diagram board | 0.296 | 0.248 | 0.84 |
+| chest | 0.113 | 0.129 | 1.14 |
+
+Two corrections get it there, and they pull in **opposite** directions -- which is why no single
+change to the lighting ever brought both into line, and why this needed measuring rather than
+reasoning about.
+
+**Terrain was 0.80x too dark** and is scaled by 1/0.80. The light texture is identical texel for
+texel by then -- 1.21.1's loop is transcribed, not approximated -- so the shortfall is somewhere else
+in the terrain path. 26.2 samples the lightmap through `sample_lightmap` where 1.21.1 used a plain
+`texelFetch`, and section meshes carry their own shading; neither has been confirmed. **The 1/0.80 is
+measured, not explained.**
+
+**Features were too bright** and are scaled by 0.59, standing in for the diffuse that
+`minecraft_mix_light` used to apply: 1.21.1 drew them through entity render types, and Create has
+since moved its `SuperByteBuffer` rendering to `solidMovingBlock()`, whose `block.vsh` applies no
+directional light.
+
+That 0.59 is a compromise and cannot be anything else. The board is 2.0x too bright and the chest
+1.5x, because the board goes through the block shader and the chest through the entity shader -- but
+one lightmap serves both. 0.59 sits between them. What matters is that it puts the board at 0.296,
+under the 0.352 at which the paper pass saturates to flat white and destroys the schematic drawing.
+
+To separate them, the board would have to be dimmed at its source -- a colour on the
+`SuperByteBuffer` in `DiagramEntityRenderer`, gated on `SimpleSubLevelGroupRenderer.RENDERING_SIMPLE`
+-- leaving the lightmap to serve the entity-shader path alone. Not done; the remaining error is 12-16%
+and invisible next to the saturation problem it replaced.
+
+**Reproducing any of this:** see `compare-against-1211-worktree` -- a 1.21.1 worktree is kept at
+`create-26.2/Simulated-1.21.1`, and four lines in `DiagramScreen.draw` dump the framebuffer from
+either side.
+
 ## The diagram still reads coarser than it did on 1.21.1
 
 The contraption diagram renders -- terrain, block entities, entities, lighting, outline, dither and

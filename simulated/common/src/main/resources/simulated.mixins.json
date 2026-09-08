@@ -50,6 +50,7 @@
     "accessor.ControlledContraptionEntityAccessor",
     "accessor.CreateBlockEntityBuilderAccessor",
     "accessor.GameRendererLightmapAccessor",
+    "accessor.LightmapTextureAccessor",
     "accessor.ParrotElementAccessor",
     "accessor.RedstoneLinkBlockEntityAccessor",
     "accessor.WorldSectionElementAccessor",

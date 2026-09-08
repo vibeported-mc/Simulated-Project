@@ -22,17 +22,20 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.Lightmap;
 import net.minecraft.client.renderer.ProjectionMatrixBuffer;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import com.mojang.blaze3d.platform.NativeImage;
 import dev.simulated_team.simulated.mixin.accessor.GameRendererLightmapAccessor;
+import dev.simulated_team.simulated.mixin.accessor.LightmapTextureAccessor;
 import dev.simulated_team.simulated.mixin_interface.diagram.VisualizationManagerExtension;
-import net.minecraft.client.renderer.state.LightmapRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayerGroup;
 import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.entity.Entity;
@@ -109,78 +112,52 @@ public class SimpleSubLevelGroupRenderer {
     private static boolean renderingFeatures = false;
 
     /**
-     * The diagram's "blueprint" lighting.
+     * How bright the terrain is lit, relative to the block entities and entities over it.
      *
-     * <h2>What 1.21.1 actually did</h2>
-     * <p>Not a flat grey, which is what a first reading of it suggests. Its loop computed
-     * {@code getBrightness(y) * 0.6 + 0.15} and wrote the result to pixel {@code (y, x)} -- the
-     * arguments swapped -- so the curve ran along the <em>block-light</em> axis and was constant
-     * across sky light. Its own comment says so. Lighting a diagram uniformly instead flattens every
-     * surface to one value, and the dither and palette behind it then collapse whole faces into a
-     * single tone, which is not what the original looked like.
+     * <p>1.21.1 built its light texture twice, at 0.65 before the chunk layers and at 1.0 before the
+     * block entities, so the contraption's fittings read against its structure. Both carry a
+     * correction on 26.2, and the two go in opposite directions -- which is why no single change to
+     * the lighting ever brought both into line.
      *
-     * <p>{@code lightmap.fsh} computes
-     * {@code AmbientColor + BlockLightColor * get_brightness(block_level) * BlockFactor} and then
-     * {@code mix(color, notGamma(color), BrightnessFactor)} -- the same shape, so the curve carries
-     * over as an ambient floor, a block factor and a gamma mix of 0.55. The constants are fitted
-     * rather than copied, for the reason {@link #TERRAIN_AMBIENT} gives.
+     * <p>Terrain arrives too dark by a fifth. Measured off the same contraption, dumped from each
+     * version's framebuffer before the paper pass:
      *
-     * <p>The original's warm green/blue tint is dropped, since the diagram is reduced to a palette
-     * downstream and it could not be seen. Its lerp toward {@code (0.99, 1.12, 1.0)} is <em>not</em>
-     * dropped, though it looks like part of that tint: at 0.25 it lifts the floor from 0.15 to 0.36,
-     * which is most of the diagram's brightness. It survives inside the fitted ambient.
+     * <table border="1">
+     *   <tr><th></th><th>26.2</th><th>1.21.1</th></tr>
+     *   <tr><td>stripped oak wood</td><td>0.192</td><td>0.240</td></tr>
+     *   <tr><td>blue seat</td><td>0.108</td><td>0.133</td></tr>
+     * </table>
+     *
+     * <p>Both land at 0.80 of the original with the light texture already identical texel for texel,
+     * so the shortfall is elsewhere in the terrain path -- 26.2 samples the lightmap through
+     * {@code sample_lightmap} where 1.21.1 used a plain {@code texelFetch}, and its section meshes
+     * carry their own shading. The cause is not established; the 1/0.80 is measured, not derived.
      */
-    private static final LightmapRenderState DIAGRAM_LIGHTMAP = new LightmapRenderState();
+    private static final float TERRAIN_BRIGHTNESS = 0.65f / 0.80f;
 
     /**
-     * The terrain's lighting, as {@code (ambient, blockFactor)}.
+     * Features are lit at 1.0 as in 1.21.1, times 0.59 for a diffuse factor 26.2 no longer applies.
      *
-     * <p>1.21.1 rebuilt the texture twice -- scaled to 0.65 before the chunk layers and to 1.0
-     * before the block entities -- so the contraption's fittings read against its structure.
+     * <p>1.21.1 drew block entities and entities through entity render types, and {@code entity.vsh}
+     * multiplies the vertex colour by {@code minecraft_mix_light(Light0, Light1, Normal, ...)}.
+     * Create has since moved its {@code SuperByteBuffer} rendering to {@code solidMovingBlock()}, and
+     * {@code block.vsh} applies no directional light at all, so that factor simply vanished.
      *
-     * <p>The scale cannot be carried across as a scale. It was applied to the finished colour,
-     * <em>after</em> the mix toward {@code notGamma}; 26.2 has no such step, and folding it into the
-     * inputs instead darkens the value before the lift rather than after it, which the lift then
-     * cannot recover. Measured at block-light zero -- what a sub-level's terrain actually carries --
-     * that is 0.229 against 1.21.1's 0.406, and the diagram comes out roughly half as bright.
+     * <p>Harmless in the world. Not here: the paper pass saturates to flat white above a luminance of
+     * 0.352, and the diagram board carrying the schematic drawing arrives at 0.501 without this,
+     * clipping to a blank rectangle.
      *
-     * <p>So these are fitted to the 1.21.1 curve rather than derived from it: the pair minimising
-     * squared error against all sixteen of its levels, which lands within 0.01 everywhere
-     * (rms 0.004 for terrain, 0.0006 for features).
+     * <p>The factor is a compromise, because the two kinds of feature are wrong by different amounts.
+     * Against 1.21.1 the board is 2.0x too bright and the chest 1.5x, and they cannot be separated:
+     * one lightmap serves both. 0.59 sits between them, leaving the board a little bright and the
+     * chest a little dark, and -- the point of the exercise -- puts the board back under the paper's
+     * saturation point so its drawing survives.
      */
-    private static final float TERRAIN_AMBIENT = 0.200f;
+    private static final float FEATURE_BRIGHTNESS = 1.0f * 0.59f;
 
-    private static final float TERRAIN_BLOCK_FACTOR = 0.135f;
-
-    /** @see #TERRAIN_AMBIENT */
-    /**
-     * The lighting for block entities and entities, which is <em>not</em> 1.21.1's curve.
-     *
-     * <p>It is that curve times about 0.59, and the 0.59 stands in for a diffuse factor 26.2 no
-     * longer applies. 1.21.1 drew these through entity render types -- {@code Sheets.solidBlockSheet()}
-     * and friends -- and {@code entity.vsh} multiplies the vertex colour by
-     * {@code minecraft_mix_light(Light0, Light1, Normal, ...)}. Create has since moved its
-     * {@code SuperByteBuffer} rendering to {@code solidMovingBlock()}, and {@code block.vsh} applies
-     * no directional light at all, so that factor simply vanished.
-     *
-     * <p>Nobody notices in the world -- things are a little brighter, that is all. The diagram is
-     * another matter, because the paper pass behind it saturates: {@code paletted_dither} computes
-     * {@code clamp((L * 1.7 - 0.32) * 1.8 + 0.5)}, which reaches pure white at a luminance of 0.352
-     * and stays there. Measured on the diagram board, the fittings that carry its drawing went in at
-     * 0.509 and came out a blank white rectangle. At the values here the same board measures 0.298,
-     * the drawing survives, and terrain -- which reads no light direction and so never lost anything
-     * -- is untouched at 0.198.
-     *
-     * <p>Restoring the diffuse itself would be better than compensating for it, but there is nowhere
-     * to put it: it is the shader that dropped it, the render type is the one Create's own blueprint
-     * board uses, and {@code disableDiffuse()} governs catnip's separate CPU-side shading, which was
-     * measured to make no difference here at all.
-     *
-     * @see #TERRAIN_AMBIENT
-     */
-    private static final float FEATURE_AMBIENT = 0.170f;
-
-    private static final float FEATURE_BLOCK_FACTOR = 0.200f;
+    /** Reused so a diagram does not allocate a lightmap every frame. */
+    @Nullable
+    private static NativeImage diagramLightPixels;
 
     /**
      * @return the chain of sub-levels that should render with a given sub-level into a diagram
@@ -263,7 +240,7 @@ public class SimpleSubLevelGroupRenderer {
 
         RenderSystem.backupProjectionMatrix();
         RENDERING_SIMPLE = true;
-        pushDiagramLightmap(TERRAIN_AMBIENT, TERRAIN_BLOCK_FACTOR);
+        pushDiagramLightmap(TERRAIN_BRIGHTNESS);
 
         try {
             RenderSystem.setProjectionMatrix(projectionBuffer.getBuffer(projectionMat), ProjectionType.ORTHOGRAPHIC);
@@ -276,7 +253,7 @@ public class SimpleSubLevelGroupRenderer {
             renderLayerGroup(fbo, draws, ChunkSectionLayerGroup.TRANSLUCENT, false);
 
             // As in 1.21.1: the fittings are lit a step brighter than the structure they sit on.
-            pushDiagramLightmap(FEATURE_AMBIENT, FEATURE_BLOCK_FACTOR);
+            pushDiagramLightmap(FEATURE_BRIGHTNESS);
             renderFeatures(level, subLevels, fbo, viewRotation, globalCamera, partialTicks, renderPlayers);
         } finally {
             restoreLightmap();
@@ -287,53 +264,97 @@ public class SimpleSubLevelGroupRenderer {
     }
 
     /**
-     * Rewrites the lightmap texture with the diagram's lighting.
+     * Rewrites the lightmap with the diagram's own, texel for texel.
      *
      * <h2>26.2 note</h2>
-     * <p>1.21.1 rebuilt the light texture pixel by pixel through a mixin on {@code LightTexture},
-     * which no longer exists. The replacement is far smaller: {@code Lightmap.render} takes the
-     * state to render as an argument and {@link LightmapRenderState} is a plain mutable class, so
-     * the lighting is simply handed to it. Only reaching the {@code Lightmap} needs a mixin --
-     * {@code GameRenderer.lightmap()} returns a texture view, not the object -- hence
-     * {@link GameRendererLightmapAccessor}.
+     * <p>This is 1.21.1's {@code simulated$makeDiagramLightTexture} transcribed, not approximated.
+     * The obvious 26.2 route is {@code Lightmap.render(LightmapRenderState)}, driving the vanilla
+     * lightmap shader through its ambient, block-factor and brightness uniforms -- but that shader
+     * computes a grey ramp, and the original does not. It derives green and blue from the red
+     * channel and then pulls the whole thing toward {@code (0.99, 1.12, 1.0)}, so its texels are
+     * tinted, with green pushed above one.
      *
-     * <p>This has to sit outside a render pass, because it opens one of its own. Everything
-     * downstream picks it up: the terrain pass binds {@code gameRenderer.lightmap()} as Sampler2,
-     * and the feature pass receives the same lightmap through its frame context.
+     * <p>That tint is not cosmetic here, which is what makes fitting the uniforms the wrong
+     * approach. The diagram is reduced to a palette by luminance, and luminance weights green at
+     * 0.587 -- so the tint is most of what decides where each surface lands on the paper's contrast
+     * curve. Writing the texture directly reproduces it exactly and leaves nothing to fit.
      *
-     * <p>Directional shading is separate from this and handled in {@link #renderFeatures}. Terrain
-     * needs none of it: {@code terrain.vsh} multiplies the baked vertex colour by the lightmap and
-     * never reads a light direction, so its face shading comes out of the section mesh either way.
+     * <p>The loop keeps the original's quirks deliberately. Its {@code setPixelRGBA(y, x, ...)}
+     * has the arguments the other way round from vanilla's, so the ramp runs along the block-light
+     * axis and is flat across sky light; the brightness multiplier is applied last, after the gamma
+     * mix, where it cannot be folded into any uniform.
      *
-     * @param ambient     the floor every surface is lit to, whatever its light level
-     * @param blockFactor how much the block-light level adds on top of it
-     * @see #TERRAIN_AMBIENT
+     * <p>It has to sit outside a render pass, hence before the terrain draws rather than between
+     * them. Everything downstream picks it up: the terrain pass binds {@code gameRenderer.lightmap()}
+     * as Sampler2, and the feature pass receives the same lightmap through its frame context.
+     *
+     * @param brightnessMultiplier see {@link #TERRAIN_BRIGHTNESS}
      */
-    private static void pushDiagramLightmap(final float ambient, final float blockFactor) {
-        // Set every time: render only rebuilds the texture when this is true, and nothing clears it
-        // back on our behalf.
-        DIAGRAM_LIGHTMAP.needsUpdate = true;
-        DIAGRAM_LIGHTMAP.skyFactor = 0.0f;
-        DIAGRAM_LIGHTMAP.blockFactor = blockFactor;
-        DIAGRAM_LIGHTMAP.ambientColor = new Vector3f(ambient, ambient, ambient);
-        DIAGRAM_LIGHTMAP.brightness = 0.55f;
-        DIAGRAM_LIGHTMAP.nightVisionEffectIntensity = 0.0f;
-        DIAGRAM_LIGHTMAP.darknessEffectScale = 0.0f;
-        DIAGRAM_LIGHTMAP.bossOverlayWorldDarkening = 0.0f;
+    private static void pushDiagramLightmap(final float brightnessMultiplier) {
+        if (diagramLightPixels == null) {
+            diagramLightPixels = new NativeImage(Lightmap.TEXTURE_SIZE, Lightmap.TEXTURE_SIZE, false);
+        }
 
-        ((GameRendererLightmapAccessor) Minecraft.getInstance().gameRenderer).simulated$getLightmap().render(DIAGRAM_LIGHTMAP);
+        final Vector3f color = new Vector3f();
+
+        for (int x = 0; x < Lightmap.TEXTURE_SIZE; x++) {
+            for (int y = 0; y < Lightmap.TEXTURE_SIZE; y++) {
+                final float brightness = getBrightness(y) * 0.6f + 0.15f;
+                final float brightnessG = brightness * ((brightness * 0.6f + 0.4f) * 0.6f + 0.4f);
+                final float brightnessB = brightness * (brightness * brightness * 0.6f + 0.4f);
+
+                color.set(brightness, brightnessG, brightnessB);
+                color.lerp(new Vector3f(0.99f, 1.12f, 1.0f), 0.25f);
+                clampColor(color);
+
+                final float gamma = 0.55f;
+                color.lerp(new Vector3f(notGamma(color.x), notGamma(color.y), notGamma(color.z)), gamma);
+                color.lerp(new Vector3f(0.75f, 0.75f, 0.75f), 0.04f);
+                clampColor(color);
+                color.mul(255.0f);
+                color.mul(brightnessMultiplier);
+
+                final int r = (int) color.x();
+                final int g = (int) color.y();
+                final int b = (int) color.z();
+
+                // Arguments swapped, as in the original: the ramp runs along block light.
+                diagramLightPixels.setPixelABGR(y, x, 0xFF000000 | b << 16 | g << 8 | r);
+            }
+        }
+
+        final Lightmap lightmap = ((GameRendererLightmapAccessor) Minecraft.getInstance().gameRenderer).simulated$getLightmap();
+        RenderSystem.getDevice().createCommandEncoder()
+                .writeToTexture(((LightmapTextureAccessor) lightmap).simulated$getTexture(), diagramLightPixels);
+    }
+
+    /** 1.21.1's {@code LightTexture.getBrightness}. */
+    private static float getBrightness(final int lightLevel) {
+        final float f = lightLevel / 15.0f;
+        return f / (4.0f - 3.0f * f);
+    }
+
+    /** 1.21.1's {@code LightTexture.notGamma}. */
+    private static float notGamma(final float value) {
+        final float f = 1.0f - value;
+        return 1.0f - f * f * f * f;
+    }
+
+    /** 1.21.1's {@code LightTexture.clampColor}. */
+    private static void clampColor(final Vector3f color) {
+        color.set(Mth.clamp(color.x, 0.0f, 1.0f), Mth.clamp(color.y, 0.0f, 1.0f), Mth.clamp(color.z, 0.0f, 1.0f));
     }
 
     /**
      * Hands the world's own lighting back.
      *
-     * <p>Nothing is restored directly -- the diagram's texture is simply marked stale, and vanilla
-     * rebuilds it from the real state at the top of {@code GameRenderer.render}, which runs after
-     * the extract phase a diagram is drawn in and before the level is drawn.
+     * <p>Nothing is restored directly -- the diagram's texels are simply marked stale, and vanilla
+     * rebuilds the lightmap from the real state at the top of {@code GameRenderer.render}, which runs
+     * after the extract phase a diagram is drawn in and before the level is drawn.
      *
      * <p>The flag has to be forced rather than left to the extractor, which only raises it when the
-     * state actually changes. On a frame where the lighting did not change, the world would
-     * otherwise keep the diagram's texture for the rest of the frame.
+     * state actually changes. On a frame where the lighting did not change, the world would otherwise
+     * keep the diagram's texture for the rest of the frame.
      */
     private static void restoreLightmap() {
         Minecraft.getInstance().gameRenderer.gameRenderState().lightmapRenderState.needsUpdate = true;
