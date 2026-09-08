@@ -4,6 +4,10 @@ import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.events.AeronauticsClientEvents;
 import dev.eriksonn.aeronautics.neoforge.content.fluids.AeroFluidType;
 import dev.eriksonn.aeronautics.neoforge.index.AeroFluidsNeoForge;
+import dev.eriksonn.aeronautics.api.CustomSituationalMusic;
+import net.minecraft.client.Minecraft;
+import net.minecraft.sounds.Music;
+import net.neoforged.neoforge.client.event.SelectMusicEvent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -21,6 +25,27 @@ public class AeroNeoForgeClientEvents {
     @SubscribeEvent
     public static void postClientTick(final ClientTickEvent.Post event) {
         AeronauticsClientEvents.clientLevelTick(true);
+    }
+
+    /**
+     * <h2>26.2 note</h2>
+     * <p>This was a mixin wrapping the read of {@code Musics.GAME} inside
+     * {@code Minecraft.getSituationalMusic}. That field is no longer read there -- background music
+     * is an environment attribute the camera carries, selected through {@code BackgroundMusic} -- so
+     * there is nothing to wrap.
+     *
+     * <p>NeoForge's {@code SelectMusicEvent} is the hook for this and is a better fit than the mixin
+     * was: it fires once music is chosen, whatever chose it, and {@code setMusic} leaves the
+     * higher-priority cases alone. The mixin could only win over the one field it wrapped.
+     */
+    @SubscribeEvent
+    public static void selectMusic(final SelectMusicEvent event) {
+        final Minecraft minecraft = Minecraft.getInstance();
+        final Music custom = CustomSituationalMusic.getSituationalMusic(minecraft.level, minecraft.player);
+
+        if (custom != null) {
+            event.setMusic(custom);
+        }
     }
 
 

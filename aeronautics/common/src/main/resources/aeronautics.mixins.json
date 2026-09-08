@@ -27,7 +27,6 @@
   ],
   "client": [
     "balloon.LevelChunkMixin",
-    "custom_situational_music.MinecraftMixin",
     "custom_situational_music.MusicManagerAccessor",
     "levitite.PonderUIMixin",
     "levitite.TerrainParticleMixin",

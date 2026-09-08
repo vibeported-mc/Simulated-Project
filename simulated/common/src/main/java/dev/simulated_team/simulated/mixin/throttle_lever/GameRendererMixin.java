@@ -6,35 +6,37 @@ import dev.simulated_team.simulated.content.blocks.throttle_lever.ThrottleLeverB
 import dev.simulated_team.simulated.content.blocks.throttle_lever.ThrottleLeverClientGripHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GameRenderer.class)
+/**
+ * Lets a throttle lever win the cursor from whatever block is behind it.
+ *
+ * <h2>26.2 note</h2>
+ * <p>{@code pick} moved from {@code GameRenderer} to {@code Minecraft}, which is also where the hit
+ * result it writes has always lived -- so the shadowed {@code minecraft} field goes away and the
+ * mixin targets the class it was reaching into. The class name is kept so the mixin config and the
+ * history do not have to move with it.
+ */
+@Mixin(Minecraft.class)
 public class GameRendererMixin {
-
-    @Shadow
-    @Final
-    private Minecraft minecraft;
 
     @Inject(method = "pick(F)V", at = @At("TAIL"))
     private void simulated$pickThrottleLever(final float partialTicks, final CallbackInfo ci) {
-        if (this.minecraft == null) return;
+        final Minecraft minecraft = (Minecraft) (Object) this;
 
-        final LocalPlayer player = this.minecraft.player;
+        final LocalPlayer player = minecraft.player;
         if (player == null) return;
 
         final Vec3 eyePos = Sable.HELPER.getEyePositionInterpolated(player, partialTicks);
 
-        final HitResult mcHitResult = this.minecraft.hitResult;
+        final HitResult mcHitResult = minecraft.hitResult;
         double minDistance = mcHitResult != null && mcHitResult.getType() != HitResult.Type.MISS ? Sable.HELPER.distanceSquaredWithSubLevels(player.level(), eyePos, mcHitResult.getLocation()) : Double.MAX_VALUE;
 
         for (final ThrottleLeverBlockEntity lever : ThrottleLeverClientGripHandler.getNearbyThrottleLevers()) {
@@ -45,7 +47,7 @@ public class GameRendererMixin {
             if (hitResultDistance != null) {
                 if (hitResultDistance < minDistance) {
                     minDistance = hitResultDistance;
-                    this.minecraft.hitResult = new BlockHitResult(Vec3.atCenterOf(lever.getBlockPos()), Direction.UP, lever.getBlockPos(), false);
+                    minecraft.hitResult = new BlockHitResult(Vec3.atCenterOf(lever.getBlockPos()), Direction.UP, lever.getBlockPos(), false);
                 }
             }
 
