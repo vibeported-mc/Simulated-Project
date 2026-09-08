@@ -26,7 +26,6 @@
     "linked_typewriter.PonderTooltipHandlerMixin",
     "lodestone_compat.CompassItemPropertyFunctionMixin",
     "new_ponder.PonderSceneRegistryMixin",
-    "new_ponder.PonderTooltipHandlerAccessor",
     "new_ponder.PonderTooltipHandlerMixin",
     "new_ponder.PonderUIMixin",
     "physics_staff.GuiGraphicsMixin",

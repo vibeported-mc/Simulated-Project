@@ -5,9 +5,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.simulated_team.simulated.content.navigation_targets.lodestone_compass_compatability.LodestoneTrackingMap;
 import dev.simulated_team.simulated.index.SimDataComponents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.CompassItem;
 import net.minecraft.world.item.Item;
@@ -27,15 +29,19 @@ public abstract class CompassItemMixin extends Item {
 		super(properties);
 	}
 
+	/**
+	 * <h2>26.2 note</h2>
+	 * <p>{@code inventoryTick} runs on the server only and is handed a {@code ServerLevel}, so the
+	 * side check this opened with is gone -- it can no longer be false. The slot index and the
+	 * "is selected" flag became one nullable {@code EquipmentSlot}, which this never read.
+	 */
 	@Inject(method = "inventoryTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;get(Lnet/minecraft/core/component/DataComponentType;)Ljava/lang/Object;"))
-	private void simulated$checkID(final ItemStack stack, final Level level, final Entity entity, final int itemSlot, final boolean isSelected, final CallbackInfo ci) {
-		if (!level.isClientSide()) {
-			if (stack.has(SimDataComponents.LODESTONE_COMPASS_SUBLEVEL_TRACKER)) {
-				final UUID trackerID = stack.get(SimDataComponents.LODESTONE_COMPASS_SUBLEVEL_TRACKER);
-				final LodestoneTrackingMap map = LodestoneTrackingMap.getOrLoad(level);
-				if (map != null && entity instanceof final ServerPlayer sp) {
-					map.sendUpdateForPlayer(trackerID, sp);
-				}
+	private void simulated$checkID(final ItemStack stack, final ServerLevel level, final Entity entity, final EquipmentSlot slot, final CallbackInfo ci) {
+		if (stack.has(SimDataComponents.LODESTONE_COMPASS_SUBLEVEL_TRACKER)) {
+			final UUID trackerID = stack.get(SimDataComponents.LODESTONE_COMPASS_SUBLEVEL_TRACKER);
+			final LodestoneTrackingMap map = LodestoneTrackingMap.getOrLoad(level);
+			if (map != null && entity instanceof final ServerPlayer sp) {
+				map.sendUpdateForPlayer(trackerID, sp);
 			}
 		}
 	}

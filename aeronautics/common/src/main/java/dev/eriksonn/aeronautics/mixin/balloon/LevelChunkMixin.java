@@ -24,8 +24,11 @@ public class LevelChunkMixin {
     @Unique
     private BlockPos simulated$blockSet = null;
 
+    /**
+     * 26.2: the "is moving" boolean became a bitmask of update flags.
+     */
     @Inject(method = "setBlockState", at = @At("HEAD"))
-    private void simulated$preSetBlockState(final BlockPos pPos, final BlockState pState, final boolean pIsMoving,
+    private void simulated$preSetBlockState(final BlockPos pPos, final BlockState pState, final int flags,
                                             final CallbackInfoReturnable<BlockState> cir) {
         this.simulated$blockSet = pPos;
     }
