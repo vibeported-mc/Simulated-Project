@@ -236,6 +236,23 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
         this.updateFacingWithBoundingBox(this.getDirection(), this.verticalOrientation);
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>{@code HangingEntity} now feeds every change of its synched direction back through
+     * {@code setDirection}, and its own version asserts the direction is horizontal. A diagram also
+     * hangs on floors and ceilings, so placing one flat threw "The validated expression is false"
+     * out of the constructor. Overriding this hands the work to the facing update below, which has
+     * always handled both cases.
+     *
+     * <p>There is no recursion here: this sets the synched direction again, and the synched data
+     * only raises an update when the value actually changes.
+     */
+    @Override
+    protected void setDirection(final Direction direction) {
+        this.updateFacingWithBoundingBox(direction,
+                this.verticalOrientation != null ? this.verticalOrientation : Direction.NORTH);
+    }
+
     protected void updateFacingWithBoundingBox(final Direction facing, final Direction verticalOrientation) {
         Objects.requireNonNull(facing);
         this.setDirectionRaw(facing);
