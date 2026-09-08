@@ -194,9 +194,11 @@ public class SimulatedCreativeTab {
 	}
 
 	public static void setPlaying(Identifier resourceLocation, boolean playing) {
-		// 26.2: the GUI sprite atlas is not exposed on Minecraft any more; it is the atlas the
-		// texture manager holds under the GUI atlas id.
-		TextureAtlas atlas = (TextureAtlas) Minecraft.getInstance().getTextureManager().getTexture(AtlasIds.GUI);
+		// 26.2: the GUI sprite atlas is not exposed on Minecraft any more, and it is not what the
+		// texture manager holds under the GUI atlas id either -- that is keyed by texture path, so
+		// asking it for "minecraft:gui" hands back an ordinary SimpleTexture and the cast fails when
+		// the tab is opened. The atlases live on their own manager now, keyed by atlas id.
+		TextureAtlas atlas = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.GUI);
 		TextureAtlasSprite sprite = atlas.getSprite(resourceLocation);
 		SpriteContents.AnimationState state = ((SpriteContentsExtension) sprite.contents()).simulated$getAnimationState();
 		if (state instanceof AnimationStateExtension extension) {
