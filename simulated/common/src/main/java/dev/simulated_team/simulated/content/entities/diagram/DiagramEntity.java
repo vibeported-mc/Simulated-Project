@@ -398,7 +398,10 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
 
     @Override
     protected void defineSynchedData(final SynchedEntityData.Builder builder) {
-
+        // 26.2: Entity's superclasses define synched data of their own now, and the builder refuses
+        // to build with a gap in the id range -- "has not defined synched data value N", thrown when
+        // the entity is constructed. Skipping super used to be harmless; it is not any more.
+        super.defineSynchedData(builder);
     }
 
     @Override
