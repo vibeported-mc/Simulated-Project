@@ -104,17 +104,18 @@ public final class SimRenderTypes {
     private static final RenderType LOCK = RenderType.create(
             Simulated.MOD_ID + ":lock",
             VeilRenderBridge.createRenderType("simulated/lock", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP)
-                    // This one used a vanilla shader rather than a Veil program, and the port
-                    // assumed 26.2 kept the same name under minecraft:core. It did not:
-                    // position_color_tex_lightmap is gone, and the core set is much smaller than it
-                    // was. core/block is the one that takes this exact format -- position, colour,
-                    // UV0 and a lightmap UV2 -- and the quad is written at full brightness, so the
-                    // lightmap it samples comes back white and the icon keeps its own colours.
-                    .vertexShader(Identifier.withDefaultNamespace("core/block"))
-                    .fragmentShader(Identifier.withDefaultNamespace("core/block"))
+                    // 1.21.1 drew this with POSITION_COLOR_TEX_LIGHTMAP_SHADER. 26.2's core shader
+                    // set is much smaller and has no equivalent, so that one is ported into this
+                    // mod rather than approximated with core/block, whose fog and filtered lightmap
+                    // sampling this never had.
+                    .vertexShader(Simulated.path("core/lock"))
+                    .fragmentShader(Simulated.path("core/lock"))
                     .snippet(VeilRenderPipelines.noDepthTest())
                     .snippet(VeilRenderPipelines.noCull())
                     .texture("Sampler0", Simulated.path("textures/gui/lock.png"))
+                    // The shader reads Sampler2, so the lightmap has to be bound. 1.21.1 got it
+                    // from the render type's format alone; on 26.2 a render setup declares it.
+                    .useLightmap()
                     .affectsCrumbling()
                     .create(true));
 
