@@ -1,17 +1,11 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "group": "simulated:handle_variants",
   "ingredients": [
-    {
-      "item": "simulated:iron_handle"
-    },
-    {
-      "item": "minecraft:purple_dye"
-    }
+    "simulated:iron_handle",
+    "minecraft:purple_dye"
   ],
   "result": {
-    "count": 1,
     "id": "simulated:purple_handle"
   }
 }

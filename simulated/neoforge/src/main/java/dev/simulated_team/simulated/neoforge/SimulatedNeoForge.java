@@ -33,8 +33,11 @@ public final class SimulatedNeoForge {
         tabRegister.register("main_tab", () -> TAB);
         tabRegister.register(modEventBus);
 
-        NeoForge.EVENT_BUS.register(SimNeoForgeCommonEvents.class);
-        modEventBus.register(SimNeoForgeCommonEvents.ModBusEvents.class);
+        // 26.2 port: these classes carry @EventBusSubscriber, and that annotation now covers both buses
+        // -- EventBusSubscriber.Bus is gone, and an event reaches the mod bus by implementing
+        // IModBusEvent. In 1.21.1 an unqualified @EventBusSubscriber meant the game bus only, so the
+        // explicit registration below was what put the mod-bus handlers on. Keeping both now delivers
+        // every mod-bus event twice, which showed up as a duplicate trigger-type registration.
 
         SimParticleTypesImpl.register(modEventBus);
         SimNeoForgeRecipeTypes.register(modEventBus);

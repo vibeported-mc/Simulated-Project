@@ -28,6 +28,12 @@ public class NeoForgeSimEntityService implements SimEntityService {
 	@Override
 	public <T extends Entity, P> EntityBuilder<T, P> loaderEntityTransform(final EntityBuilder<T, P> builder, final SimEntityTypes.EntityLoaderData data) {
 		return builder.properties(p -> {
+			// 26.2: every entity type gets a default loot table id and datagen insists a table
+			// exists for it. None of these entities drops through one -- contraptions, the diagram and
+			// the projectiles all hand back their contents in code -- so say outright that there is
+			// none. Create's own entity builder carries the same note.
+			p.noLootTable();
+
 			if (data.immuneToFire())
 				p.fireImmune();
 

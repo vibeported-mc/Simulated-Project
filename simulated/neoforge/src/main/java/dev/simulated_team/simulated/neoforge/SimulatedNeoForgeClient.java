@@ -20,8 +20,11 @@ public class SimulatedNeoForgeClient {
 		// in-game screen. Restore this line when Catnip's screens land.
 		// container.registerExtensionPoint(IConfigScreenFactory.class, ((c, l) -> new BaseConfigScreen(l, Simulated.MOD_ID)));
 
-		NeoForge.EVENT_BUS.register(SimNeoForgeClientEvents.class);
-		modEventBus.register(SimNeoForgeClientEvents.ModBusEvents.class);
+		// 26.2 port: these classes carry @EventBusSubscriber, and that annotation now covers both buses
+		// -- EventBusSubscriber.Bus is gone, and an event reaches the mod bus by implementing
+		// IModBusEvent. In 1.21.1 an unqualified @EventBusSubscriber meant the game bus only, so the
+		// explicit registration below was what put the mod-bus handlers on. Keeping both now delivers
+		// every mod-bus event twice, which showed up as a duplicate trigger-type registration.
 		SimulatedClient.PLUNGER_LAUNCHER_RENDER_HANDLER.registerListeners(NeoForge.EVENT_BUS);
 
 		SimulatedClient.init();

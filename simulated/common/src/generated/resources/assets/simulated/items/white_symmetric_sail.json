@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "simulated:block/symmetric_sail/item"
+  }
+}

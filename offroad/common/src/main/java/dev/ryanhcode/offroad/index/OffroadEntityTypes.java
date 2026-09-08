@@ -20,6 +20,10 @@ public class OffroadEntityTypes {
                             .clientTrackingRange(20)
                             .updateInterval(40)
                             .sized(1, 1)
+                            // 26.2: every entity type gets a default loot table id and datagen
+                            // insists a table exists for it. A contraption hands back its contents
+                            // in code, so there is none to generate.
+                            .noLootTable()
                             .eyeHeight(0)
                             .fireImmune()))
                     .register();

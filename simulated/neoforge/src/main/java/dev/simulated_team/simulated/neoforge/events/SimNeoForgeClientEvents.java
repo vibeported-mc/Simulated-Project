@@ -10,6 +10,8 @@ import dev.simulated_team.simulated.neoforge.service.SimpleResourceManagerRegist
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionResult;
+import dev.simulated_team.simulated.index.client.SimCustomItemRenderers;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -87,6 +89,22 @@ public class SimNeoForgeClientEvents {
 		@SubscribeEvent
 		public static void registerGuiLayers(final RegisterGuiLayersEvent event) {
 			event.registerAbove(VanillaGuiLayers.HOTBAR, Simulated.path("linked_typewriter_binding"), LinkedTypewriterItemBindHandler.OVERLAY);
+		}
+
+		/**
+		 * <h2>26.2 note</h2>
+		 * <p>The custom item renderers are registered here rather than from {@code SimulatedClient.init},
+		 * which runs in the mod's constructor. {@code CustomRenderedItems.register} takes the item
+		 * itself, and an item cannot be resolved while the mod is being constructed -- asking for one
+		 * throws "Trying to access unbound value" and fails mod construction outright.
+		 *
+		 * <p>Client setup is late enough for the items to exist and still early enough for Create's
+		 * {@code ModelSwapper}, which wraps each of these items' baked models so the renderer is reached
+		 * through the item's render state. It is where Create registers its own.
+		 */
+		@SubscribeEvent
+		public static void clientSetup(final FMLClientSetupEvent event) {
+			event.enqueueWork(SimCustomItemRenderers::register);
 		}
 
 		@SubscribeEvent

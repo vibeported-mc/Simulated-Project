@@ -17,6 +17,8 @@ import dev.simulated_team.simulated.service.SimModCompatibilityService;
 import dev.simulated_team.simulated.util.SimAssemblyHelper;
 import dev.simulated_team.simulated.util.SimColors;
 import net.createmod.catnip.api.client.lang.FontHelper;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Rarity;
@@ -59,16 +61,39 @@ public final class Simulated {
         SableEventPlatform.INSTANCE.onPostPhysicsTick(SimulatedCommonEvents::onPostPhysicsTick);
     }
 
+    /**
+     * <h2>26.2 note</h2>
+     * <p>This asked each item for its rarity while the item was being registered, to pick a palette.
+     * An item's default components -- rarity among them -- are bound after registration in 26.2, so
+     * {@code getDefaultInstance} at that moment throws "Components not bound yet" and takes the whole
+     * registration with it.
+     *
+     * <p>The rarity is read on first use instead. {@code TooltipModifier} is a functional interface,
+     * so the factory can hand back one that builds the real modifier the first time a tooltip is
+     * asked for -- by which point the components exist. It is memoised because the factory's result
+     * is stored per item and reused for every tooltip after that.
+     */
     public static void setTooltips() {
-        getRegistrate().setTooltipModifierFactory(item -> {
-            final Rarity rarity = item.getDefaultInstance().getRarity();
-            FontHelper.Palette color = FontHelper.Palette.STANDARD_CREATE;
-            if (rarity == Rarity.EPIC)
-                color = new FontHelper.Palette(TooltipHelper.styleFromColor(SimColors.EPIC_OURPLE), TooltipHelper.styleFromColor(rarity.color()));
+        getRegistrate().setTooltipModifierFactory(item -> new TooltipModifier() {
 
-            return new ItemDescription
-                    .Modifier(item, color)
-                    .andThen(TooltipModifier.mapNull(KineticStats.create(item)));
+            @Nullable
+            private TooltipModifier resolved;
+
+            @Override
+            public void modify(final ItemTooltipEvent context) {
+                if (this.resolved == null) {
+                    final Rarity rarity = item.getDefaultInstance().getRarity();
+                    FontHelper.Palette color = FontHelper.Palette.STANDARD_CREATE;
+                    if (rarity == Rarity.EPIC)
+                        color = new FontHelper.Palette(TooltipHelper.styleFromColor(SimColors.EPIC_OURPLE), TooltipHelper.styleFromColor(rarity.color()));
+
+                    this.resolved = new ItemDescription
+                            .Modifier(item, color)
+                            .andThen(TooltipModifier.mapNull(KineticStats.create(item)));
+                }
+
+                this.resolved.modify(context);
+            }
         });
     }
 

@@ -2,6 +2,7 @@ package dev.simulated_team.simulated.data.advancements;
 
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import dev.simulated_team.simulated.util.SimColors;
+import java.util.function.Supplier;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.triggers.InventoryChangeTrigger;
@@ -63,7 +64,7 @@ public class SimulatedAdvancement {
         }
 
         // 26.2: the icon is an ItemStackTemplate, and the overload taking a stack is gone.
-        this.builder.display(t.icon.getItem(), Component.translatable(this.titleKey()),
+        this.builder.display(t.icon.get(), Component.translatable(this.titleKey()),
                 Component.translatable(this.descriptionKey()).withStyle(s -> s.withColor(SimColors.ADVANCABLE_GOLD)),
                 id.equals("root") ? this.background : null, t.type.advancementType, t.type.toast, t.type.announce, t.type.hide);
 
@@ -171,7 +172,17 @@ public class SimulatedAdvancement {
         private TaskType type = TaskType.NORMAL;
         private boolean externalTrigger;
         private int keyIndex;
-        private ItemStack icon;
+        /**
+         * <h2>26.2 note</h2>
+         * <p>Held as a supplier of the item rather than as a stack. An advancement icon only ever
+         * uses the item -- the three places below all call {@code getItem()} -- and building a stack
+         * eagerly asks the item registry for its default components, which are not bound while the
+         * advancements are being declared. That threw "Trying to access unbound value" and took the
+         * whole registration down with it.
+         *
+         * <p>Create's own builder carries the same note on its {@code icon(ItemStack)} overload.
+         */
+        private Supplier<Item> icon;
 
         public Builder special(final TaskType type) {
             this.type = type;
@@ -184,15 +195,17 @@ public class SimulatedAdvancement {
         }
 
         public Builder icon(final ItemProviderEntry<?, ?> item) {
-            return this.icon(item.asStack());
+            this.icon = item::asItem;
+            return this;
         }
 
         public Builder icon(final ItemLike item) {
-            return this.icon(new ItemStack(item));
+            this.icon = item::asItem;
+            return this;
         }
 
         public Builder icon(final ItemStack stack) {
-            this.icon = stack;
+            this.icon = stack::getItem;
             return this;
         }
 
@@ -211,11 +224,11 @@ public class SimulatedAdvancement {
         }
 
         public Builder whenIconCollected() {
-            return this.externalTrigger(InventoryChangeTrigger.TriggerInstance.hasItems(this.icon.getItem()));
+            return this.externalTrigger(InventoryChangeTrigger.TriggerInstance.hasItems(this.icon.get()));
         }
 
         public Builder whenIconPlaced() {
-            if(this.icon.getItem() instanceof final BlockItem blockItem) {
+            if(this.icon.get() instanceof final BlockItem blockItem) {
                 return this.externalTrigger(ItemUsedOnLocationTrigger.TriggerInstance.placedBlock(blockItem.getBlock()));
             }
             return this.whenIconCollected();

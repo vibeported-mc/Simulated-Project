@@ -30,14 +30,24 @@ neoForge {
             ideName = "Simulated NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
         }
 
-        data {
-            data()
+        // 26.2 port: datagen is split by side, so there are two runs rather than one --
+        // matching the GatherDataEvent.Client / .Server split the providers were ported onto.
+        clientData {
+            clientData()
             gameDirectory = project.file('runs/data')
             programArguments.addAll '--all',
                     '--mod', 'simulated',
                     '--output', generatedResources.absolutePath,
-                    '--existing', commonResources.absolutePath,
-                    '--existing-mod', 'create'
+                    '--existing', commonResources.absolutePath
+        }
+
+        serverData {
+            serverData()
+            gameDirectory = project.file('runs/data')
+            programArguments.addAll '--all',
+                    '--mod', 'simulated',
+                    '--output', generatedResources.absolutePath,
+                    '--existing', commonResources.absolutePath
         }
         
         gameTest {

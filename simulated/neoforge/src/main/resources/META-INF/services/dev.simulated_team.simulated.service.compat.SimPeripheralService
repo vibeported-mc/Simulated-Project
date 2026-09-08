@@ -1,1 +1,5 @@
-dev.simulated_team.simulated.neoforge.service.compat.NeoForgeSimPeripheralService
+# 26.2 port: ComputerCraft has no 26.2 release, so its peripheral service is excluded from this
+# module's sources in simulated/neoforge/build.gradle. The entry goes with it -- FML validates
+# service descriptors before any mod loads, and a provider that is not in the jar is fatal.
+#
+#dev.simulated_team.simulated.neoforge.service.compat.NeoForgeSimPeripheralService

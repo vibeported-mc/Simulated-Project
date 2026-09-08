@@ -14,8 +14,11 @@ import net.neoforged.neoforge.common.NeoForge;
 @Mod(Aeronautics.MOD_ID)
 public class AeronauticsNeoForge {
     public AeronauticsNeoForge(final IEventBus modBus, final ModContainer modContainer) {
-        NeoForge.EVENT_BUS.register(AeroNeoForgeCommonEvents.class);
-        modBus.register(AeroNeoForgeCommonEvents.ModBusEvents.class);
+        // 26.2 port: these classes carry @EventBusSubscriber, and that annotation now covers both buses
+        // -- EventBusSubscriber.Bus is gone, and an event reaches the mod bus by implementing
+        // IModBusEvent. In 1.21.1 an unqualified @EventBusSubscriber meant the game bus only, so the
+        // explicit registration below was what put the mod-bus handlers on. Keeping both now delivers
+        // every mod-bus event twice, which showed up as a duplicate trigger-type registration.
 
         AeroParticleTypesNeoForge.registerEventListeners(modBus);
         Aeronautics.getRegistrate().registerEventListeners(modBus);

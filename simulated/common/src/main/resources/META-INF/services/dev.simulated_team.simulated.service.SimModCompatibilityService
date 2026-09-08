@@ -1,3 +1,11 @@
-dev.simulated_team.simulated.compat.computercraft.ComputerCraftPeripherals
-dev.simulated_team.simulated.compat.naturescompass.NaturesCompassCompatibility
-dev.simulated_team.simulated.compat.explorerscompass.ExplorersCompassCompatibility
+# 26.2 port: every compat this named is excluded from the build -- none of ComputerCraft, Nature's
+# Compass or Explorer's Compass has a 26.2 release, and their sources are excluded in
+# simulated/common/build.gradle rather than deleted.
+#
+# The entries have to go with them: FML validates a module's service descriptors before any mod
+# loads, and a provider naming a class that is not in the jar is a fatal startup error, not a
+# warning. Restore each line alongside its source exclusion.
+#
+#dev.simulated_team.simulated.compat.computercraft.ComputerCraftPeripherals
+#dev.simulated_team.simulated.compat.naturescompass.NaturesCompassCompatibility
+#dev.simulated_team.simulated.compat.explorerscompass.ExplorersCompassCompatibility

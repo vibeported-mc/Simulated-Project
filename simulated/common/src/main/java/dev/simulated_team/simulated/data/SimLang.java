@@ -99,6 +99,10 @@ public class SimLang {
         final Map<String, String> lang = getLangMap("en_us");
         lang.forEach(consumer);
 
+        // Compiling a ponder scene builds item stacks, and an item's default components are not
+        // bound during datagen unless something binds them. Create's own ponder lang does the same.
+        SimDatagenRegistries.bindItemComponents();
+
         PonderIndex.addPlugin(new SimPonderPlugin());
         PonderIndex.getLangAccess().provideLang(Simulated.MOD_ID, consumer);
     }

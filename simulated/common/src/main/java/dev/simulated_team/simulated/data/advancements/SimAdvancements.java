@@ -39,7 +39,7 @@ public class SimAdvancements implements DataProvider {
             .special(TaskType.SILENT)),
 
     APPLIED_KINEMATICS = create("applied_kinematics", b -> b
-            .icon(SimBlocks.PHYSICS_ASSEMBLER.asStack())
+            .icon(SimBlocks.PHYSICS_ASSEMBLER)
             .title("Applied Kinematics")
             .description("Obtain a Physics Assembler, the heart of every Simulated Contraption")
             .special(TaskType.NOISY)

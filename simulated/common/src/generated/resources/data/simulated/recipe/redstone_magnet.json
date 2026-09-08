@@ -1,19 +1,11 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
-    {
-      "tag": "c:dusts/redstone"
-    },
-    {
-      "tag": "c:plates/copper"
-    },
-    {
-      "item": "create:industrial_iron_block"
-    }
+    "#c:dusts/redstone",
+    "#c:plates/copper",
+    "create:industrial_iron_block"
   ],
   "result": {
-    "count": 1,
     "id": "simulated:redstone_magnet"
   }
 }

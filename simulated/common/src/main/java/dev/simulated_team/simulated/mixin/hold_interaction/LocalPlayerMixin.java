@@ -34,9 +34,14 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
      *
      * <p>{@code lastSentInput} still records the unmodified input, so the "has it changed" test on
      * the next tick stays consistent with what the player is actually pressing.
+     *
+     * <p>The constructor is named as an {@code INVOKE} rather than through {@code @At("NEW")}:
+     * {@code NEW} matches the allocation instruction, and {@code @ModifyArg} needs the call that
+     * takes the argument. A selector can resolve and still be the wrong kind of injection point.
      */
     @ModifyArg(method = "tick",
-            at = @At(value = "NEW", target = "(Lnet/minecraft/world/entity/player/Input;)Lnet/minecraft/network/protocol/game/ServerboundPlayerInputPacket;"))
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/network/protocol/game/ServerboundPlayerInputPacket;<init>(Lnet/minecraft/world/entity/player/Input;)V"))
     private Input simulated$shhhhDontTellTheServer(final Input input) {
         if (input.shift() && !HoldInteractionManager.canCrouch()) {
             return new Input(input.forward(), input.backward(), input.left(), input.right(), input.jump(), false,

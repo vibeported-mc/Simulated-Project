@@ -16,8 +16,11 @@ import net.neoforged.neoforge.common.NeoForge;
 @Mod(value = Aeronautics.MOD_ID, dist = Dist.CLIENT)
 public class AeronauticsNeoForgeClient {
 	public AeronauticsNeoForgeClient(final IEventBus modBus, final ModContainer container) {
-		NeoForge.EVENT_BUS.register(AeroNeoForgeClientEvents.class);
-		modBus.register(AeroNeoForgeClientEvents.ModBusEvents.class);
+		// 26.2 port: these classes carry @EventBusSubscriber, and that annotation now covers both buses
+		// -- EventBusSubscriber.Bus is gone, and an event reaches the mod bus by implementing
+		// IModBusEvent. In 1.21.1 an unqualified @EventBusSubscriber meant the game bus only, so the
+		// explicit registration below was what put the mod-bus handlers on. Keeping both now delivers
+		// every mod-bus event twice, which showed up as a duplicate trigger-type registration.
 		// 26.2 port: Catnip's config *screens* are not ported -- configure-platform.gradle.kts
 		// excludes **/client/config/** from the build, because the definitions in api/config are what
 		// back the TOML files and only the UI needed porting. Create comments out its own

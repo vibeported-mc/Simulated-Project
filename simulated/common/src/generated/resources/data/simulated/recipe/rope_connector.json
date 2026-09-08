@@ -1,20 +1,14 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
-    "I": {
-      "tag": "c:plates/iron"
-    },
-    "S": {
-      "item": "create:industrial_iron_block"
-    }
+    "I": "#c:plates/iron",
+    "S": "create:industrial_iron_block"
   },
   "pattern": [
     "I",
     "S"
   ],
   "result": {
-    "count": 1,
     "id": "simulated:rope_connector"
   }
 }

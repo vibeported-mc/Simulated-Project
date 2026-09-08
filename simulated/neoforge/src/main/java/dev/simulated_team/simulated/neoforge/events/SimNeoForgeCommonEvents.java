@@ -1,6 +1,7 @@
 package dev.simulated_team.simulated.neoforge.events;
 
 
+import dev.simulated_team.simulated.data.SimDatagenRegistries;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.command.SimCommand;
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysicsData;
@@ -179,11 +180,13 @@ public class SimNeoForgeCommonEvents {
 
 		@SubscribeEvent(priority = EventPriority.HIGHEST)
 		public static void gatherDataHighPriority(final GatherDataEvent.Server event) {
+			SimDatagenRegistries.set(event.getLookupProvider());
 			addGenerators();
 		}
 
 		@SubscribeEvent(priority = EventPriority.HIGHEST)
 		public static void gatherDataHighPriority(final GatherDataEvent.Client event) {
+			SimDatagenRegistries.set(event.getLookupProvider());
 			addGenerators();
 		}
 

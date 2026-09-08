@@ -6,6 +6,7 @@ import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.data.models.model.TextureSlot;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.ModelTemplate;
+import com.simibubi.create.foundation.data.ModelSlots;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllTags;
@@ -343,9 +344,9 @@ public class SimBlocks {
                     .item()
                     .model(() -> (c, p) -> p.generateWithTemplate(c.getEntry(),
                             new ModelTemplate(java.util.Optional.of(p.modLoc("block/portable_engine/item")),
-                                    java.util.Optional.empty(), TextureSlot.create("0"), TextureSlot.PARTICLE),
+                                    java.util.Optional.empty(), ModelSlots.SLOT_0, TextureSlot.PARTICLE),
                             new TextureMapping()
-                                    .put(TextureSlot.create("0"), new Material(p.modLoc("block/portable_engine/" + colorName)))
+                                    .put(ModelSlots.SLOT_0, new Material(p.modLoc("block/portable_engine/" + colorName)))
                                     .put(TextureSlot.PARTICLE, new Material(p.modLoc("block/portable_engine/" + colorName)))))
                     .build()
                     .register();
@@ -355,9 +356,9 @@ public class SimBlocks {
                     .item()
                     .model(() -> (c, p) -> p.generateWithTemplate(c.getEntry(),
                             new ModelTemplate(java.util.Optional.of(p.modLoc("block/portable_engine/item")),
-                                    java.util.Optional.empty(), TextureSlot.create("0"), TextureSlot.PARTICLE),
+                                    java.util.Optional.empty(), ModelSlots.SLOT_0, TextureSlot.PARTICLE),
                             new TextureMapping()
-                                    .put(TextureSlot.create("0"), new Material(p.modLoc("block/portable_engine/" + colorName)))
+                                    .put(ModelSlots.SLOT_0, new Material(p.modLoc("block/portable_engine/" + colorName)))
                                     .put(TextureSlot.PARTICLE, new Material(p.modLoc("block/portable_engine/" + colorName)))))
                     .build()
                     .register();
@@ -378,7 +379,7 @@ public class SimBlocks {
                 .blockstate(() -> (c, p) -> BlockStateGen.horizontalBlock(c, p, blockState ->
                         BlockModelGenerators.plainVariant(p.getBuilder()
                                 .parent(p.modLoc("block/portable_engine/block"))
-                                .texture(TextureSlot.create("0"), new Material(p.modLoc("block/portable_engine/" + colorName)))
+                                .texture(ModelSlots.SLOT_0, new Material(p.modLoc("block/portable_engine/" + colorName)))
                                 .texture(TextureSlot.PARTICLE, new Material(p.modLoc("block/portable_engine/" + colorName)))
                                 .build(p.modLoc("block/" + colorName + "_portable_engine")))))
                 .transform(SimStress.setCapacity(64.0))
@@ -801,8 +802,8 @@ public class SimBlocks {
                     .properties(p -> p.bounceRestitution(0.26f))
                     .blockstate(() -> (c, p) -> BlockStateGen.axisBlock(c, p, blockState -> BlockModelGenerators.plainVariant(p.getBuilder()
                             .parent(p.modLoc("block/symmetric_sail/block"))
-                            .texture(TextureSlot.create("0"), new Material(Create.asResource("block/sail/canvas_" + colorName)))
-                            .texture(TextureSlot.create("1"), new Material(p.modLoc("block/symmetric_sail/side_" + colorName)))
+                            .texture(ModelSlots.SLOT_0, new Material(Create.asResource("block/sail/canvas_" + colorName)))
+                            .texture(ModelSlots.SLOT_1, new Material(p.modLoc("block/symmetric_sail/side_" + colorName)))
                             .texture(TextureSlot.PARTICLE, new Material(Create.asResource("block/sail/canvas_" + colorName)))
                             .build(p.modLoc("block/" + colorName + "_symmetric_sail")))))
                     .tag(BlockTags.MINEABLE_WITH_AXE, AllTags.AllBlockTags.WINDMILL_SAILS.tag, SimTags.Blocks.SYMMETRIC_SAILS)
@@ -822,7 +823,7 @@ public class SimBlocks {
                     NameplateBlock.Position position = state.getValue(NameplateBlock.POSITION);
                     return BlockModelGenerators.plainVariant(prov.getBuilder()
                             .parent(prov.modLoc("block/nameplate/block_" + position.getSerializedName()))
-                            .texture(TextureSlot.create("0"), new Material(Simulated.path("block/nameplate/" + colorName + "_nameplate")))
+                            .texture(ModelSlots.SLOT_0, new Material(Simulated.path("block/nameplate/" + colorName + "_nameplate")))
                             .texture(TextureSlot.PARTICLE, new Material(Simulated.path("block/nameplate/" + colorName + "_nameplate")))
                             .build(prov.modLoc("block/" + colorName + "_nameplate_" + position.getSerializedName())));
                 }))
@@ -894,7 +895,7 @@ public class SimBlocks {
                     // hands back the identifier the variant names.
                     return BlockModelGenerators.plainVariant(prov.getBuilder()
                             .parent(prov.modLoc("block/handle/block_" + suffix))
-                            .texture(TextureSlot.create("0"), new Material(prov.modLoc("block/handle/" + name)))
+                            .texture(ModelSlots.SLOT_0, new Material(prov.modLoc("block/handle/" + name)))
                             .build(prov.modLoc("block/" + ctx.getName() + "_" + suffix)));
                 }
             });
@@ -905,8 +906,8 @@ public class SimBlocks {
         final ItemBuilder<BlockItem, BlockBuilder<HandleBlock, CreateRegistrate>> itemBuilder = builder.item();
         itemBuilder.model(() -> (ctx, prov) -> prov.generateWithTemplate(ctx.getEntry(),
                 new ModelTemplate(java.util.Optional.of(prov.modLoc("block/handle/item")),
-                        java.util.Optional.empty(), TextureSlot.create("0")),
-                new TextureMapping().put(TextureSlot.create("0"),
+                        java.util.Optional.empty(), ModelSlots.SLOT_0),
+                new TextureMapping().put(ModelSlots.SLOT_0,
                         new Material(prov.modLoc("block/handle/" + name)))));
 
         if(variant != HandleBlock.Variant.IRON) {
