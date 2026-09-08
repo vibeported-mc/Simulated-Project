@@ -82,6 +82,19 @@ public class DiagramScreen extends AbstractSimiScreen {
     private static final Vector3d LOCAL_CAMERA_POSITION = new Vector3d();
     private static final Vector3d CAMERA_POSITION = new Vector3d();
     private static final Matrix4f PROJECTION_MAT = new Matrix4f();
+    /**
+     * The same projection built for the GPU.
+     *
+     * <h2>26.2 note</h2>
+     * <p>26.2 renders reversed-Z: the device is set to {@code GL_ZERO_TO_ONE} and the depth test is
+     * {@code GREATER_THAN_OR_EQUAL}, so the far plane is 0 and the near plane is 1. Vanilla builds
+     * its matrices by handing {@code ortho} its near and far the other way round, and so must this.
+     *
+     * <p>{@link #PROJECTION_MAT} keeps the forward-Z form because the overlay maths --
+     * {@link #getScreenCoords}, {@link #getPlotCoords}, the force arrows and the centre-of-mass
+     * marker -- is calibrated against it and only ever uses x and y.
+     */
+    private static final Matrix4f RENDER_PROJECTION_MAT = new Matrix4f();
     public static final Quaternionf LOCAL_ORIENTATION = new Quaternionf();
 
     private static final Vector2d MAGNIFYING_CENTER = new Vector2d();
@@ -425,6 +438,8 @@ public class DiagramScreen extends AbstractSimiScreen {
 
         final float aspect = (float) DIAGRAM_TEXTURE.width / DIAGRAM_TEXTURE.height;
         PROJECTION_MAT.identity().ortho(-radius * aspect, radius * aspect, -radius, radius, zNear, radius * 2.0f);
+        RENDER_PROJECTION_MAT.identity().setOrtho(-radius * aspect, radius * aspect, -radius, radius,
+                radius * 2.0f, zNear, RenderSystem.getDevice().getDeviceInfo().isZZeroToOne());
 
         // account for the smaller screen size
         LOCAL_CAMERA_POSITION.set(plotBoundsCenter.add(LOCAL_ORIENTATION.transform(new Vector3d(0, 0, radius))));
@@ -432,18 +447,21 @@ public class DiagramScreen extends AbstractSimiScreen {
         final Pose3dc renderPose = ((ClientSubLevel) subLevel).renderPose(partialTicks);
         renderPose.transformPosition(CAMERA_POSITION.set(LOCAL_CAMERA_POSITION));
 
-        draw(subLevel, partialTicks, LOCAL_ORIENTATION, PROJECTION_MAT, CAMERA_POSITION, DIAGRAM_TEXTURE.width, DIAGRAM_TEXTURE.height, this.fbo, this.outlineFbo, this.finalFbo, 0.25f, 1.0f, 0x2E3032, 0x696965);
+        draw(subLevel, partialTicks, LOCAL_ORIENTATION, PROJECTION_MAT, RENDER_PROJECTION_MAT, CAMERA_POSITION, DIAGRAM_TEXTURE.width, DIAGRAM_TEXTURE.height, this.fbo, this.outlineFbo, this.finalFbo, 0.25f, 1.0f, 0x2E3032, 0x696965);
     }
 
-    public static void draw(final SubLevel subLevel, final float partialTicks, final Quaternionf localOrientation, final Matrix4f projMatrix, final Vector3d cameraPos, final float inWidth, final float inHeight, final AdvancedFbo fbo, final AdvancedFbo outlineFbo, final AdvancedFbo finalFbo, final float paletteOffset, final float fadeScale, final int lineColor, final int lineShadowColor) {
+    public static void draw(final SubLevel subLevel, final float partialTicks, final Quaternionf localOrientation, final Matrix4f projMatrix, final Matrix4f renderProjMatrix, final Vector3d cameraPos, final float inWidth, final float inHeight, final AdvancedFbo fbo, final AdvancedFbo outlineFbo, final AdvancedFbo finalFbo, final float paletteOffset, final float fadeScale, final int lineColor, final int lineShadowColor) {
         fbo.bind(true);
-        fbo.clear();
+        // 26.2 is reversed-Z, so an empty depth buffer is 0 rather than 1. AdvancedFbo.clear()
+        // still uses the old convention, under which nothing would pass GREATER_THAN_OR_EQUAL.
+        // The populated path clears again inside the render pass; this covers the empty-chain one.
+        fbo.clear(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, fbo.getClearMask());
 
         final Pose3dc renderPose = ((ClientSubLevel) subLevel).renderPose(partialTicks);
         final Quaternionf orientation = new Quaternionf(renderPose.orientation()).conjugate();
         orientation.premul(localOrientation.conjugate(new Quaternionf()));
 
-        SimpleSubLevelGroupRenderer.renderChain(subLevel, fbo, new Matrix4f(), projMatrix, cameraPos, orientation, partialTicks);
+        SimpleSubLevelGroupRenderer.renderChain(subLevel, fbo, new Matrix4f(), renderProjMatrix, cameraPos, orientation, partialTicks);
 
         final PostProcessingManager manager = VeilRenderSystem.renderer().getPostProcessingManager();
         final PostPipeline pipeline = manager.getPipeline(Simulated.path("diagram"));

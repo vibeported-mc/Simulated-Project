@@ -138,6 +138,9 @@ void main() {
     vec4 fade = vec4(vec3(1.0 - dist * 0.08), 1.0);
     vec4 dither_mask = dither_colors(texCoord, fade.rgb, vec3(0.0), vec3(1.0));
 
-    float alpha = step(depth, 0.99);
+    // 26.2 renders reversed-Z with a [0,1] depth range, so an untouched background reads 0.0 and
+    // geometry reads upward from there -- the opposite of the [0,1]-with-1.0-far convention this
+    // was written for. Testing the old way made every pixel of the sheet opaque.
+    float alpha = step(0.01, depth);
     fragColor = vec4(mix(dither.rgb, outline.rgb, outline.a), alpha * dither_mask.r);
 }

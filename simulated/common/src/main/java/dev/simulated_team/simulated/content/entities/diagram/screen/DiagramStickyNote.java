@@ -1,5 +1,6 @@
 package dev.simulated_team.simulated.content.entities.diagram.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import dev.ryanhcode.sable.companion.math.BoundingBox3i;
@@ -41,6 +42,8 @@ public class DiagramStickyNote extends DiagramButton {
     private static final Vector3d NOTE_LOCAL_CAM_POS = new Vector3d();
     private static final Vector3d NOTE_CAMERA_POS = new Vector3d();
     private static final Matrix4f NOTE_PROJ_MAT = new Matrix4f();
+    /** The reversed-Z sibling of {@link #NOTE_PROJ_MAT}; see {@code DiagramScreen.RENDER_PROJECTION_MAT}. */
+    private static final Matrix4f NOTE_RENDER_PROJ_MAT = new Matrix4f();
 
     private static final Quaternionf NOTE_ORIENTATION = new Quaternionf();
     private DiagramScreen parent;
@@ -243,6 +246,8 @@ public class DiagramStickyNote extends DiagramButton {
         final Vector3d plotBoundsCenter = new Vector3d((scopeBounds.minX() + scopeBounds.maxX() + 1) / 2.0, (scopeBounds.minY() + scopeBounds.maxY() + 1) / 2.0, (scopeBounds.minZ() + scopeBounds.maxZ() + 1) / 2.0);
         final float aspect = (float) SUBLEVEL_RENDER_WIDTH_PIXELS / SUBLEVEL_RENDER_HEIGHT_PIXELS;
         NOTE_PROJ_MAT.identity().ortho(-radius * aspect, radius * aspect, -radius, radius, zNear, maxDistance * 2.0f);
+        NOTE_RENDER_PROJ_MAT.identity().setOrtho(-radius * aspect, radius * aspect, -radius, radius,
+                maxDistance * 2.0f, zNear, RenderSystem.getDevice().getDeviceInfo().isZZeroToOne());
 
         // account for the smaller screen size
         NOTE_LOCAL_CAM_POS.set(plotBoundsCenter.add(NOTE_ORIENTATION.transform(new Vector3d(0, 0, maxDistance))));
@@ -250,7 +255,7 @@ public class DiagramStickyNote extends DiagramButton {
         final Pose3dc renderPose = this.parent.subLevel.renderPose(partialTicks);
         renderPose.transformPosition(NOTE_CAMERA_POS.set(NOTE_LOCAL_CAM_POS));
 
-        DiagramScreen.draw(this.parent.subLevel, partialTicks, NOTE_ORIENTATION, NOTE_PROJ_MAT, NOTE_CAMERA_POS, SUBLEVEL_RENDER_WIDTH_PIXELS, SUBLEVEL_RENDER_HEIGHT_PIXELS, this.fbo, this.outlineFbo, this.finalFbo, 0.75f, 1.15f, 0x6e684d, 0x59543e);
+        DiagramScreen.draw(this.parent.subLevel, partialTicks, NOTE_ORIENTATION, NOTE_PROJ_MAT, NOTE_RENDER_PROJ_MAT, NOTE_CAMERA_POS, SUBLEVEL_RENDER_WIDTH_PIXELS, SUBLEVEL_RENDER_HEIGHT_PIXELS, this.fbo, this.outlineFbo, this.finalFbo, 0.75f, 1.15f, 0x6e684d, 0x59543e);
     }
 
     @Override
