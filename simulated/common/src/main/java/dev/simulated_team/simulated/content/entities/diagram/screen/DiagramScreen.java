@@ -52,6 +52,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.createmod.catnip.api.data.Pair;
+import java.nio.ByteBuffer;
+import org.lwjgl.system.MemoryUtil;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
@@ -416,14 +418,32 @@ public class DiagramScreen extends AbstractSimiScreen {
         }
 
         final int length = width * height;
-        final int[] buffer = new int[length];
-        glReadPixels(x0, y0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
-        for (int i = 0; i < length; i++) {
-            final int color = buffer[i] >> 24;
-            if (color != 0) return true;
+        // Say how the rows are packed before reading them. This state is global and whatever drew
+        // last may have left a row length or an alignment set; glReadPixels then writes more than
+        // the four bytes a pixel this buffer is sized for and runs off the end of it. That is not an
+        // exception -- it is a write into memory the driver does not own, which Windows reports as
+        // EXCEPTION_ACCESS_VIOLATION inside nvoglv64.dll with the whole process gone. Clamping the
+        // rectangle, which is what the last go at this fixed, does not help: the coordinates were
+        // only half of it.
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+        glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+        glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+
+        // A direct buffer of exactly the size the read is told to produce, rather than a Java array
+        // the binding has to size on our behalf.
+        final ByteBuffer buffer = MemoryUtil.memAlloc(length * 4);
+        try {
+            glReadPixels(x0, y0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+            for (int i = 0; i < length; i++) {
+                if (buffer.get(i * 4 + 3) != 0) return true;
+            }
+            return false;
+        } finally {
+            MemoryUtil.memFree(buffer);
         }
-        return false;
     }
 
     private void renderContents(final SubLevel subLevel, final float partialTicks) {
