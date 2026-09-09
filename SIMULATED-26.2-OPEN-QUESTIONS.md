@@ -141,6 +141,68 @@ a possibly-empty `ItemStack` to a 26.2 transfer API is worth a look.
 **Covered by** `SimulatedRegistryTest` in Create-e2e, which places every block the three mods register
 and ticks it.
 
+## 3.6 Every render type lost its depth test, and the obvious repair was backwards
+
+Eight of them, across all three mods, and the symptom is one a screenshot shows in a second and no
+server-side assertion ever will: a burner's flame, an accumulator's diode, a laser, a rope and a
+spring all drew **through solid blocks**, from any distance and any angle.
+
+**Half one.** 1.21.1's `RenderType.CompositeState.builder()` started with `LEQUAL_DEPTH_TEST` and
+`COLOR_DEPTH_WRITE` already set, so a render type that said nothing about depth still tested and wrote
+it -- and most of these types said nothing. 26.2 moved that state onto `RenderPipeline`, whose builder
+ends with:
+
+```java
+this.depthStencilState.orElse(null),
+```
+
+A pipeline holding a null `DepthStencilState` is given no depth attachment at all --
+`wantsDepthTexture()` returns false -- so the draw neither tests nor writes. Every type carried across
+verbatim silently became an overlay.
+
+**Half two, which cost a run to find.** Naming `VeilRenderPipelines.lequalDepthTest()` -- the compare
+op these types had on 1.21.1, by that name -- changes nothing. 26.2 reversed the depth buffer:
+
+```java
+public static final DepthStencilState DEFAULT = new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, true);
+```
+
+Near is 1 and far is 0, so the test that keeps the nearer fragment is the *greater* one, and LEQUAL
+keeps whatever is furthest away instead. The screenshot after that fix was indistinguishable from the
+one before it. **On 26.2, "lequal" is not a synonym for "normal depth testing" -- it is the exact
+opposite of it**, and the name is the trap, because it is the name the 1.21.1 code used.
+
+The repair is `VeilRenderPipelines.defaultDepthTest()`, added for this: vanilla's own
+`DepthStencilState.DEFAULT`, which stays right whichever way round the buffer is.
+
+| Type | Where | Now |
+|---|---|---|
+| burner flame | `HotAirBurnerRenderer.flameType` | `defaultDepthTest()` |
+| accumulator diode | `RedstoneAccumulatorRenderer.DIODE_RENDER_TYPE` | `defaultDepthTest()` |
+| levitite, levitite ghosts | `AeroRenderTypes` | `defaultDepthTest()` |
+| laser, lens, rope, spring | `SimRenderTypes` | `defaultDepthTest()` |
+| End Sea | `SimRenderTypes` | `noDepthWrite()` alone; it had named LEQUAL, backwards |
+| staff overlay | `SimRenderTypes` | `noDepthTestOrWrite()`, see below |
+| lock marker | `SimRenderTypes` | unchanged: `noDepthTest()` is right |
+
+Two further defects fell out of the same reading, both in Veil and both fixed there:
+
+- **`noDepthWrite()` reversed the test as well as dropping the write.** It was
+  `depth(LESS_THAN_OR_EQUAL, false)`, so a type asking only to stop writing depth quietly got the
+  wrong compare op too. It reads the op off `DepthStencilState.DEFAULT` now.
+- **A depth state is one snippet, not two.** `STAFF_OVERLAY` set `noDepthWrite()` and then
+  `noDepthTest()`; the later one replaces the whole `DepthStencilState`, so the overlay was *writing*
+  depth and occluding everything drawn after it. `noDepthTestOrWrite()` says both at once.
+
+**Any render type added from here on must name a depth state**, and `defaultDepthTest()` is almost
+always the one meant. A Veil-built type that omits it, or that reaches for `lequalDepthTest()` because
+the 1.21.1 source said LEQUAL, is this bug again.
+
+**Covered by** `RenderThroughWallsTest` in Create-e2e, which stands a lit burner and an accumulator
+behind a stone wall, on the ground and in a sub-level, and photographs the scene with the wall and
+then without it from the same camera. It is a picture for a person rather than an assertion: the
+defect is invisible from the server side, and it is what caught the backwards first fix.
+
 ## 4. Smaller things noted in passing
 
 - **The docking connector's unpair-on-turn.** `onRemove` used to see the replacing state, so a

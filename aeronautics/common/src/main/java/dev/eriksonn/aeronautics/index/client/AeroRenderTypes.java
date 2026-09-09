@@ -60,6 +60,9 @@ public final class AeroRenderTypes {
                     .vertexShader(LEVITITE_SHADER)
                     .fragmentShader(LEVITITE_SHADER)
                     .snippet(VeilRenderPipelines.translucentBlend())
+                    // The depth state 1.21.1 got by default and 26.2 does not give at all.
+                    // See the note on SimRenderTypes.
+                    .snippet(VeilRenderPipelines.defaultDepthTest())
                     .snippet(VeilRenderPipelines.cull())
                     .texture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
                     .useLightmap()
@@ -72,6 +75,9 @@ public final class AeroRenderTypes {
                     .vertexShader(LEVITITE_SHADER)
                     .fragmentShader(LEVITITE_SHADER)
                     .snippet(VeilRenderPipelines.translucentBlend())
+                    // The depth state 1.21.1 got by default and 26.2 does not give at all.
+                    // See the note on SimRenderTypes.
+                    .snippet(VeilRenderPipelines.defaultDepthTest())
                     .snippet(VeilRenderPipelines.noCull())
                     .texture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
                     .useLightmap()

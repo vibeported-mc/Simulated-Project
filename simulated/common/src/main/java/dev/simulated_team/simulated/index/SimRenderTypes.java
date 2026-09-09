@@ -40,6 +40,28 @@ import java.util.function.Function;
  *   <li>{@code affectsCrumbling} and {@code sort} moved onto the builder, and the outline flag is
  *       the argument to {@code create}.</li>
  * </ul>
+ *
+ * <h2>Depth is not optional any more, and LEQUAL is not the answer</h2>
+ * <p>1.21.1's {@code CompositeState.builder()} started with {@code LEQUAL_DEPTH_TEST} and
+ * {@code COLOR_DEPTH_WRITE} already set, so a type that said nothing about depth still tested and
+ * wrote it. 26.2 has no such default: {@code RenderPipeline.Builder.build} ends with
+ * {@code depthStencilState.orElse(null)}, and a pipeline holding a null one is given no depth
+ * attachment at all -- {@code wantsDepthTexture()} is false and the draw neither tests nor writes.
+ *
+ * <p>Nothing reports this. The draw is issued, it validates, and it simply paints over whatever is
+ * already in the colour buffer: a laser, a rope, a lens or a burner's flame shows through the wall
+ * in front of it, through the block it belongs to, and from any distance.
+ *
+ * <p>The obvious repair is wrong. Naming {@code lequalDepthTest()} -- the compare op these types had
+ * on 1.21.1, by that name -- fixes nothing at all, because 26.2 reversed the depth buffer:
+ * {@code DepthStencilState.DEFAULT} is {@code GREATER_THAN_OR_EQUAL}, near is 1 and far is 0, and
+ * asking for LEQUAL keeps the furthest fragment rather than the nearest. It draws through walls just
+ * as thoroughly as having no depth state at all, which is exactly how it looked when tried.
+ *
+ * <p>So every type that relied on the old default names {@link VeilRenderPipelines#defaultDepthTest()}
+ * here, which is vanilla's own state and stays right whichever way round the buffer is. The two that
+ * genuinely want to be seen through walls -- the staff overlay and the lock marker, both of which set
+ * {@code NO_DEPTH_TEST} on 1.21.1 -- keep saying so.
  */
 public final class SimRenderTypes {
 
@@ -56,9 +78,10 @@ public final class SimRenderTypes {
                     .vertexShader(Identifier.withDefaultNamespace("core/position_color"))
                     .fragmentShader(Identifier.withDefaultNamespace("core/position_color"))
                     .snippet(VeilRenderPipelines.translucentBlend())
-                    // COLOR_WRITE: colour only, so depth writing is off.
-                    .snippet(VeilRenderPipelines.noDepthWrite())
-                    .snippet(VeilRenderPipelines.noDepthTest())
+                    // COLOR_WRITE and NO_DEPTH_TEST together: drawn over everything, and occluding
+                    // nothing afterwards. Asked for as one snippet because the two of them are one
+                    // depth state -- set separately, whichever came last decided the write as well.
+                    .snippet(VeilRenderPipelines.noDepthTestOrWrite())
                     .snippet(VeilRenderPipelines.cull())
                     .sortOnUpload()
                     .create(false));
@@ -68,6 +91,8 @@ public final class SimRenderTypes {
             VeilRenderBridge.createRenderType("simulated/laser", DefaultVertexFormat.POSITION_TEX_COLOR)
                     .vertexShader(Simulated.path("core/laser/laser"))
                     .fragmentShader(Simulated.path("core/laser/laser"))
+                    // The depth state 1.21.1 gave by default. See the class note.
+                    .snippet(VeilRenderPipelines.defaultDepthTest())
                     .snippet(VeilRenderPipelines.translucentBlend())
                     .snippet(VeilRenderPipelines.noCull())
                     .sortOnUpload()
@@ -80,6 +105,8 @@ public final class SimRenderTypes {
                     // -- and the second won. Only the winner is named here.
                     .vertexShader(Simulated.path("core/laser_pointer/lens"))
                     .fragmentShader(Simulated.path("core/laser_pointer/lens"))
+                    // The depth state 1.21.1 gave by default. See the class note.
+                    .snippet(VeilRenderPipelines.defaultDepthTest())
                     .texture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
                     .useLightmap()
                     .affectsCrumbling()
@@ -124,6 +151,8 @@ public final class SimRenderTypes {
             VeilRenderBridge.createRenderType("simulated/rope", DefaultVertexFormat.BLOCK)
                     .vertexShader(Simulated.path("core/rope/rope"))
                     .fragmentShader(Simulated.path("core/rope/rope"))
+                    // The depth state 1.21.1 gave by default. See the class note.
+                    .snippet(VeilRenderPipelines.defaultDepthTest())
                     .texture("Sampler0", Simulated.path("textures/block/rope_particle.png"))
                     .useLightmap()
                     .snippet(VeilRenderPipelines.cull())
@@ -135,6 +164,8 @@ public final class SimRenderTypes {
                     VeilRenderBridge.createRenderType("spring", SPRING_FORMAT)
                             .vertexShader(Simulated.path("core/spring/spring"))
                             .fragmentShader(Simulated.path("core/spring/spring"))
+                            // The depth state 1.21.1 gave by default. See the class note.
+                            .snippet(VeilRenderPipelines.defaultDepthTest())
                             .texture("Sampler0", texture)
                             .snippet(VeilRenderPipelines.noBlend())
                             .useLightmap()
@@ -160,7 +191,8 @@ public final class SimRenderTypes {
                     .fragmentShader(Simulated.path("core/end_sea"))
                     .texture("SkySampler", Identifier.withDefaultNamespace("textures/entity/end_portal.png"))
                     .snippet(VeilRenderPipelines.additiveBlend())
-                    .snippet(VeilRenderPipelines.lequalDepthTest())
+                    // `depthMask(false)` around the old immediate-mode draw, and nothing about the
+                    // test -- so the default test with the write off, which is one snippet.
                     .snippet(VeilRenderPipelines.noDepthWrite())
                     .snippet(VeilRenderPipelines.noCull())
                     .create(false));

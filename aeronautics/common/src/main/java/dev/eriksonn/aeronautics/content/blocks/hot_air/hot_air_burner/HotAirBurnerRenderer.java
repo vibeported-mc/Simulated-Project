@@ -84,6 +84,9 @@ public class HotAirBurnerRenderer
                         // baked in instead -- one compiled program per palette.
                         .shaderDefine("PALETTE", p)
                         .snippet(VeilRenderPipelines.translucentBlend())
+                        // The depth state 1.21.1 got from its own `enableDepthTest` around the
+                        // draw, and 26.2 does not give at all. See the note on SimRenderTypes.
+                        .snippet(VeilRenderPipelines.defaultDepthTest())
                         .snippet(VeilRenderPipelines.noCull())
                         .useLightmap()
                         .create(false)));

@@ -8,6 +8,7 @@ import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRende
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import foundry.veil.api.client.render.VeilRenderBridge;
+import foundry.veil.api.client.render.rendertype.VeilRenderPipelines;
 import net.createmod.catnip.api.math.AngleHelper;
 import com.simibubi.create.foundation.render.CachedBufferer;
 import net.createmod.catnip.api.client.render.SuperByteBuffer;
@@ -37,6 +38,9 @@ public class RedstoneAccumulatorRenderer
             VeilRenderBridge.createRenderType("redstone_accumulator_diode", DefaultVertexFormat.BLOCK)
                     .vertexShader(SHADER_NAME)
                     .fragmentShader(SHADER_NAME)
+                    // The depth state 1.21.1 got by default and 26.2 does not give at all.
+                    // See the note on SimRenderTypes.
+                    .snippet(VeilRenderPipelines.defaultDepthTest())
                     .texture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
                     .useLightmap()
                     .affectsCrumbling()
