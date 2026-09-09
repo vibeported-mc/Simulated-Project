@@ -233,6 +233,20 @@ public class DiagramEntity extends HangingEntity implements ISyncPersistentData,
         }
 
         super.readAdditionalSaveData(input);
+
+        // 26.2 note
+        // BlockAttachedEntity drops a stored attachment position more than sixteen blocks from where
+        // it believes the entity to be, which is a guard against corrupt saves. A diagram on an
+        // assembled contraption lives in a sub-level, twenty million blocks out, and is read before
+        // it has been placed there -- so the guard throws away the only correct answer and leaves the
+        // attachment on the block the diagram used to hang on in the world. The bounding box is built
+        // from that attachment, so the diagram is drawn where the contraption is not, while staying
+        // clickable where it really is. Vanilla says as much in the log first:
+        // "Block-attached entity at invalid position: BlockPos{x=20481033, ...}".
+        input.read("block_pos", BlockPos.CODEC)
+                .filter(stored -> !stored.equals(this.pos))
+                .ifPresent(stored -> this.pos = stored);
+
         this.updateFacingWithBoundingBox(this.getDirection(), this.verticalOrientation);
     }
 
