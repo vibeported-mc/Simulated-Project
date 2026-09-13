@@ -61,6 +61,19 @@ public class PortableEngineBlock extends HorizontalKineticBlock implements IBE<P
         super.createBlockStateDefinition(builder);
     }
 
+    /**
+     * Dyeing an engine swaps it for the engine of that colour, a different block, and what is burning
+     * in it has to come along.
+     * <p>
+     * 1.21.1 kept the block entity by declining to remove it in {@code onRemove}. 26.2 has no
+     * {@code onRemove}: the chunk removes a block entity itself whenever the block changes, unless the
+     * <em>new</em> block asks to keep it here. Without this, dyeing an engine deleted the item in it.
+     */
+    @Override
+    protected boolean shouldChangedStateKeepBlockEntity(final BlockState oldState) {
+        return SimBlockEntityTypes.PORTABLE_ENGINE.get().isValid(oldState);
+    }
+
     @Override
     public boolean hasShaftTowards(final LevelReader world, final BlockPos pos, final BlockState state, final Direction face) {
         return face == state.getValue(HORIZONTAL_FACING);
