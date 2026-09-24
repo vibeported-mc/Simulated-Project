@@ -53,10 +53,17 @@ public class ClientBalloonEffectRenderer {
         // level stage maps onto a NeoForge sub-event inside the frame graph.
         //
         // Deferring the draw to RenderGuiEvent.Pre, the first point after the level, was tried and
-        // kills the client just the same, so that hook is inside a pass too. Everything underneath
-        // the overlay works and is covered by tests -- the framebuffer, the program, the uniforms,
-        // the post pipeline that composites it. What is missing is a point in the frame where a mod
-        // may open a pass, and finding or making one is a change to the renderer, not to this.
+        // is half of the answer. Measured there: an empty listener is harmless, and building a
+        // full-window framebuffer and clearing it runs for tens of thousands of frames with the
+        // suite green. So a target *can* be made and written to after the level; the hook is fine.
+        //
+        // What still kills the client is renderBalloonEffects itself, and it does so before the
+        // world is even up rather than when a balloon first appears, which points at something
+        // structural in that method rather than at a per-frame draw. It was not found.
+        //
+        // Everything underneath the overlay works and is covered: the framebuffer, the program,
+        // its uniforms, the post pipeline that composites it, and now the resolve that moves one
+        // framebuffer into another.
         if (!VeilGlDevice.isSupported()) {
             freeFbo();
             return;
