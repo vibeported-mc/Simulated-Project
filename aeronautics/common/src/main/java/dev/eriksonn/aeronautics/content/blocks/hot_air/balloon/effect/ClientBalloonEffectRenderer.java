@@ -1,6 +1,7 @@
 package dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.effect;
 
 import com.mojang.blaze3d.platform.Window;
+import foundry.veil.api.client.render.ext.VeilGlDevice;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import dev.eriksonn.aeronautics.Aeronautics;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.BlockEntityLiftingGasProvider;
@@ -39,6 +40,17 @@ public class ClientBalloonEffectRenderer {
                                           final Matrix4fc projectionMatrix,
                                           final int renderTick) {
         if (stage != VeilRenderLevelStageEvent.Stage.AFTER_SOLID_BLOCKS) {
+            return;
+        }
+
+        // The overlay is drawn into an AdvancedFbo, which is a raw OpenGL framebuffer object with
+        // no counterpart on another backend. Building one there does not fail politely: the colour
+        // attachment limit reads as zero, validation rejects the first buffer, and the throw lands
+        // in the middle of a frame and takes the client down with it.
+        //
+        // Comes off when Veil's framebuffers are rebuilt on GpuTexture.
+        if (!VeilGlDevice.isSupported()) {
+            freeFbo();
             return;
         }
 
