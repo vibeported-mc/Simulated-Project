@@ -35,6 +35,7 @@ public class ClientBalloonEffectRenderer {
     @Nullable
     private static AdvancedFbo overlayFbo;
 
+
     public static void onRenderLevelStage(final VeilRenderLevelStageEvent.Stage stage,
                                           final Matrix4fc frustumMatrix,
                                           final Matrix4fc projectionMatrix,
@@ -44,13 +45,18 @@ public class ClientBalloonEffectRenderer {
         }
 
 
-        // The overlay draws into its own framebuffer, from inside the level render.
+        // The overlay is not drawn off OpenGL, and the reason is where rather than how.
         //
-        // On OpenGL that is a framebuffer switch mid-frame, which is what the API was built for.
-        // Off it there is no switch: drawing into another target means opening a render pass, and
-        // this event fires while one is already open -- `Close the existing render pass before
-        // creating a new one!`. The overlay has to be drawn somewhere a pass can be opened, which
-        // is not here, so it is a restructuring rather than a port.
+        // It goes into a framebuffer of its own. On OpenGL that is a bind mid-frame, which is what
+        // this API was built for. Off it there is no bind: drawing into another target means
+        // opening a render pass, and this event fires while one is already open -- every Veil
+        // level stage maps onto a NeoForge sub-event inside the frame graph.
+        //
+        // Deferring the draw to RenderGuiEvent.Pre, the first point after the level, was tried and
+        // kills the client just the same, so that hook is inside a pass too. Everything underneath
+        // the overlay works and is covered by tests -- the framebuffer, the program, the uniforms,
+        // the post pipeline that composites it. What is missing is a point in the frame where a mod
+        // may open a pass, and finding or making one is a change to the renderer, not to this.
         if (!VeilGlDevice.isSupported()) {
             freeFbo();
             return;
