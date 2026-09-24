@@ -45,30 +45,6 @@ public class ClientBalloonEffectRenderer {
         }
 
 
-        // The overlay is not drawn off OpenGL, and the reason is where rather than how.
-        //
-        // It goes into a framebuffer of its own. On OpenGL that is a bind mid-frame, which is what
-        // this API was built for. Off it there is no bind: drawing into another target means
-        // opening a render pass, and this event fires while one is already open -- every Veil
-        // level stage maps onto a NeoForge sub-event inside the frame graph.
-        //
-        // Deferring the draw to RenderGuiEvent.Pre, the first point after the level, was tried and
-        // is half of the answer. Measured there: an empty listener is harmless, and building a
-        // full-window framebuffer and clearing it runs for tens of thousands of frames with the
-        // suite green. So a target *can* be made and written to after the level; the hook is fine.
-        //
-        // What still kills the client is renderBalloonEffects itself, and it does so before the
-        // world is even up rather than when a balloon first appears, which points at something
-        // structural in that method rather than at a per-frame draw. It was not found.
-        //
-        // Everything underneath the overlay works and is covered: the framebuffer, the program,
-        // its uniforms, the post pipeline that composites it, and now the resolve that moves one
-        // framebuffer into another.
-        if (!VeilGlDevice.isSupported()) {
-            freeFbo();
-            return;
-        }
-
         final Minecraft minecraft = Minecraft.getInstance();
         final ClientLevel level = minecraft.level;
         if (level == null) {
