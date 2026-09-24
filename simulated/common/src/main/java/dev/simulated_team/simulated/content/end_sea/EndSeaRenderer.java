@@ -7,17 +7,12 @@ import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.PrimitiveTopology;
-import dev.simulated_team.simulated.Simulated;
-import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.shader.program.ShaderProgram;
-import foundry.veil.api.client.render.shader.uniform.ShaderUniform;
 import foundry.veil.api.client.render.vertex.VertexArray;
 import dev.simulated_team.simulated.index.SimRenderTypes;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -28,8 +23,6 @@ import org.joml.Vector3dc;
  * Renders the end-sea effect
  */
 public class EndSeaRenderer {
-
-    private static final Identifier SHADER = Simulated.path("end_sea");
 
     private static final int LAYER_COUNT = 48;
     // 26.2: Position + Color + UV0 + UV2 is DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP.
@@ -89,14 +82,17 @@ public class EndSeaRenderer {
      * filled them is parked, so they would sample an empty buffer either way. Restoring the shadow
      * map means declaring them in the shader's Veil JSON as framebuffer textures, which is how a
      * render type names its samplers. See {@code SIMULATED-26.2-OPEN-QUESTIONS.md} §1.
+     *
+     * <p>And Veil's own {@code simulated:end_sea} program is no longer fetched here. It was, and
+     * the two uniforms set on it -- {@code ShadowVolumeSize} and {@code StartY} -- are declared
+     * only by that program's fragment shader, which is part of the same parked shadow path. The
+     * render type draws {@code shaders/core/end_sea} instead, and nothing it declares was being
+     * set. So the sets were dead on both backends; the fetch was worse than dead on Vulkan, where
+     * Veil compiles no programs and the null check below it removed the sea from the picture
+     * entirely. They come back together with the shadow map, if they come back.
      */
     private static void renderLayers(final EndSeaPhysics physics, final Camera camera) {
         final Minecraft minecraft = Minecraft.getInstance();
-
-        final ShaderProgram shader = VeilRenderSystem.renderer().getShaderManager().getShader(SHADER);
-        if (shader == null) {
-            return;
-        }
 
         for (int i = 0; i < LAYER_COLORS.length; i++) {
             LAYER_COLORS[i] = LAYER_COLORS[i].lerp(LAYER_COLORS[i].normalize(), 1.0);
@@ -109,16 +105,6 @@ public class EndSeaRenderer {
         poseStack.translate(renderOrigin.x() - cameraPosition.x, 0.0, renderOrigin.z() - cameraPosition.z);
         poseStack.scale(EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS, 1.0f, EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS);
         poseStack.translate(0.0, physics.startY() - cameraPosition.y, 0.0);
-
-        final ShaderUniform volumeSize = shader.getUniform("ShadowVolumeSize");
-        if (volumeSize != null) {
-            volumeSize.setFloat(EndSeaShadowRenderer.SHADOW_VOLUME_RADIUS);
-        }
-
-        final ShaderUniform startY = shader.getUniform("StartY");
-        if (startY != null) {
-            startY.setFloat((float) physics.startY());
-        }
 
         final LocalPlayer player = minecraft.player;
         final float renderTime = player.tickCount + minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
