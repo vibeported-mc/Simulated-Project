@@ -128,6 +128,24 @@ public final class SimRenderTypes {
             .addAttribute(DefaultVertexFormat.NORMAL_SEMANTIC_NAME, GpuFormat.RGBA8_SNORM)
             .build();
 
+    /**
+     * What 1.21.1's {@code BLOCK} was: position, colour, texture, lightmap and a normal.
+     *
+     * <p>26.2's {@code DefaultVertexFormat.BLOCK} dropped the normal. The rope's renderer still
+     * writes one -- every {@code addVertex} in {@code LaunchedPlungerEntityRenderer} ends in
+     * {@code setNormal} -- and its shader still reads one, to mix the two directional lights. With
+     * the stock format those writes go nowhere, and the mismatch is invisible on OpenGL and fatal
+     * on Vulkan: {@code Shader expects input variables which are not being provided: [Normal]},
+     * and the whole pipeline fails to compile.
+     */
+    private static final VertexFormat ROPE_FORMAT = VertexFormat.builder(0)
+            .addAttribute(DefaultVertexFormat.POSITION_SEMANTIC_NAME, GpuFormat.RGB32_FLOAT)
+            .addAttribute(DefaultVertexFormat.COLOR_SEMANTIC_NAME, GpuFormat.RGBA8_UNORM)
+            .addAttribute(DefaultVertexFormat.UV0_SEMANTIC_NAME, GpuFormat.RG32_FLOAT)
+            .addAttribute(DefaultVertexFormat.UV2_SEMANTIC_NAME, GpuFormat.RG16_SINT)
+            .addAttribute(DefaultVertexFormat.NORMAL_SEMANTIC_NAME, GpuFormat.RGBA8_SNORM)
+            .build();
+
     private static final RenderType LOCK = RenderType.create(
             Simulated.MOD_ID + ":lock",
             VeilRenderBridge.createRenderType("simulated/lock", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP)
@@ -148,7 +166,7 @@ public final class SimRenderTypes {
 
     private static final RenderType ROPE = RenderType.create(
             Simulated.MOD_ID + ":rope",
-            VeilRenderBridge.createRenderType("simulated/rope", DefaultVertexFormat.BLOCK)
+            VeilRenderBridge.createRenderType("simulated/rope", ROPE_FORMAT)
                     .vertexShader(Simulated.path("core/rope/rope"))
                     .fragmentShader(Simulated.path("core/rope/rope"))
                     // The depth state 1.21.1 gave by default. See the class note.
