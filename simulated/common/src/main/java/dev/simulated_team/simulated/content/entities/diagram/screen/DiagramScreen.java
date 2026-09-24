@@ -492,7 +492,9 @@ public class DiagramScreen extends AbstractSimiScreen {
     }
 
     public static void draw(final SubLevel subLevel, final float partialTicks, final Quaternionf localOrientation, final Matrix4f projMatrix, final Matrix4f renderProjMatrix, final Vector3d cameraPos, final float inWidth, final float inHeight, final AdvancedFbo fbo, final AdvancedFbo outlineFbo, final AdvancedFbo finalFbo, final float paletteOffset, final float fadeScale, final int lineColor, final int lineShadowColor) {
-        fbo.bind(true);
+        // Not bound. Every draw below names this framebuffer -- the sub-level render through
+        // RenderSystem's output override and the render pass it opens, the post pipeline through
+        // the context -- and off OpenGL there is no binding to do anyway.
         // 26.2 is reversed-Z, so an empty depth buffer is 0 rather than 1. AdvancedFbo.clear()
         // still uses the old convention, under which nothing would pass GREATER_THAN_OR_EQUAL.
         // The populated path clears again inside the render pass; this covers the empty-chain one.

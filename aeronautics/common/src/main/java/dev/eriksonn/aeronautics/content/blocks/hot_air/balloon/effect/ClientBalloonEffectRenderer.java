@@ -44,6 +44,18 @@ public class ClientBalloonEffectRenderer {
         }
 
 
+        // The overlay draws into its own framebuffer, from inside the level render.
+        //
+        // On OpenGL that is a framebuffer switch mid-frame, which is what the API was built for.
+        // Off it there is no switch: drawing into another target means opening a render pass, and
+        // this event fires while one is already open -- `Close the existing render pass before
+        // creating a new one!`. The overlay has to be drawn somewhere a pass can be opened, which
+        // is not here, so it is a restructuring rather than a port.
+        if (!VeilGlDevice.isSupported()) {
+            freeFbo();
+            return;
+        }
+
         final Minecraft minecraft = Minecraft.getInstance();
         final ClientLevel level = minecraft.level;
         if (level == null) {
