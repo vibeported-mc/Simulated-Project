@@ -9,6 +9,8 @@
     "accessor.CreativeModeInventoryScreenSelectedTabAccessor",
     "accessor.KeyMappingsAccessor",
     "conditional_display_target.DisplayLinkScreenMixin",
+    "creative_tab_sections.AbstractContainerScreenMixin",
+    "creative_tab_sections.CreativeModeInventoryScreenAccessor",
     "creative_tab_sections.CreativeModeInventoryScreenMixin",
     "creative_tab_sections.ItemPickerMenuMixin",
     "creative_tab_sections.SpriteContentsMixin",

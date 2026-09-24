@@ -51,6 +51,21 @@ neoForge {
             programArgument 'porttest'
         }
 
+        // The same client on Minecraft's Vulkan backend, in its own game directory so a Vulkan
+        // run and an OpenGL one do not fight over one set of options and configs.
+        //
+        // --graphicsBackend alone is not enough: FML's early loading screen creates a GL context
+        // on the window before Minecraft's backend loop runs, so Vulkan cannot get GLFW_NO_API
+        // and PreferredGraphicsApi quietly falls back to OpenGL. The game then starts, plays and
+        // looks correct while not being on Vulkan at all. disableEarlyWindowForVulkan turns that
+        // screen off, and is wired as a dependency below because a run directory regenerates
+        // with it on.
+        clientVulkan {
+            client()
+            gameDirectory = project.file('runs/vulkan')
+            programArguments.addAll('--graphicsBackend', 'vulkan')
+        }
+
         clientAuth {
             client()
             gameDirectory = project.file('runs/client')
@@ -90,4 +105,32 @@ dependencies {
             }
         }
     }
+}
+
+// Turn off FML's early loading screen for the Vulkan run directory.
+//
+// It is the one setting that decides whether a "Vulkan" run is actually on Vulkan, and nothing
+// reports when it is wrong: FMLConfig reads earlyWindowControl from config/fml.toml only -- there
+// is no system property and no launch argument for it -- and a failed Vulkan device just falls
+// through to OpenGL.
+tasks.register('disableEarlyWindowForVulkan') {
+    description = "Disables FML's early loading screen so the Vulkan backend can start."
+
+    def configFile = project.file('runs/vulkan/config/fml.toml')
+    outputs.upToDateWhen { configFile.isFile() && configFile.text.contains('earlyWindowControl = false') }
+
+    doLast {
+        configFile.parentFile.mkdirs()
+        if (!configFile.isFile()) {
+            configFile.text = 'earlyWindowControl = false' + System.lineSeparator()
+        } else if (configFile.text =~ /(?m)^\s*earlyWindowControl\s*=/) {
+            configFile.text = configFile.text.replaceAll(/(?m)^(\s*earlyWindowControl\s*=\s*).*\$/, '\$1false')
+        } else {
+            configFile.text = 'earlyWindowControl = false' + System.lineSeparator() + configFile.text
+        }
+    }
+}
+
+tasks.matching { it.name == 'runClientVulkan' }.configureEach {
+    dependsOn('disableEarlyWindowForVulkan')
 }

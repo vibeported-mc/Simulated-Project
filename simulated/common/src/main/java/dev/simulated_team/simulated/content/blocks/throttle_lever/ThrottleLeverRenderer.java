@@ -165,9 +165,12 @@ public class ThrottleLeverRenderer
         ms.popPose();
     }
 
+    /** As Create's track outline uses, so the two look the same where they meet. */
+    private static final float LINE_WIDTH = 1.0f;
+
     /**
      * What {@code LevelRenderer.renderShape} used to do: one line per edge of the shape, each
-     * carrying the edge direction as its normal.
+     * carrying the edge direction as its normal and its width.
      */
     private static void renderShape(final VoxelShape shape, final PoseStack.Pose transform, final VertexConsumer vb,
                                     final float red, final float green, final float blue, final float alpha) {
@@ -181,12 +184,19 @@ public class ThrottleLeverRenderer
             yDiff /= length;
             zDiff /= length;
 
+            // The width goes on every vertex. 26.2 moved line width out of the GL state machine
+            // and into the vertex format -- RenderTypes.lines() draws with
+            // POSITION_COLOR_NORMAL_LINE_WIDTH -- and a vertex left without one is not drawn thin,
+            // it is rejected: `Missing elements in vertex`, thrown mid-frame, which took the client
+            // down the moment a throttle lever came into view.
             vb.addVertex(transform.pose(), (float) x1, (float) y1, (float) z1)
                     .setColor(red, green, blue, alpha)
-                    .setNormal(transform, xDiff, yDiff, zDiff);
+                    .setNormal(transform, xDiff, yDiff, zDiff)
+                    .setLineWidth(LINE_WIDTH);
             vb.addVertex(transform.pose(), (float) x2, (float) y2, (float) z2)
                     .setColor(red, green, blue, alpha)
-                    .setNormal(transform, xDiff, yDiff, zDiff);
+                    .setNormal(transform, xDiff, yDiff, zDiff)
+                    .setLineWidth(LINE_WIDTH);
         });
     }
 
