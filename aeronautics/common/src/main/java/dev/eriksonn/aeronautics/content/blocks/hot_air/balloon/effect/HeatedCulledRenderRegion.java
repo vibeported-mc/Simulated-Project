@@ -13,6 +13,8 @@ import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.util.LevelAccelerator;
 import net.minecraft.client.Minecraft;
 import foundry.veil.api.client.render.shader.program.ShaderProgram;
+import foundry.veil.api.client.render.VeilDraw;
+import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
 import foundry.veil.api.client.render.vertex.VertexArray;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
@@ -43,7 +45,14 @@ public class HeatedCulledRenderRegion implements NativeResource {
      * that bound it. {@code setDefaultUniforms} went with it, so the two matrices the shader
      * declares are set by name here -- there is no engine-side convention left to lean on.
      */
-    public void render(final ShaderProgram shader, final Matrix4f modelView, final Matrix4f projectionMatrix) {
+    /**
+     * <h2>26.2 note</h2>
+     *
+     * <p>Takes the target it draws into. It used to draw into whichever framebuffer was bound,
+     * which off OpenGL is nothing -- a target is named when the pass is opened, and a pass is
+     * what a draw is.
+     */
+    public void render(final AdvancedFbo target, final ShaderProgram shader, final Matrix4f modelView, final Matrix4f projectionMatrix) {
         if (!this.built) {
             this.build();
         }
@@ -74,10 +83,7 @@ public class HeatedCulledRenderRegion implements NativeResource {
         shader.getUniformSafe("ModelViewMat").setMatrix(modelViewMatrix);
         shader.getUniformSafe("ProjMat").setMatrix(projectionMatrix);
 
-        this.buffer.bind();
-        this.buffer.draw();
-
-        VertexArray.unbind();
+        VeilDraw.geometry(target, shader, this.buffer);
     }
 
     public void build() {

@@ -10,7 +10,11 @@ out vec4 fragColor;
 void main() {
     vec4 baseColor = texture(MainSampler, texCoord);
 
-    if (texture(DiffuseDepthSampler, texCoord).r > texture(MainDepthSampler, texCoord).r) {
+    // Less-than, not greater-than. 26.2 reverses the depth buffer: near is 1 and far is 0, so a
+    // smaller depth is farther away. This asks whether the overlay is behind what the world drew
+    // and leaves the pixel alone if it is. Written the other way round it skipped the effect
+    // exactly where the overlay was in front, which is the only place it should have applied.
+    if (texture(DiffuseDepthSampler, texCoord).r < texture(MainDepthSampler, texCoord).r) {
         fragColor = baseColor;
         return;
     }

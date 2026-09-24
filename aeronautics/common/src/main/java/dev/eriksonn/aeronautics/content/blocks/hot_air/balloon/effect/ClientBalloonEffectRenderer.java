@@ -43,16 +43,6 @@ public class ClientBalloonEffectRenderer {
             return;
         }
 
-        // The overlay is drawn into an AdvancedFbo, which is a raw OpenGL framebuffer object with
-        // no counterpart on another backend. Building one there does not fail politely: the colour
-        // attachment limit reads as zero, validation rejects the first buffer, and the throw lands
-        // in the middle of a frame and takes the client down with it.
-        //
-        // Comes off when Veil's framebuffers are rebuilt on GpuTexture.
-        if (!VeilGlDevice.isSupported()) {
-            freeFbo();
-            return;
-        }
 
         final Minecraft minecraft = Minecraft.getInstance();
         final ClientLevel level = minecraft.level;
@@ -93,22 +83,38 @@ public class ClientBalloonEffectRenderer {
         final ShaderProgram shader = VeilRenderSystem.setShader(SHADER_ID);
         if (shader == null) return;
 
-        overlayFbo.bind(false);
-        overlayFbo.clear(0.0f, 0.0f, 0.0f, 0.0f, GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
+
+        // Depth cleared to zero, which is *far* under 26.2's reversed depth buffer. The five-argument
+        // clear passes 1.0, because that is what an empty depth buffer meant on every version before
+        // this one -- and here 1.0 is nearest, so everything drawn into this framebuffer afterwards
+        // fails the depth test and the overlay comes out empty. That was true on OpenGL too.
+        overlayFbo.clear(0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT);
 
         // 26.2: RenderSystem.setShaderTexture is gone, and with it the two constants that named the
         // side and top textures here. The samplers this program reads are declared in
         // hot_air_overlay.json instead, which is how Veil binds a program's textures -- the same
         // mechanism levitite already used for its noise sampler.
-        GlStateManager._enableCull();
-        GlStateManager._depthMask(true);
-        GlStateManager._enableDepthTest();
+        // Off OpenGL this state belongs to the pipeline and is set when the pass is opened,
+        // and calling GlStateManager without a context reaches raw GL with no context behind
+        // it. So it is set here only where there is a state machine to set it in.
+        //
+        // Two of these have no counterpart in the pipeline, and the overlay differs because
+        // of it. Blaze3D culls back faces or nothing -- there is no front-face option -- so
+        // the depth this writes is the near surface of the balloon rather than the far one.
+        // And a pipeline carries a depth bias but Veil has no channel to ask for one, so the
+        // polygon offset that pushed the overlay in front of block faces is absent.
+        if (VeilGlDevice.isSupported()) {
+            GlStateManager._enableCull();
+            GlStateManager._depthMask(true);
+            GlStateManager._enableDepthTest();
 
-        GL30.glCullFace(GL11.GL_FRONT);
+            GL30.glCullFace(GL11.GL_FRONT);
 
-        // Polygon offset to be before blocks
-        GlStateManager._polygonOffset(-0.5F, -30.0F);
-        GlStateManager._enablePolygonOffset();
+            // Polygon offset to be before blocks
+            GlStateManager._polygonOffset(-0.5F, -30.0F);
+            GlStateManager._enablePolygonOffset();
+        }
 
         final float scrollAmount = (renderTick + partialTicks) / -20.0f;
 
@@ -146,15 +152,19 @@ public class ClientBalloonEffectRenderer {
             filledPercent = Mth.clamp(filledPercent, 0.0f, 1.0f);
             yCutoffUniform.setFloat((1.0f - filledPercent) * (balloon.getHeight() + 1.0f));
 
-            renderRegion.render(shader, modelViewMat, projMat);
+            renderRegion.render(overlayFbo, shader, modelViewMat, projMat);
         }
 
-        // Cleanup render state
-        GlStateManager._polygonOffset(0.0F, 0.0F);
-        GlStateManager._disablePolygonOffset();
-        GL30.glCullFace(GL11.GL_BACK);
+        // Cleanup render state. Nothing to undo off OpenGL, where none of it was set and
+        // where nothing stays bound past the pass that used it.
+        if (VeilGlDevice.isSupported()) {
+            GlStateManager._polygonOffset(0.0F, 0.0F);
+            GlStateManager._disablePolygonOffset();
+            GL30.glCullFace(GL11.GL_BACK);
+            AdvancedFbo.unbind();
+        }
+
         shader.getUniformSafe("ColorModulator").setVector(1.0f, 1.0f, 1.0f, 1.0f);
-        AdvancedFbo.unbind();
 
         applyHeatingToScreen();
     }
