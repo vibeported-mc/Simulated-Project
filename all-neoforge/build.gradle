@@ -76,7 +76,7 @@ neoForge {
             gameDirectory = project.file('runs/vulkan')
             programArguments.addAll('--graphicsBackend', 'vulkan')
             programArgument '--quickPlaySingleplayer'
-            programArgument 'New World'
+            programArgument 'normal'
         }
 
         // The same world and the same game directory as clientVulkanWorld, on OpenGL.
@@ -90,7 +90,7 @@ neoForge {
             gameDirectory = project.file('runs/vulkan')
             programArguments.addAll('--graphicsBackend', 'opengl')
             programArgument '--quickPlaySingleplayer'
-            programArgument 'New World'
+            programArgument 'normal'
         }
 
         clientAuth {
