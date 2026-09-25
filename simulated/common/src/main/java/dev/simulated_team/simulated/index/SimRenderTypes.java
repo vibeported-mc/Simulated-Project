@@ -121,8 +121,13 @@ public final class SimRenderTypes {
      */
     private static final VertexFormat SPRING_FORMAT = VertexFormat.builder(0)
             .addAttribute(DefaultVertexFormat.POSITION_SEMANTIC_NAME, GpuFormat.RGB32_FLOAT)
-            // "Stress" rather than "Color": the spring shader reads the colour channel as strain.
-            .addAttribute("Stress", GpuFormat.RGBA8_UNORM)
+            // Named Color even though the spring shader reads it as strain, because on 26.2 an
+            // attribute's name is its semantic on both sides. The pipeline matches the shader's
+            // inputs to this format by name, and the renderer writes this element by calling
+            // setColor -- so calling it "Stress" leaves the shader's "Color" unsatisfied. The
+            // pipeline is then built invalid and takes the game down on the first spring drawn,
+            // at setPipeline, with the reason only in an earlier log line.
+            .addAttribute(DefaultVertexFormat.COLOR_SEMANTIC_NAME, GpuFormat.RGBA8_UNORM)
             .addAttribute(DefaultVertexFormat.UV0_SEMANTIC_NAME, GpuFormat.RG32_FLOAT)
             .addAttribute(DefaultVertexFormat.UV2_SEMANTIC_NAME, GpuFormat.RG16_SINT)
             .addAttribute(DefaultVertexFormat.NORMAL_SEMANTIC_NAME, GpuFormat.RGBA8_SNORM)

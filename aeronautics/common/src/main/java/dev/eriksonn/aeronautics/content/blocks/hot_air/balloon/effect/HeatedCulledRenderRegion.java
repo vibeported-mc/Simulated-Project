@@ -1,6 +1,7 @@
 package dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.effect;
 
 import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.vertex.*;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.Balloon;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.balloon.graph.BalloonLayerData;
@@ -52,7 +53,7 @@ public class HeatedCulledRenderRegion implements NativeResource {
      * which off OpenGL is nothing -- a target is named when the pass is opened, and a pass is
      * what a draw is.
      */
-    public void render(final AdvancedFbo target, final ShaderProgram shader, final Matrix4f modelView, final Matrix4f projectionMatrix) {
+    public void render(final AdvancedFbo target, final ShaderProgram shader, final DepthStencilState depthState, final net.minecraft.client.Camera camera, final Matrix4f modelView, final Matrix4f projectionMatrix) {
         if (!this.built) {
             this.build();
         }
@@ -73,7 +74,24 @@ public class HeatedCulledRenderRegion implements NativeResource {
             globalOrientation.set(renderPose.orientation());
         }
 
-        final Vec3 relativePos = globalOrigin.subtract(client.gameRenderer.mainCamera().position());
+        // The camera this frame's geometry was actually rasterised from.
+        //
+        // Not the one the level-stage event hands over, and not Minecraft's current one -- they
+        // are the same object and it is the wrong one. 26.2 extracts a frame's render state and
+        // draws from that, so the live camera has already moved on; Veil's NeoForge platform has
+        // the frame's cameraRenderState in hand when it fires the event and passes mainCamera()
+        // anyway.
+        //
+        // It matters here because this volume's depth is compared against the world's in
+        // soft_light. Position it from a camera the world was not drawn with and the two depths
+        // disagree by exactly how far the camera travelled between them -- nothing standing
+        // still, more the faster you move -- so the comparison flips across a band and the effect
+        // is cut away along a hard edge that drifts while walking and settles when you stop.
+        final Vec3 framePos = Minecraft.getInstance()
+                .gameRenderer
+                .gameRenderState().levelRenderState.cameraRenderState.pos;
+
+        final Vec3 relativePos = globalOrigin.subtract(framePos);
 
         final Matrix4f modelViewMatrix = new Matrix4f(modelView)
                 .setTranslation(0.0f, 0.0f, 0.0f)
@@ -83,7 +101,7 @@ public class HeatedCulledRenderRegion implements NativeResource {
         shader.getUniformSafe("ModelViewMat").setMatrix(modelViewMatrix);
         shader.getUniformSafe("ProjMat").setMatrix(projectionMatrix);
 
-        VeilDraw.geometry(target, shader, this.buffer);
+        VeilDraw.geometry(target, shader, this.buffer, depthState);
     }
 
     public void build() {

@@ -52,13 +52,23 @@ public final class AeroRenderTypes {
      * finds it, so the first levitite drawn threw "Pipeline contains invalid shader program" and took
      * the game down. Drawing plain is the honest failure. See AERONAUTICS-26.2-OPEN-QUESTIONS.md.
      */
-    private static final Identifier LEVITITE_SHADER = Identifier.withDefaultNamespace("core/block");
+    private static final Identifier LEVITITE_SHADER = Aeronautics.path("core/levitite");
+
+    /** The noise the shimmer is sampled from; blurred, as its mcmeta asks. */
+    private static final Identifier NOISE = Aeronautics.path("textures/special/noise_composed.png");
 
     private static final RenderType LEVITITE = RenderType.create(
             Aeronautics.MOD_ID + ":levitite",
             VeilRenderBridge.createRenderType("aeronautics/levitite", DefaultVertexFormat.BLOCK)
+                    // Terrain, not block: levitite is registered as a chunk layer, so its
+                    // vertices are section-relative and its shader needs ChunkPosition to put
+                    // them back in the world. The snippet is also what declares Globals, which
+                    // carries the game time the shimmer moves with -- an undeclared bind group
+                    // draws nothing and says nothing about it.
+                    .snippet(net.minecraft.client.renderer.RenderPipelines.TERRAIN_SNIPPET)
                     .vertexShader(LEVITITE_SHADER)
                     .fragmentShader(LEVITITE_SHADER)
+                    .texture("Noise", NOISE)
                     .snippet(VeilRenderPipelines.translucentBlend())
                     // The depth state 1.21.1 got by default and 26.2 does not give at all.
                     // See the note on SimRenderTypes.

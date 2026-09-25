@@ -66,6 +66,33 @@ neoForge {
             programArguments.addAll('--graphicsBackend', 'vulkan')
         }
 
+        // The Vulkan client, straight into the saved world rather than the title screen.
+        //
+        // The renderer faults worth looking at are all in a level, and several of them only show
+        // while the camera is moving, so clicking through the menus by hand is the slow part of
+        // every attempt to reproduce one.
+        clientVulkanWorld {
+            client()
+            gameDirectory = project.file('runs/vulkan')
+            programArguments.addAll('--graphicsBackend', 'vulkan')
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'New World'
+        }
+
+        // The same world and the same game directory as clientVulkanWorld, on OpenGL.
+        //
+        // Deliberately not its own directory, unlike the pair above: comparing a renderer fault
+        // between the two backends means comparing them on the same build, in the same place,
+        // from the same angle, and a second world would be none of those. The two cannot run at
+        // once over one directory, which is the price.
+        clientOpenGlWorld {
+            client()
+            gameDirectory = project.file('runs/vulkan')
+            programArguments.addAll('--graphicsBackend', 'opengl')
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'New World'
+        }
+
         clientAuth {
             client()
             gameDirectory = project.file('runs/client')
@@ -131,6 +158,6 @@ tasks.register('disableEarlyWindowForVulkan') {
     }
 }
 
-tasks.matching { it.name == 'runClientVulkan' }.configureEach {
+tasks.matching { it.name in ['runClientVulkan', 'runClientVulkanWorld'] }.configureEach {
     dependsOn('disableEarlyWindowForVulkan')
 }

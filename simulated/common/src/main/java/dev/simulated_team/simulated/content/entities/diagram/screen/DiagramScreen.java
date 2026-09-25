@@ -25,6 +25,7 @@ import dev.simulated_team.simulated.util.SimpleSubLevelGroupRenderer;
 import foundry.veil.api.client.render.VeilLevelPerspectiveRenderer;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.framebuffer.AdvancedFbo;
+import foundry.veil.api.client.render.framebuffer.FramebufferReadback;
 import foundry.veil.api.client.render.post.PostPipeline;
 import foundry.veil.api.client.render.post.PostProcessingManager;
 import foundry.veil.api.network.VeilPacketManager;
@@ -354,7 +355,17 @@ public class DiagramScreen extends AbstractSimiScreen {
         final int padding = 10;
         final int greebles = 8;
 
-        this.finalFbo.bindRead();
+        // Read once, here, rather than a rectangle at a time inside the loop.
+        //
+        // bindRead() hands out the framebuffer's OpenGL name and there is none off that
+        // backend, so this threw straight out of init() -- which is why the diagram opened
+        // with no buttons at all on Vulkan. They are added further down this method and it
+        // never got there. Nothing reported it either: the throw surfaced as a failed
+        // network payload, several frames away from the screen it broke.
+        //
+        // A null reading means no pixels to test against, so nothing is known to be occupied
+        // and the greebles fall back on the reserved boxes above.
+        final int[] pixels = FramebufferReadback.readColor(this.finalFbo, 0);
 
         for (int i = 0; i < greebles; i++) {
             final Identifier greebleID = this.randomGreeble(random);
@@ -377,7 +388,7 @@ public class DiagramScreen extends AbstractSimiScreen {
                 }
             }
 
-            if (intersects || this.aabbInFramebuffer(box)) {
+            if (intersects || this.aabbDrawnOver(pixels, box)) {
                 continue;
             }
 
@@ -385,65 +396,47 @@ public class DiagramScreen extends AbstractSimiScreen {
             this.addRenderableOnly(new GreebleRenderable(x + diagramX, y + diagramY, greeble.width(), greeble.height(), greeble.texture(), slice));
         }
 
-        AdvancedFbo.unbind();
     }
 
     /**
      * @return whether anything has been drawn in the given rectangle of the diagram
      *
      * <h2>26.2 note</h2>
-     * <p>The rectangle is clamped to the framebuffer before it is read. It was not, and the read
-     * origin is {@code minY - height}, which goes negative for any box in the upper part of the
-     * sheet. Reading outside the attachment is undefined, and the driver's answer here was to take
-     * the process down: {@code EXCEPTION_ACCESS_VIOLATION} inside {@code nvoglv64.dll}, with
-     * {@code glReadPixels} at the top of the Java frames. Greebles are placed at random positions,
-     * so it only crashed on the openings that happened to roll a box near the top edge.
+     * <p>Tests pixels already read back rather than asking the driver for the rectangle. The call
+     * this replaces was {@code glReadPixels} against a bound framebuffer, which does not exist off
+     * OpenGL, and it was dangerous on it: the read origin is {@code minY - height}, which goes
+     * negative for any box in the upper part of the sheet, and reading outside the attachment took
+     * the process down inside the driver. Greebles are placed at random, so that only happened on
+     * the openings that rolled a box near the top edge. Indexing an array cannot do either.
+     *
+     * @param pixels the whole attachment as packed ARGB, or <code>null</code> if it could not be read
      */
-    private boolean aabbInFramebuffer(final AABB aabb) {
-        final int minX = (int) aabb.minX;
-        final int minY = (int) (DIAGRAM_TEXTURE.height - aabb.minY);
-        final int maxX = (int) aabb.maxX;
-        final int maxY = (int) (DIAGRAM_TEXTURE.height - aabb.maxY);
+    private boolean aabbDrawnOver(final int @Nullable [] pixels, final AABB aabb) {
+        if (pixels == null) {
+            return false;
+        }
 
-        final int x0 = Math.max(0, Math.min(minX, maxX));
+        final int width = DIAGRAM_TEXTURE.width;
+        final int height = DIAGRAM_TEXTURE.height;
+
+        // The sheet is addressed from the top and the attachment from the bottom.
+        final int minY = height - (int) aabb.minY;
+        final int maxY = height - (int) aabb.maxY;
+
+        final int x0 = Math.max(0, Math.min((int) aabb.minX, (int) aabb.maxX));
         final int y0 = Math.max(0, Math.min(minY, maxY));
-        final int x1 = Math.min(DIAGRAM_TEXTURE.width, Math.max(minX, maxX));
-        final int y1 = Math.min(DIAGRAM_TEXTURE.height, Math.max(minY, maxY));
+        final int x1 = Math.min(width, Math.max((int) aabb.minX, (int) aabb.maxX));
+        final int y1 = Math.min(height, Math.max(minY, maxY));
 
-        final int width = x1 - x0;
-        final int height = y1 - y0;
-
-        if (width <= 0 || height <= 0) {
-            return false;
-        }
-
-        final int length = width * height;
-
-        // Say how the rows are packed before reading them. This state is global and whatever drew
-        // last may have left a row length or an alignment set; glReadPixels then writes more than
-        // the four bytes a pixel this buffer is sized for and runs off the end of it. That is not an
-        // exception -- it is a write into memory the driver does not own, which Windows reports as
-        // EXCEPTION_ACCESS_VIOLATION inside nvoglv64.dll with the whole process gone. Clamping the
-        // rectangle, which is what the last go at this fixed, does not help: the coordinates were
-        // only half of it.
-        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-        glPixelStorei(GL_PACK_SKIP_ROWS, 0);
-        glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
-
-        // A direct buffer of exactly the size the read is told to produce, rather than a Java array
-        // the binding has to size on our behalf.
-        final ByteBuffer buffer = MemoryUtil.memAlloc(length * 4);
-        try {
-            glReadPixels(x0, y0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-            for (int i = 0; i < length; i++) {
-                if (buffer.get(i * 4 + 3) != 0) return true;
+        for (int y = y0; y < y1; y++) {
+            for (int x = x0; x < x1; x++) {
+                if ((pixels[y * width + x] >>> 24) != 0) {
+                    return true;
+                }
             }
-            return false;
-        } finally {
-            MemoryUtil.memFree(buffer);
         }
+
+        return false;
     }
 
     private void renderContents(final SubLevel subLevel, final float partialTicks) {

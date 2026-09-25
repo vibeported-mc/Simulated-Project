@@ -34,7 +34,7 @@ public class AeronauticsClient {
                                                            deltaTracker,
                                                            camera,
                                                            frustum) -> {
-            ClientBalloonEffectRenderer.onRenderLevelStage(stage, frustumMatrix, projectionMatrix, renderTick);
+            ClientBalloonEffectRenderer.onRenderLevelStage(stage, frustumMatrix, projectionMatrix, renderTick, camera);
         });
 
         VeilEventPlatform.INSTANCE.onVeilRegisterBlockLayers(registry -> {
